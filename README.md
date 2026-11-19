@@ -186,6 +186,18 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - Regional patrols now mix distinct combat roles: durable **Vanguards**, mobile **Hunters**, fast-attacking **Assassins**, plus additional Raider/Sentinel variants when patrol size is increased. Roles have different health, movement, damage, attack cadence and visual tint.
 
 
+
+## Boss-specific legendary loot
+
+- Each of the four regional dungeon bosses and regional champions now has a dedicated legendary drop identity when the legendary rarity roll succeeds:
+  - Ashen Warden: **Ashen Warden's Cinderfang** — Meteor Flame.
+  - Rootbound Colossus: **Rootbound Colossus Heart** — Wind Vortex.
+  - Raijin's Broken Avatar: **Raijin's Tempest Core** — Thunderstorm.
+  - Abyssal Guardian: **Abyssal Guardian's Deepwater Seal** — Water Prison.
+- These relics use boss-specific equipment slots and stronger secondary-stat bonuses.
+- Corrected rarity roll bands so increasing a boss's legendary chance no longer unintentionally removes the Epic rarity band. Epic/Rare/Uncommon band widths remain consistent as the legendary chance changes.
+- This is still a prototype loot implementation; boss drop rates and item balance require playtesting.
+
 ## Village story quest chain
 
 - A new original **Mission Officer** NPC stands outside the Village Mission Office. Entering the interaction area opens the mission board; leaving the area closes it.
