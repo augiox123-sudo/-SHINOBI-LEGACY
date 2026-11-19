@@ -91,6 +91,20 @@ namespace ShinobiLegacy.Combat
             EmitBurst(to, new Color(0.45f, 0.85f, 1f), 18, 0.45f, 3f, 0.3f);
         }
 
+        public void PlayWater(Vector3 origin, Vector3 direction, float range)
+        {
+            Color water = new Color(0.12f, 0.62f, 1f, 1f);
+            EmitCone(origin, direction, water, 90, range, 13f, 0.62f, 9f);
+            EmitRing(origin + direction.normalized * 3f + Vector3.up * 0.08f, 2.2f, water);
+        }
+
+        public void PlayWind(Vector3 center, Vector3 direction)
+        {
+            Color wind = new Color(0.72f, 0.92f, 1f, 1f);
+            EmitBurst(center, wind, 75, 2.4f, 8f, 0.55f);
+            EmitRing(center + Vector3.up * 0.08f, 3.1f, wind);
+        }
+
         private static void EmitCone(Vector3 origin, Vector3 direction, Color color, int count,
             float range, float angle, float size, float speed)
         {
