@@ -31,6 +31,7 @@ namespace ShinobiLegacy.Enemies
         private float nextSpecialTime;
         private Color baseColor;
         private LineRenderer attackTelegraph;
+        private Material telegraphMaterial;
         private const int TelegraphSegments = 48;
 
         public void SetTarget(Transform value) => target = value;
@@ -54,6 +55,11 @@ namespace ShinobiLegacy.Enemies
         private void OnDestroy()
         {
             if (health != null) health.Died -= OnDied;
+            if (telegraphMaterial != null)
+            {
+                if (Application.isPlaying) Destroy(telegraphMaterial);
+                else DestroyImmediate(telegraphMaterial);
+            }
         }
 
         private void Update()
@@ -181,7 +187,14 @@ namespace ShinobiLegacy.Enemies
             attackTelegraph.startWidth = 0.12f;
             attackTelegraph.endWidth = 0.12f;
             attackTelegraph.numCapVertices = 2;
-            attackTelegraph.material = new Material(Shader.Find("Sprites/Default"));
+            Shader telegraphShader = Shader.Find("Sprites/Default");
+            if (telegraphShader == null)
+            {
+                attackTelegraph.enabled = false;
+                return;
+            }
+            telegraphMaterial = new Material(telegraphShader);
+            attackTelegraph.material = telegraphMaterial;
             attackTelegraph.startColor = new Color(1f, 0.28f, 0.08f, 0.9f);
             attackTelegraph.endColor = attackTelegraph.startColor;
             attackTelegraph.enabled = false;
