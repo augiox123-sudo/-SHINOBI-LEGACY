@@ -21,6 +21,7 @@ namespace ShinobiLegacy.Enemies
         [SerializeField] private float specialRange = 7.5f;
 
         private CharacterController controller;
+        private CombatAnimationBridge animationBridge;
         private CombatantHealth health;
         private float nextSlamTime;
         private float windupRemaining;
@@ -50,6 +51,8 @@ namespace ShinobiLegacy.Enemies
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
+            animationBridge = GetComponent<CombatAnimationBridge>();
+            if (animationBridge == null) animationBridge = gameObject.AddComponent<CombatAnimationBridge>();
             health = GetComponent<CombatantHealth>();
             if (bodyRenderer == null) bodyRenderer = GetComponentInChildren<Renderer>();
             if (bodyRenderer != null)
@@ -167,6 +170,7 @@ namespace ShinobiLegacy.Enemies
                 return;
             }
 
+            if (animationBridge != null) animationBridge.SetMoveSpeed(distance > slamRange ? moveSpeed : 0f);
             if (distance > slamRange)
             {
                 Vector3 direction = offset.normalized;
@@ -196,6 +200,7 @@ namespace ShinobiLegacy.Enemies
             flatTarget.y = transform.position.y;
             if (Vector3.Distance(transform.position, flatTarget) <= slamRange + 0.8f)
             {
+                if (animationBridge != null) animationBridge.TriggerAttack();
                 CombatantHealth playerHealth = target.GetComponent<CombatantHealth>();
                 if (playerHealth != null && !playerHealth.IsDead) playerHealth.TakeDamage(slamDamage);
             }
@@ -221,6 +226,7 @@ namespace ShinobiLegacy.Enemies
                 return;
             }
 
+            if (animationBridge != null) animationBridge.TriggerAbility();
             float damage = slamDamage * (bossProfile == 0 ? 1.55f : 1.2f);
             targetHealth.TakeDamage(damage);
             if (bossProfile == 2) targetHealth.ApplyStun(1.15f);
