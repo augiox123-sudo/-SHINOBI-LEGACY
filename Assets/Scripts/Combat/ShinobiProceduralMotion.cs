@@ -92,13 +92,13 @@ namespace ShinobiLegacy.Combat
 
             float stride = Mathf.Sin(cycle) * runSwingAngle * moveSpeed;
             float armCounter = -stride;
-            if (leftLeg != null) leftLeg.localRotation = leftLegBase * Quaternion.Euler(stride, 0f, 0f);
-            if (rightLeg != null) rightLeg.localRotation = rightLegBase * Quaternion.Euler(-stride, 0f, 0f);
-            if (leftArm != null) leftArm.localRotation = leftArmBase * Quaternion.Euler(armCounter + heavyWeight * -72f, 0f, 0f);
-
             float attackWeight = attackTimer > 0f ? Mathf.Sin((1f - attackTimer / 0.42f) * Mathf.PI) : 0f;
             float abilityWeight = abilityTimer > 0f ? Mathf.Sin((1f - abilityTimer / 0.42f) * Mathf.PI) : 0f;
             float heavyWeight = heavyAttackTimer > 0f ? Mathf.Sin((1f - heavyAttackTimer / 0.62f) * Mathf.PI) : 0f;
+
+            if (leftLeg != null) leftLeg.localRotation = leftLegBase * Quaternion.Euler(stride, 0f, 0f);
+            if (rightLeg != null) rightLeg.localRotation = rightLegBase * Quaternion.Euler(-stride, 0f, 0f);
+            if (leftArm != null) leftArm.localRotation = leftArmBase * Quaternion.Euler(armCounter + heavyWeight * -72f, 0f, 0f);
             float rightArmAngle = stride + attackWeight * -105f + abilityWeight * -55f + heavyWeight * -48f;
             if (rightArm != null) rightArm.localRotation = rightArmBase * Quaternion.Euler(rightArmAngle, 0f, 0f);
 
