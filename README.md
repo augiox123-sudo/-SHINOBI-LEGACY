@@ -255,3 +255,18 @@ The mobile target-lock system can cycle nearby enemies and display the selected 
 ## Mobile rendering and effect cleanup
 
 Enemy hit flashes now write both URP Lit (`_BaseColor`) and legacy (`_Color`) shader properties through `MaterialPropertyBlock`, preserving each renderer's original supported colors. Boss attack telegraphs keep ownership of their generated material and release it when the boss object is destroyed; telegraphs also fail safely if the expected shader is unavailable.
+
+## Android first-test build
+
+The repository now includes an automated first-test scene and APK workflow for Unity 2022.3.62f1.
+
+1. Install **Unity 2022.3.62f1** through Unity Hub with **Android Build Support**, including Android SDK & NDK Tools and OpenJDK.
+2. Open this repository as a Unity project and wait for package import and script compilation to finish.
+3. In the Unity Editor, run **Tools → Shinobi Legacy → Prepare Android First Test**. This generates the Safe Village and Prototype Arena scenes and places Safe Village first in Build Settings.
+4. Switch the active build platform to **Android** in File → Build Settings if Unity requests it, then wait for the platform switch/import to finish.
+5. Run **Tools → Shinobi Legacy → Build Android First Test APK**.
+6. The development APK is written to `Builds/Android/SHINOBI_LEGACY_FirstTest.apk`.
+
+The first-test player is configured for landscape, ARM64, Android API 26+, Gamma color space, IL2CPP and a conservative mobile 30 FPS profile with shadows disabled. This is a development test build, not a store release.
+
+**Build limitation:** the repository changes can be prepared here, but an actual APK cannot be claimed until Unity's Android toolchain compiles the project successfully. Check the Unity Console and Editor.log for any compile or build errors. The APK must then be installed and tested on a physical Android device; stable 30 FPS is a target, not yet a measured result.
