@@ -485,3 +485,10 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Enemy melee attacks and Stone Guardian slam/phase-two damaging specials apply a stronger, brief push away from the attacker to the player.
 - Knockback is handled by a small `CharacterController` component in `LateUpdate`, after normal movement/AI updates, with capped strength and duration. It does not apply to defeated targets or the Verdant boss heal.
 - Existing procedural hit animation and enemy hit flash remain in place. The knockback is a first-pass gameplay reaction; collision feel, attack interruption and device behavior still need Unity Play Mode and Android testing.
+
+
+## Enemy attack windup animation
+
+- Enemy AI now signals a visible procedural windup when a melee attack begins. Hunter and Skirmisher use a shorter arm preparation; Brute uses a longer, heavier two-arm preparation and torso lean.
+- The windup is cancelled when the enemy is stunned, loses its target, or the target leaves detection range. The attack still rechecks target life and distance at resolution, so the animation does not guarantee a hit.
+- This is a lightweight transform-based fallback for the current blockout rigs. Authored skeletal animation clips and in-game timing validation remain future work.
