@@ -173,6 +173,7 @@ namespace ShinobiLegacy.Enemies
             health.SetMaxHealth((650f + currentWave * 180f + level * 45f) * scale);
             BossCombatAI bossAI = boss.AddComponent<BossCombatAI>();
             bossAI.SetTarget(player);
+            bossAI.ConfigureProfile((int)selectedTheme);
 
             EnemyRewardDrop rewards = boss.AddComponent<EnemyRewardDrop>();
             rewards.Configure(player.GetComponent<PlayerProgression>(),
