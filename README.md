@@ -572,3 +572,10 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - The three basic melee combo steps now send their strike index through the animation bridge to the procedural character rig.
 - Strike one uses a compact right-arm diagonal cut; strike two adds a counter-swing with the left arm and opposite torso twist; strike three uses a wider two-arm finisher pose with stronger torso rotation.
 - The combo still uses the same damage, cooldown and hit logic. These are transform-driven placeholder poses, not authored skeletal clips; their readability and timing must be checked in Unity Play Mode and on Android.
+
+
+## Local hit-stop feedback
+
+- Procedural character rigs now briefly hold their current visual pose when struck: 0.04 seconds for a normal hit and 0.075 seconds for a heavy hit.
+- The pause is local to the affected character's visual motion component. It does not change Unity's global time scale, so player input, enemy AI, cooldowns and other combatants continue running.
+- The short hold is followed by the existing light/heavy recoil pose. This is a lightweight hit-confirmation layer; exact feel, animation overlap and Android frame pacing still need Unity Play Mode and device testing.
