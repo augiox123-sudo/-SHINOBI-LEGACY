@@ -131,3 +131,11 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - Ability ranks, use counts, and legendary affixes on carried/equipped gear are included in the local save.
 - The combat HUD displays skill rank and the active legendary modifier.
 - These are first-pass gameplay transformations using the current combat hit logic. Dedicated animated chakra/fire VFX, unique animation sets, further skills and multi-item legendary synergy are planned for the next combat-art pass.
+
+
+### Elemental status effects and legendary synergy
+
+- Legendary fire transformations now apply a 3-second burn (damage over time) to each target hit. A target is counted once per cast even when it overlaps multiple hit zones or parallel fire lanes.
+- Chakra Tempest briefly stuns enemies for 0.8 seconds. Stun interrupts regular enemy movement/attacks and can cancel a boss wind-up.
+- Equipping at least two legendary items with ability affixes activates Legendary Synergy, increasing technique damage by 10%. The combat HUD reports when this bonus is active.
+- These effects are implemented in gameplay logic; visual burn, stun, flame trails, impact bursts and chakra shockwave effects still need dedicated VFX and animation work.
