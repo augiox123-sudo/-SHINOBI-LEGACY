@@ -18,6 +18,24 @@ namespace ShinobiLegacy.Items
             }
         }
 
+        public InventoryItem[] GetEquippedItems()
+        {
+            List<InventoryItem> snapshot = new List<InventoryItem>();
+            foreach (InventoryItem item in equipped.Values)
+                if (item != null) snapshot.Add(item);
+            return snapshot.ToArray();
+        }
+
+        public void RestoreEquipment(IEnumerable<InventoryItem> restoredItems)
+        {
+            equipped.Clear();
+            if (restoredItems != null)
+                foreach (InventoryItem item in restoredItems)
+                    if (item != null && !string.IsNullOrEmpty(item.slot))
+                        Equip(item);
+            EquipmentChanged?.Invoke();
+        }
+
         public InventoryItem GetEquipped(string slot)
         {
             InventoryItem item;
