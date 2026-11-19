@@ -125,6 +125,7 @@ namespace ShinobiLegacy.Editor
             playerController.height = 2f;
             playerController.radius = 0.42f;
             player.AddComponent<PlayerMotor>();
+            player.AddComponent<ShinobiLegacy.Performance.MobilePerformanceBootstrap>();
             player.AddComponent<PlayerProgression>();
             player.AddComponent<WorldRegionProgression>();
             player.AddComponent<RegionalBountySystem>();
