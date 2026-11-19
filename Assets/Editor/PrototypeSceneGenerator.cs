@@ -193,7 +193,7 @@ namespace ShinobiLegacy.Editor
             statusRect.anchorMax = new Vector2(0f, 1f);
             statusRect.pivot = new Vector2(0f, 1f);
             statusRect.anchoredPosition = new Vector2(35f, -112f);
-            statusRect.sizeDelta = new Vector2(650f, 36f);
+            statusRect.sizeDelta = new Vector2(760f, 58f);
             GameObject progressionObject = new GameObject("Progression Status", typeof(RectTransform), typeof(Text));
             progressionObject.transform.SetParent(canvasObject.transform, false);
             RectTransform progressionRect = progressionObject.GetComponent<RectTransform>();
@@ -209,7 +209,9 @@ namespace ShinobiLegacy.Editor
             progressionText.raycastTarget = false;
             Text statusText = statusObject.GetComponent<Text>();
             statusText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            statusText.fontSize = 20;
+            statusText.fontSize = 18;
+            statusText.horizontalOverflow = HorizontalWrapMode.Wrap;
+            statusText.verticalOverflow = VerticalWrapMode.Overflow;
             statusText.color = Color.white;
             statusText.text = "SKILLS READY";
             statusText.raycastTarget = false;
