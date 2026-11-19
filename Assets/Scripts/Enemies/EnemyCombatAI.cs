@@ -20,9 +20,13 @@ namespace ShinobiLegacy.Enemies
         private CombatantHealth health;
         private float nextAttackTime;
         private Renderer[] visuals;
-        private Color[] originalVisualColors;
+        private Color[] originalBaseColors;
+        private Color[] originalLegacyColors;
+        private bool[] supportsBaseColor;
+        private bool[] supportsLegacyColor;
         private MaterialPropertyBlock hitBlock;
         private Coroutine hitFlashRoutine;
+        private static readonly int BaseColorProperty = Shader.PropertyToID("_BaseColor");
         private static readonly int ColorProperty = Shader.PropertyToID("_Color");
 
         public void SetTarget(Transform value) => target = value;
@@ -40,9 +44,18 @@ namespace ShinobiLegacy.Enemies
             controller = GetComponent<CharacterController>();
             health = GetComponent<CombatantHealth>();
             visuals = GetComponentsInChildren<Renderer>();
-            originalVisualColors = new Color[visuals.Length];
+            originalBaseColors = new Color[visuals.Length];
+            originalLegacyColors = new Color[visuals.Length];
+            supportsBaseColor = new bool[visuals.Length];
+            supportsLegacyColor = new bool[visuals.Length];
             for (int i = 0; i < visuals.Length; i++)
-                originalVisualColors[i] = visuals[i] != null && visuals[i].sharedMaterial != null ? visuals[i].sharedMaterial.color : Color.white;
+            {
+                Material material = visuals[i] != null ? visuals[i].sharedMaterial : null;
+                supportsBaseColor[i] = material != null && material.HasProperty(BaseColorProperty);
+                supportsLegacyColor[i] = material != null && material.HasProperty(ColorProperty);
+                originalBaseColors[i] = supportsBaseColor[i] ? material.GetColor(BaseColorProperty) : Color.white;
+                originalLegacyColors[i] = supportsLegacyColor[i] ? material.GetColor(ColorProperty) : Color.white;
+            }
             hitBlock = new MaterialPropertyBlock();
             health.Died += OnDied;
             health.HealthChanged += OnHealthChanged;
@@ -110,7 +123,8 @@ namespace ShinobiLegacy.Enemies
             {
                 if (visuals[i] == null) continue;
                 visuals[i].GetPropertyBlock(hitBlock);
-                hitBlock.SetColor(ColorProperty, originalVisualColors[i]);
+                if (supportsBaseColor[i]) hitBlock.SetColor(BaseColorProperty, originalBaseColors[i]);
+                if (supportsLegacyColor[i]) hitBlock.SetColor(ColorProperty, originalLegacyColors[i]);
                 visuals[i].SetPropertyBlock(hitBlock);
             }
         }
@@ -121,7 +135,9 @@ namespace ShinobiLegacy.Enemies
             {
                 if (visual == null) continue;
                 visual.GetPropertyBlock(hitBlock);
-                hitBlock.SetColor(ColorProperty, color);
+                int index = System.Array.IndexOf(visuals, visual);
+                if (index >= 0 && supportsBaseColor[index]) hitBlock.SetColor(BaseColorProperty, color);
+                if (index >= 0 && supportsLegacyColor[index]) hitBlock.SetColor(ColorProperty, color);
                 visual.SetPropertyBlock(hitBlock);
             }
         }
