@@ -13,6 +13,9 @@ namespace ShinobiLegacy.Performance
             Application.targetFrameRate = 30;
             QualitySettings.vSyncCount = 0;
 
+            if (Debug.isDebugBuild && GetComponent<MobilePerformanceOverlay>() == null)
+                gameObject.AddComponent<MobilePerformanceOverlay>();
+
             if (!Application.isMobilePlatform) return;
 
             QualitySettings.antiAliasing = 0;
