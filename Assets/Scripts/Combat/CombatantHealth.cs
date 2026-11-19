@@ -52,6 +52,7 @@ namespace ShinobiLegacy.Combat
         public void ReviveAtFullHealth(float invulnerabilitySeconds = 3f)
         {
             IsDead = false;
+            if (animationBridge != null) animationBridge.SetDead(false);
             currentHealth = maxHealth;
             invulnerableUntil = Time.time + Mathf.Max(0f, invulnerabilitySeconds);
             HealthChanged?.Invoke(currentHealth, maxHealth);
