@@ -231,6 +231,26 @@ namespace ShinobiLegacy.Editor
             ProgressionHud progressionHud = canvasObject.AddComponent<ProgressionHud>();
             progressionHud.Configure(progression, inventory, progressionText, equipment);
 
+            GameObject dungeonStatusObject = new GameObject("Dungeon Status", typeof(RectTransform), typeof(Text));
+            dungeonStatusObject.transform.SetParent(canvasObject.transform, false);
+            RectTransform dungeonStatusRect = dungeonStatusObject.GetComponent<RectTransform>();
+            dungeonStatusRect.anchorMin = new Vector2(0.5f, 1f);
+            dungeonStatusRect.anchorMax = new Vector2(0.5f, 1f);
+            dungeonStatusRect.pivot = new Vector2(0.5f, 1f);
+            dungeonStatusRect.anchoredPosition = new Vector2(0f, -118f);
+            dungeonStatusRect.sizeDelta = new Vector2(600f, 32f);
+            Text dungeonStatusText = dungeonStatusObject.GetComponent<Text>();
+            dungeonStatusText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            dungeonStatusText.fontSize = 20;
+            dungeonStatusText.alignment = TextAnchor.MiddleCenter;
+            dungeonStatusText.color = new Color(0.55f, 0.9f, 1f);
+            dungeonStatusText.raycastTarget = false;
+
+            DungeonWaveController dungeon = canvasObject.AddComponent<DungeonWaveController>();
+            dungeon.Configure(player.transform, dungeonStatusText, 3, 3);
+            CreateActionButton(canvasObject.transform, "START DUNGEON", new Vector2(-180f, 485f),
+                new Vector2(180f, 76f), () => dungeon.StartDungeon());
+
             if (!AssetDatabase.IsValidFolder("Assets/Scenes")) AssetDatabase.CreateFolder("Assets", "Scenes");
             EditorSceneManager.MarkSceneDirty(scene);
             const string scenePath = "Assets/Scenes/PrototypeArena.unity";
