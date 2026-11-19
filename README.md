@@ -536,3 +536,11 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - The final hit check performs a non-allocating raycast toward that collider point. The boss's own colliders are ignored, while a nearer solid obstruction can block the impact.
 - The slam and profile-specific special still use their existing visible warning radii; the final damage decision now uses the same radius with collider-aware validation.
 - This is source-level collision logic. Collider hierarchy, raycast layers, edge cases, Unity compilation, Play Mode and Android device behavior still require testing.
+
+## Directional enemy melee warning telegraphs
+
+- Standard enemies now display a ground-level directional arc during their melee wind-up. The warning follows the committed facing direction and spans the same forward attack sector used by the strike validation.
+- The warning radius matches the melee reach check, including its small collider tolerance. It pulses and becomes more prominent as the wind-up approaches completion.
+- Brutes use a stronger red warning and heavier line treatment; Hunter and Skirmisher attacks use an amber warning.
+- The telegraph is hidden when the strike resolves, the wind-up is cancelled, or the enemy dies. Its runtime material is released when the AI component is destroyed.
+- This is a lightweight LineRenderer indicator. Ground clipping, visual readability, shader availability, Unity compilation, Play Mode timing and Android performance still require validation.
