@@ -411,3 +411,9 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Added an Editor-side `ShinobiCharacterVisualBuilder` that assembles an original stylized shinobi from lightweight mesh parts: cloth torso, chest and shoulder armor, headband, face mask, forearm and shin guards, sandals and a sheathed katana. Rogue enemies and the Stone Guardian receive a distinct silhouette and material treatment.
 - Both generated test scenes now hide the single-capsule placeholder renderer and build the multi-part visual rig under the existing gameplay root. Gameplay colliders and movement/combat components remain on the root, while decorative mesh-part colliders are removed.
 - This is a procedural visual prototype made from Unity primitive meshes, not a final rigged character asset. It has no authored skinning, animation clips, textures or production-quality facial detail. The Animator bridge is ready for a later rigged model integration. Unity scene generation, compilation and Android performance still need Editor/device validation.
+
+## Enemy visual archetypes
+
+- The prototype arena's three training enemies now use three distinct original visual profiles: a crimson hooded rogue, a moss-toned forest raider and a violet storm fighter. Their head crests, shoulder details, sash colors and armor accents help distinguish silhouettes at the isometric camera distance.
+- The Stone Guardian boss now has a broader torso, chest core, crown-like stone crests and a reinforced shoulder plate to make its boss silhouette easier to read.
+- These profiles remain lightweight procedural blockout visuals built from Unity primitive meshes. They are not final character art, do not include rigged animation or authored textures, and require Unity Editor plus device validation.
