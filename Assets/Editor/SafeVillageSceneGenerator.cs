@@ -107,6 +107,7 @@ namespace ShinobiLegacy.Editor
             player.AddComponent<PlayerMotor>();
             player.AddComponent<PlayerProgression>();
             player.AddComponent<WorldRegionProgression>();
+            player.AddComponent<RegionalBountySystem>();
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerWallet>();
             player.AddComponent<PlayerForgeSystem>();
