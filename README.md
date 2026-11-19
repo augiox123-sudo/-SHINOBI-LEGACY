@@ -78,3 +78,12 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - The generated hub has a guarded main gate, perimeter walls, forest edge, central market square, six named merchant stalls, residential blocks, academy, hospital, forge, mission office, training ground and a high ridge monument.
 - The layout uses original placeholder geometry and abstract monument details. Merchant stands are visual placeholders at this stage; vendor dialogue, buy/sell UI, currency, player spawn and travel links are not implemented yet.
 - The generator saves `Assets/Scenes/SafeVillage.unity` and adds it to Build Settings alongside the prototype arena.
+
+
+## Village merchant economy prototype
+
+- The safe village scene generator now creates a playable arrival point, isometric camera and Android virtual joystick.
+- Six market stalls receive vendor interaction triggers. Walk close to a vendor and tap **OPEN SHOP** (or press E in Editor/PC).
+- The prototype shop supports buying stock into the 60-slot inventory and selling carried inventory items for coins.
+- New players start with 500 prototype coins. Wallet and inventory are runtime-only at this stage; persistence, equipped-item selling restrictions, consumable effects and a polished mobile shop UI remain future work.
+- Generate the scene with **Tools → Shinobi Legacy → Create Safe Village Hub**. The scene is source-generated and still requires Unity Editor compilation and device testing.
