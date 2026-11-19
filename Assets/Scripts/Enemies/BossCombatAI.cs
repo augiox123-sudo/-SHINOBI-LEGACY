@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using ShinobiLegacy.Combat;
+using ShinobiLegacy.CameraSystem;
 using ShinobiLegacy.Items;
 using ShinobiLegacy.Player;
 using System.Collections.Generic;
