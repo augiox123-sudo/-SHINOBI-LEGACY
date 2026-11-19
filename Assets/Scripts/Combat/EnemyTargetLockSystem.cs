@@ -135,9 +135,8 @@ namespace ShinobiLegacy.Combat
                 (panel.width - 28f) * healthRatio, 9f), Texture2D.whiteTexture);
             GUI.color = Color.white;
 
-            Rect cycleButton = new Rect((Screen.width - 190f) * 0.5f, Screen.height - 142f, 190f, 48f);
-            if (GUI.Button(cycleButton, "NEXT TARGET"))
-                CycleTarget();
+            // Target cycling is handled by the shared Canvas combat controls.
+            // Keep OnGUI focused on the target marker and health panel only.
         }
     }
 }
