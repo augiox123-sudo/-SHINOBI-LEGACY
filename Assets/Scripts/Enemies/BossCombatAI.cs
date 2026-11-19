@@ -92,9 +92,21 @@ namespace ShinobiLegacy.Enemies
         private void Update()
         {
             if (health == null || health.IsDead || target == null) return;
+            CombatantHealth currentTargetHealth = target.GetComponent<CombatantHealth>();
+            if (currentTargetHealth == null || currentTargetHealth.IsDead)
+            {
+                target = null;
+                windingUp = false;
+                specialWindup = false;
+                windupRemaining = 0f;
+                SetTelegraphVisible(false);
+                if (bodyRenderer != null) SetBodyColor(phaseTwo ? ProfileColor() : baseColor);
+                return;
+            }
             if (health.IsStunned)
             {
                 windingUp = false;
+                specialWindup = false;
                 windupRemaining = 0f;
                 SetTelegraphVisible(false);
                 if (bodyRenderer != null) SetBodyColor(phaseTwo ? ProfileColor() : baseColor);
@@ -185,7 +197,7 @@ namespace ShinobiLegacy.Enemies
             if (Vector3.Distance(transform.position, flatTarget) <= slamRange + 0.8f)
             {
                 CombatantHealth playerHealth = target.GetComponent<CombatantHealth>();
-                if (playerHealth != null) playerHealth.TakeDamage(slamDamage);
+                if (playerHealth != null && !playerHealth.IsDead) playerHealth.TakeDamage(slamDamage);
             }
         }
 
@@ -201,6 +213,7 @@ namespace ShinobiLegacy.Enemies
             if (distance > specialRange + 1f) return;
 
             CombatantHealth targetHealth = target.GetComponent<CombatantHealth>();
+            if (targetHealth == null || targetHealth.IsDead) return;
             if (bossProfile == 1)
             {
                 // Verdant boss briefly regenerates instead of dealing burst damage.
@@ -208,7 +221,6 @@ namespace ShinobiLegacy.Enemies
                 return;
             }
 
-            if (targetHealth == null) return;
             float damage = slamDamage * (bossProfile == 0 ? 1.55f : 1.2f);
             targetHealth.TakeDamage(damage);
             if (bossProfile == 2) targetHealth.ApplyStun(1.15f);
@@ -292,7 +304,7 @@ namespace ShinobiLegacy.Enemies
             SetTelegraphVisible(false);
             if (bodyRenderer != null) SetBodyColor(phaseTwo ? ProfileColor() : baseColor);
             enabled = false;
-            controller.enabled = false;
+            if (controller != null) controller.enabled = false;
             Destroy(gameObject, 2f);
         }
     }
