@@ -12,7 +12,7 @@ This repository is transitioning from an earlier browser prototype to a real Uni
 - generated 3D test arena and player capsule;
 - isometric camera follow;
 - camera-relative keyboard movement for editor testing;
-- movement API for future mobile touch controls;
+- on-screen virtual joystick for Android movement;
 - Android-oriented URP project configuration.
 
 ## Open the project
