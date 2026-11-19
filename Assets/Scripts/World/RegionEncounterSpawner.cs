@@ -175,6 +175,7 @@ namespace ShinobiLegacy.World
             EnemyRewardDrop rewards = champion.AddComponent<EnemyRewardDrop>();
             rewards.Configure(progression, 180 + level * 30, 1f, true);
             rewards.SetLegendaryChance(0.12f);
+            rewards.SetBossLootProfile(profile);
             health.Died += OnPatrolEnemyDied;
             activeEnemies.Add(champion);
             Debug.Log("SHINOBI LEGACY: Elite champion appeared in " + regionId);
