@@ -373,7 +373,11 @@ namespace ShinobiLegacy.Enemies
             if (targetHit)
             {
                 CombatantHealth playerHealth = target.GetComponent<CombatantHealth>();
-                if (playerHealth != null && !playerHealth.IsDead) playerHealth.TakeDamage(slamDamage);
+                if (playerHealth != null && !playerHealth.IsDead)
+                {
+                    playerHealth.TakeDamage(slamDamage);
+                    if (!playerHealth.IsDead) playerHealth.ApplyKnockbackFrom(transform.position, 4.2f, 0.18f);
+                }
             }
         }
 
@@ -404,6 +408,7 @@ namespace ShinobiLegacy.Enemies
                     if (targetInsideImpact)
                     {
                         targetHealth.TakeDamage(slamDamage * 1.55f);
+                        if (!targetHealth.IsDead) targetHealth.ApplyKnockbackFrom(transform.position, 4.6f, 0.19f);
                         if (!targetHealth.IsDead) targetHealth.ApplyBurn(Mathf.Max(2f, slamDamage * 0.12f), 3f, 1f);
                     }
                     break;
@@ -416,6 +421,7 @@ namespace ShinobiLegacy.Enemies
                     if (targetInsideImpact)
                     {
                         targetHealth.TakeDamage(slamDamage * 1.2f);
+                        if (!targetHealth.IsDead) targetHealth.ApplyKnockbackFrom(transform.position, 3.6f, 0.16f);
                         if (!targetHealth.IsDead) targetHealth.ApplyStun(1.25f);
                     }
                     break;
@@ -424,6 +430,7 @@ namespace ShinobiLegacy.Enemies
                     if (targetInsideImpact)
                     {
                         targetHealth.TakeDamage(slamDamage * 1.35f);
+                        if (!targetHealth.IsDead) targetHealth.ApplyKnockbackFrom(transform.position, 4.0f, 0.17f);
                         if (!targetHealth.IsDead) targetHealth.ApplyStun(0.8f);
                     }
                     break;
