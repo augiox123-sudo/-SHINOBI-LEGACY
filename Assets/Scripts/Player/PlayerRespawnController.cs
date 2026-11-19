@@ -16,6 +16,7 @@ namespace ShinobiLegacy.Player
         private CharacterController controller;
         private CombatantHealth health;
         private PlayerSaveSystem saveSystem;
+        private PlayerMotor motor;
         private bool respawning;
 
         private void Awake()
@@ -23,6 +24,7 @@ namespace ShinobiLegacy.Player
             controller = GetComponent<CharacterController>();
             health = GetComponent<CombatantHealth>();
             saveSystem = GetComponent<PlayerSaveSystem>();
+            motor = GetComponent<PlayerMotor>();
         }
 
         private void OnEnable()
@@ -47,6 +49,7 @@ namespace ShinobiLegacy.Player
         {
             respawning = true;
             if (saveSystem != null) saveSystem.Save();
+            if (motor != null) motor.SetMovementEnabled(false);
             if (controller != null) controller.enabled = false;
             yield return new WaitForSeconds(respawnDelay);
 
@@ -55,6 +58,7 @@ namespace ShinobiLegacy.Player
             transform.rotation = safeSpawn != null ? safeSpawn.rotation : Quaternion.identity;
 
             if (controller != null) controller.enabled = true;
+            if (motor != null) motor.SetMovementEnabled(true);
             if (health != null) health.ReviveAtFullHealth(protectionSeconds);
             if (saveSystem != null) saveSystem.Save();
             respawning = false;
