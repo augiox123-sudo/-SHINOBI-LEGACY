@@ -11,6 +11,7 @@ namespace ShinobiLegacy.Player
         [SerializeField, Range(0.1f, 1f)] private float deadZone = 0.12f;
 
         private Vector2 input;
+        private int activePointerId = int.MinValue;
 
         public void Configure(RectTransform baseRect, RectTransform handleRect, PlayerMotor motor)
         {
@@ -19,11 +20,18 @@ namespace ShinobiLegacy.Player
             player = motor;
         }
 
-        public void OnPointerDown(PointerEventData eventData) => OnDrag(eventData);
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (activePointerId != int.MinValue) return;
+            activePointerId = eventData.pointerId;
+            OnDrag(eventData);
+        }
 
         public void OnDrag(PointerEventData eventData)
         {
+            if (eventData.pointerId != activePointerId) return;
             if (background == null || handle == null || player == null) return;
+
             if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 background, eventData.position, eventData.pressEventCamera, out Vector2 localPoint))
                 return;
@@ -31,13 +39,36 @@ namespace ShinobiLegacy.Player
             float radius = Mathf.Min(background.rect.width, background.rect.height) * 0.5f;
             input = Vector2.ClampMagnitude(localPoint / Mathf.Max(1f, radius), 1f);
             if (input.magnitude < deadZone) input = Vector2.zero;
+
             handle.anchoredPosition = input * radius * 0.62f;
             player.MoveInput = input;
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            if (eventData.pointerId != activePointerId) return;
+            ResetInput();
+        }
+
+        private void OnDisable()
+        {
+            ResetInput();
+        }
+
+        private void OnApplicationFocus(bool hasFocus)
+        {
+            if (!hasFocus) ResetInput();
+        }
+
+        private void OnApplicationPause(bool pauseStatus)
+        {
+            if (pauseStatus) ResetInput();
+        }
+
+        private void ResetInput()
+        {
             input = Vector2.zero;
+            activePointerId = int.MinValue;
             if (handle != null) handle.anchoredPosition = Vector2.zero;
             if (player != null) player.MoveInput = Vector2.zero;
         }
