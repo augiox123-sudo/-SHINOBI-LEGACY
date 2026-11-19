@@ -12,6 +12,7 @@ namespace ShinobiLegacy.Combat
     public sealed class CombatAnimationBridge : MonoBehaviour
     {
         [SerializeField] private Animator animator;
+        private ShinobiProceduralMotion proceduralMotion;
         private readonly HashSet<int> floatParameters = new HashSet<int>();
         private readonly HashSet<int> boolParameters = new HashSet<int>();
         private readonly HashSet<int> triggerParameters = new HashSet<int>();
@@ -23,6 +24,12 @@ namespace ShinobiLegacy.Combat
         private static readonly int AbilityHash = Animator.StringToHash("Ability");
         private bool parametersCached;
         private Coroutine attackStateRoutine;
+
+        private ShinobiProceduralMotion ResolveProceduralMotion()
+        {
+            if (proceduralMotion == null) proceduralMotion = GetComponentInChildren<ShinobiProceduralMotion>();
+            return proceduralMotion;
+        }
 
         private Animator ResolveAnimator()
         {
@@ -47,6 +54,8 @@ namespace ShinobiLegacy.Combat
 
         public void SetMoveSpeed(float speed)
         {
+            ShinobiProceduralMotion motion = ResolveProceduralMotion();
+            if (motion != null) motion.SetMoveSpeed(speed);
             Animator current = ResolveAnimator();
             if (current != null && floatParameters.Contains(MoveSpeedHash))
                 current.SetFloat(MoveSpeedHash, Mathf.Max(0f, speed), 0.12f, Time.deltaTime);
@@ -61,6 +70,8 @@ namespace ShinobiLegacy.Combat
 
         public void SetDead(bool value)
         {
+            ShinobiProceduralMotion motion = ResolveProceduralMotion();
+            if (motion != null) motion.SetDead(value);
             if (value && attackStateRoutine != null)
             {
                 StopCoroutine(attackStateRoutine);
@@ -73,6 +84,8 @@ namespace ShinobiLegacy.Combat
 
         public void PlayAttack(float activeDuration = 0.28f)
         {
+            ShinobiProceduralMotion motion = ResolveProceduralMotion();
+            if (motion != null) motion.PlayAttack();
             Trigger(AttackHash);
             if (attackStateRoutine != null) StopCoroutine(attackStateRoutine);
             if (ResolveAnimator() != null && boolParameters.Contains(IsAttackingHash))
@@ -100,11 +113,15 @@ namespace ShinobiLegacy.Combat
 
         public void TriggerHit()
         {
+            ShinobiProceduralMotion motion = ResolveProceduralMotion();
+            if (motion != null) motion.PlayHit();
             Trigger(HitHash);
         }
 
         public void TriggerAbility()
         {
+            ShinobiProceduralMotion motion = ResolveProceduralMotion();
+            if (motion != null) motion.PlayAbility();
             Trigger(AbilityHash);
         }
 
