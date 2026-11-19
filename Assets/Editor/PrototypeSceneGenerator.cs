@@ -10,6 +10,7 @@ using ShinobiLegacy.Combat;
 using ShinobiLegacy.Enemies;
 using ShinobiLegacy.UI;
 using ShinobiLegacy.Items;
+using ShinobiLegacy.World;
 
 namespace ShinobiLegacy.Editor
 {
@@ -41,6 +42,23 @@ namespace ShinobiLegacy.Editor
             PlayerProgression progression = player.AddComponent<PlayerProgression>();
             PlayerInventory inventory = player.AddComponent<PlayerInventory>();
             EquipmentManager equipment = player.AddComponent<EquipmentManager>();
+            player.AddComponent<PlayerWallet>();
+            player.AddComponent<PlayerSaveSystem>();
+            PlayerRespawnController respawn = player.AddComponent<PlayerRespawnController>();
+            player.AddComponent<FastTravelMapUI>();
+            GameObject safeSpawn = new GameObject("Arena_Safe_Respawn_Point");
+            safeSpawn.transform.position = new Vector3(0f, 1f, 0f);
+            respawn.SetSafeSpawn(safeSpawn.transform);
+
+            GameObject arenaTravelObject = new GameObject("FastTravel_TrainingCamp");
+            arenaTravelObject.transform.position = new Vector3(0f, 1f, 0f);
+            SphereCollider arenaTravelTrigger = arenaTravelObject.AddComponent<SphereCollider>();
+            arenaTravelTrigger.isTrigger = true;
+            arenaTravelTrigger.radius = 7f;
+            FastTravelPoint arenaTravel = arenaTravelObject.AddComponent<FastTravelPoint>();
+            arenaTravel.pointId = "training_camp";
+            arenaTravel.displayName = "Training Camp";
+            arenaTravel.Unlock();
 
             GameObject cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
