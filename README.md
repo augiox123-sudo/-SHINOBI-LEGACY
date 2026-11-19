@@ -431,3 +431,11 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Melee effects use the existing lightweight runtime particle/line helpers and short lifetimes; they are prototype feedback, not final authored combat VFX.
 - Boss slam and phase-two special telegraphs now intensify as the windup approaches: pulse frequency, line width and opacity increase. The actual attack radius and damage checks are unchanged.
 - Unity compilation, in-editor combat validation and Android GPU/performance profiling are still required.
+
+
+## Enemy combat archetypes
+
+- Training arena enemies are assigned three distinct behaviors: Hunter (direct pursuit and balanced melee), Skirmisher (keeps distance, circles and performs short lateral dodges), and Brute (slower movement, heavier damage, longer attack preparation and cooldown).
+- Enemy melee attacks now have a short windup and re-check target life and distance before applying damage, giving the player a reaction window to move away.
+- AI cancels pending attacks and stops its movement animation when stunned, when its target dies or disappears, or when the target leaves detection range.
+- These behaviors are an initial tuning pass. Actual difficulty, dodge readability, hit timing and mobile performance need validation in Unity Play Mode and on Android.
