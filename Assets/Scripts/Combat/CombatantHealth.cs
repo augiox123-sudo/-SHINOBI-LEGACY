@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using ShinobiLegacy.Items;
 
 namespace ShinobiLegacy.Combat
 {
@@ -8,6 +9,7 @@ namespace ShinobiLegacy.Combat
         [SerializeField] private float maxHealth = 100f;
         [SerializeField] private bool destroyOnDeath;
         private float currentHealth;
+        private EquipmentManager equipment;
 
         public float CurrentHealth => currentHealth;
         public float MaxHealth => maxHealth;
@@ -21,12 +23,18 @@ namespace ShinobiLegacy.Combat
             currentHealth = maxHealth;
         }
 
-        private void Awake() => currentHealth = maxHealth;
+        private void Awake()
+        {
+            currentHealth = maxHealth;
+            equipment = GetComponent<EquipmentManager>();
+        }
 
         public void TakeDamage(float amount)
         {
             if (IsDead || amount <= 0f) return;
-            currentHealth = Mathf.Max(0f, currentHealth - amount);
+            float incomingDamage = amount;
+            if (equipment != null) incomingDamage = Mathf.Max(1f, amount - equipment.Defense);
+            currentHealth = Mathf.Max(0f, currentHealth - incomingDamage);
             HealthChanged?.Invoke(currentHealth, maxHealth);
             if (currentHealth <= 0f) Die();
         }
