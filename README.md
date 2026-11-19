@@ -152,3 +152,11 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - Chakra Burst emits a chakra burst and ground shockwave. Chakra Tempest adds a second forward pulse; Guardian Pulse uses a green chakra treatment.
 - Chain Lightning draws a short jagged LineRenderer bolt between each chained target and emits a small impact spark at the destination.
 - Effects use lightweight runtime-generated Unity Particle Systems and simple geometry, with no external asset dependency. They are functional placeholder VFX, not final authored AAA-quality effects; dedicated meshes, textures, animation curves, audio and mobile GPU profiling remain required.
+
+
+### Persistent character progression and equipment quality-of-life
+
+- Local save data now includes player level and current XP in addition to coins, inventory, equipped items and skill mastery.
+- Loading restores the saved level/XP and reapplies the character's level-based maximum-health bonuses.
+- XP/level changes trigger an immediate local save; the existing periodic and app-pause saves remain in place.
+- `Equip Best` now compares each candidate against the currently equipped item in the same slot and equips only a genuine power upgrade. It no longer picks a high-power item from an unrelated slot or replaces stronger gear with weaker gear.
