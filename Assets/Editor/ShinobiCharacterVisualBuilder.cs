@@ -45,6 +45,7 @@ namespace ShinobiLegacy.Editor
         {
             EnsureMaterials();
             Transform rig = CreateRoot(parent, "VisualRig_ShadowShinobi");
+            rig.gameObject.AddComponent<ShinobiLegacy.Combat.ShinobiProceduralMotion>();
             Part(rig, "Torso", PrimitiveType.Capsule, new Vector3(0f, 0.05f, 0f), new Vector3(0.58f, 0.72f, 0.34f), cloth);
             Part(rig, "ChestArmor", PrimitiveType.Cube, new Vector3(0f, 0.19f, 0.205f), new Vector3(0.48f, 0.38f, 0.12f), armor);
             Part(rig, "ShoulderLeft", PrimitiveType.Sphere, new Vector3(-0.39f, 0.37f, 0f), new Vector3(0.29f, 0.23f, 0.31f), armor);
@@ -77,6 +78,7 @@ namespace ShinobiLegacy.Editor
             int style = Mathf.Abs(variant) % 3;
             string rigName = boss ? "VisualRig_StoneGuardian" : "VisualRig_Rogue_" + style;
             Transform rig = CreateRoot(parent, rigName);
+            rig.gameObject.AddComponent<ShinobiLegacy.Combat.ShinobiProceduralMotion>();
             float scale = boss ? 1.35f : 1f;
             Material body = boss ? armor : (style == 0 ? darkCloth : style == 1 ? moss : violet);
             Material trim = boss ? metal : (style == 0 ? crimson : style == 1 ? accent : violet);
