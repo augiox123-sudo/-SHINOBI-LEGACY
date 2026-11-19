@@ -109,7 +109,7 @@ namespace ShinobiLegacy.World
         {
             if (point == null) return;
             if (controller != null) controller.enabled = false;
-            transform.position = point.transform.position + Vector3.up * 1.2f;
+            transform.position = point.transform.position;
             if (controller != null) controller.enabled = true;
             CombatantHealth health = GetComponent<CombatantHealth>();
             if (health != null && health.IsDead) health.ReviveAtFullHealth(2f);
