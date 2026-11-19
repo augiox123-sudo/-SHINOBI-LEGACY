@@ -29,6 +29,7 @@ namespace ShinobiLegacy.Combat
         private float comboDuration;
         private int comboStrike;
         private float hitTimer;
+        private float hitPauseTimer;
         private bool heavyHit;
         private bool staggered;
         private float abilityTimer;
@@ -90,6 +91,8 @@ namespace ShinobiLegacy.Combat
             if (dead) return;
             heavyHit = heavy;
             hitTimer = heavy ? 0.26f : 0.18f;
+            // Freeze only this visual rig for a few milliseconds; never pause global gameplay time.
+            hitPauseTimer = Mathf.Max(hitPauseTimer, heavy ? 0.075f : 0.04f);
         }
 
         public void SetStaggered(bool value)
@@ -120,6 +123,12 @@ namespace ShinobiLegacy.Combat
 
         private void LateUpdate()
         {
+            if (hitPauseTimer > 0f)
+            {
+                hitPauseTimer -= Time.unscaledDeltaTime;
+                if (hitPauseTimer > 0f) return;
+            }
+
             float dt = Time.deltaTime;
             cycle += dt * runCycleSpeed * Mathf.Lerp(0.25f, 1f, moveSpeed);
             attackTimer = Mathf.Max(0f, attackTimer - dt);
