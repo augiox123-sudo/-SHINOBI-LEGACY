@@ -20,6 +20,8 @@ namespace ShinobiLegacy.Combat
         [SerializeField] private float comboFinisherDamageMultiplier = 1.35f;
         private int comboStep;
         private float lastBasicAttackTime = -10f;
+        private bool resolvingBasicAttack;
+        private float basicAttackKnockbackStrength = 2.5f;
 
         [Header("Chakra burst")]
         [SerializeField] private float burstDamage = 65f;
@@ -142,22 +144,35 @@ namespace ShinobiLegacy.Combat
 
             if (animationBridge != null) animationBridge.PlayAttack();
             damagedThisCast.Clear();
+            bool isFinisher = currentStep == 2;
             float comboMultiplier = currentStep == 1 ? comboSecondDamageMultiplier :
-                currentStep == 2 ? comboFinisherDamageMultiplier : 1f;
+                isFinisher ? comboFinisherDamageMultiplier : 1f;
             float damage = GetScaledDamage(attackDamage) * comboMultiplier;
+            basicAttackKnockbackStrength = isFinisher ? 4.5f : currentStep == 1 ? 2.9f : 2.5f;
+            resolvingBasicAttack = true;
             CombatantHealth lockedTarget = targetLock != null ? targetLock.CurrentTarget : null;
             bool focusedHit = TryHitLockedTarget(damage);
             if (focusedHit)
             {
                 if (abilityVfx != null && lockedTarget != null)
-                    abilityVfx.PlayMeleeImpact(lockedTarget.transform.position + Vector3.up * 0.9f, transform.forward);
+                {
+                    Vector3 impactPoint = lockedTarget.transform.position + Vector3.up * 0.9f;
+                    if (isFinisher) abilityVfx.PlayMeleeFinisherImpact(impactPoint, transform.forward);
+                    else abilityVfx.PlayMeleeImpact(impactPoint, transform.forward);
+                }
             }
             else
             {
                 HitTargets(attackRange, attackRadius, damage);
                 if (abilityVfx != null)
-                    abilityVfx.PlayMeleeSwing(transform.position + Vector3.up * 1.05f, transform.forward);
+                {
+                    Vector3 swingOrigin = transform.position + Vector3.up * 1.05f;
+                    if (isFinisher) abilityVfx.PlayMeleeFinisherSwing(swingOrigin, transform.forward);
+                    else abilityVfx.PlayMeleeSwing(swingOrigin, transform.forward);
+                }
             }
+            resolvingBasicAttack = false;
+            basicAttackKnockbackStrength = 2.5f;
         }
 
         private bool TryHitLockedTarget(float damage)
@@ -544,7 +559,9 @@ namespace ShinobiLegacy.Combat
             bool critical = equipment != null && UnityEngine.Random.value < equipment.CriticalChance;
             if (critical) damage *= equipment.CriticalDamageMultiplier;
             target.TakeDamage(damage);
-            if (!target.IsDead) target.ApplyKnockbackFrom(transform.position, 2.5f, 0.11f);
+            if (!target.IsDead)
+                target.ApplyKnockbackFrom(transform.position, resolvingBasicAttack ? basicAttackKnockbackStrength : 2.5f,
+                    resolvingBasicAttack && basicAttackKnockbackStrength >= 4f ? 0.19f : 0.11f);
             if (applyBurn && !target.IsDead) target.ApplyBurn(Mathf.Max(2f, damage * 0.08f), 3f, 1f);
         }
 
