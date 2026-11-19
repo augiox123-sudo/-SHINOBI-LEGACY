@@ -33,8 +33,10 @@ namespace ShinobiLegacy.Items
         {
             if (equipment == null || index < 0 || index >= items.Count) return false;
             InventoryItem item = items[index];
+            InventoryItem previous = equipment.GetEquipped(item != null ? item.slot : string.Empty);
             if (!equipment.Equip(item)) return false;
             items.RemoveAt(index);
+            if (previous != null) items.Add(previous);
             ItemEquipped?.Invoke(item);
             return true;
         }
