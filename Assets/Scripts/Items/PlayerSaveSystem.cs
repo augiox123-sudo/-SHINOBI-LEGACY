@@ -46,6 +46,7 @@ namespace ShinobiLegacy.Items
             if (inventory != null) inventory.ItemAdded += OnInventoryChanged;
             if (inventory != null) inventory.ItemEquipped += OnItemEquipped;
             if (equipment != null) equipment.EquipmentChanged += Save;
+            if (playerCombat != null) playerCombat.ResourcesChanged += Save;
             ready = true;
         }
 
@@ -133,6 +134,7 @@ namespace ShinobiLegacy.Items
             if (inventory != null) inventory.ItemAdded -= OnInventoryChanged;
             if (inventory != null) inventory.ItemEquipped -= OnItemEquipped;
             if (equipment != null) equipment.EquipmentChanged -= Save;
+            if (playerCombat != null) playerCombat.ResourcesChanged -= Save;
         }
     }
 }
