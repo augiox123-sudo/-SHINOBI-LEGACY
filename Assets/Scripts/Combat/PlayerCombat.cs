@@ -36,6 +36,7 @@ namespace ShinobiLegacy.Combat
         private float chakra;
         private readonly Collider[] hitBuffer = new Collider[24];
         private readonly HashSet<CombatantHealth> damagedThisCast = new HashSet<CombatantHealth>();
+        private readonly Collider[] chainBuffer = new Collider[24];
         private EquipmentManager equipment;
         private CombatantHealth ownHealth;
         [SerializeField, Range(1, 5)] private int burstRank = 1;
@@ -99,6 +100,11 @@ namespace ShinobiLegacy.Combat
                 HitTargets(burstRange * 0.82f, burstRadius * 1.2f, damage * 0.42f);
                 StunTargetsInFront(burstRange, burstRadius * 1.45f, 0.8f);
             }
+            else if (modifier == "burst_chain")
+            {
+                HitTargets(burstRange, burstRadius, damage * 0.55f);
+                ChainLightning(damage, 3, 4.2f);
+            }
             else
             {
                 HitTargets(burstRange, burstRadius, damage);
@@ -129,11 +135,12 @@ namespace ShinobiLegacy.Combat
                 FireRay(origin - transform.right * 0.8f, direction, damage * 0.82f, 0.8f, true);
                 FireRay(origin + transform.right * 0.8f, direction, damage * 0.82f, 0.8f, true);
             }
-            else if (modifier == "fire_burst")
+            else if (modifier == "fire_burst" || modifier == "fire_meteor")
             {
                 if (Physics.SphereCast(origin, 0.55f, direction, out RaycastHit hit, fireRange,
                     Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
-                    DamageArea(hit.point, 3.2f, damage * 1.15f, true);
+                    DamageArea(hit.point, modifier == "fire_meteor" ? 4.5f : 3.2f,
+                        damage * (modifier == "fire_meteor" ? 1.4f : 1.15f), true);
             }
             else FireRay(origin, direction, damage, 0.55f, false);
             RecordAbilityUse(false);
@@ -163,6 +170,39 @@ namespace ShinobiLegacy.Combat
                 if (health != null && !health.IsDead && health.transform != transform) ApplyDamageOnce(health, damage, applyBurn);
                 hitBuffer[i] = null;
             }
+        }
+
+        private void ChainLightning(float baseDamage, int maxJumps, float jumpRadius)
+        {
+            CombatantHealth previous = null;
+            Vector3 searchCenter = transform.position + Vector3.up + transform.forward * burstRange * 0.55f;
+            for (int jump = 0; jump < maxJumps; jump++)
+            {
+                int count = Physics.OverlapSphereNonAlloc(searchCenter, jumpRadius, chainBuffer,
+                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+                CombatantHealth closest = null;
+                float closestDistance = float.MaxValue;
+                for (int i = 0; i < count; i++)
+                {
+                    Collider hit = chainBuffer[i];
+                    if (hit == null) continue;
+                    CombatantHealth candidate = hit.GetComponentInParent<CombatantHealth>();
+                    if (candidate == null || candidate.IsDead || candidate.transform == transform ||
+                        damagedThisCast.Contains(candidate)) continue;
+                    float distance = (candidate.transform.position - searchCenter).sqrMagnitude;
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        closest = candidate;
+                    }
+                }
+                if (closest == null) break;
+                ApplyDamageOnce(closest, baseDamage * Mathf.Pow(0.72f, jump + 1), false);
+                closest.ApplyStun(0.35f);
+                previous = closest;
+                searchCenter = previous.transform.position + Vector3.up;
+            }
+            for (int i = 0; i < chainBuffer.Length; i++) chainBuffer[i] = null;
         }
 
         private void StunTargetsInFront(float range, float radius, float duration)
