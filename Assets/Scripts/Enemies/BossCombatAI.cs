@@ -217,34 +217,57 @@ namespace ShinobiLegacy.Enemies
             if (bodyRenderer != null) SetBodyColor(ProfileColor());
             if (target == null) return;
 
-            float distance = Vector3.Distance(transform.position, target.position);
-            if (distance > specialRange + 1f) return;
-
             CombatantHealth targetHealth = target.GetComponent<CombatantHealth>();
             if (targetHealth == null || targetHealth.IsDead) return;
             if (animationBridge != null) animationBridge.TriggerAbility();
 
-            // Each guardian profile has a different phase-two signature attack.
+            // The special is a dodgeable close-range area attack. The warning ring
+            // uses the same profile radius that is checked when the attack resolves.
+            float impactRadius = SpecialImpactRadius();
+            Vector3 flatOffset = target.position - transform.position;
+            flatOffset.y = 0f;
+            bool targetInsideImpact = flatOffset.sqrMagnitude <= impactRadius * impactRadius;
+
             switch (bossProfile)
             {
-                case 0: // Ashen: high burst followed by a short burn.
-                    targetHealth.TakeDamage(slamDamage * 1.55f);
-                    if (!targetHealth.IsDead) targetHealth.ApplyBurn(Mathf.Max(2f, slamDamage * 0.12f), 3f, 1f);
+                case 0: // Ashen: heavy impact followed by a short burn.
+                    if (targetInsideImpact)
+                    {
+                        targetHealth.TakeDamage(slamDamage * 1.55f);
+                        if (!targetHealth.IsDead) targetHealth.ApplyBurn(Mathf.Max(2f, slamDamage * 0.12f), 3f, 1f);
+                    }
                     break;
 
-                case 1: // Verdant: recover health instead of striking the player.
+                case 1: // Verdant: defensive recovery; the player can use the heal window to reposition.
                     health.Restore(health.MaxHealth * 0.10f);
                     break;
 
-                case 2: // Thunder: moderate burst and a longer interrupting stun.
-                    targetHealth.TakeDamage(slamDamage * 1.2f);
-                    if (!targetHealth.IsDead) targetHealth.ApplyStun(1.25f);
+                case 2: // Thunder: area burst and a longer interrupting stun.
+                    if (targetInsideImpact)
+                    {
+                        targetHealth.TakeDamage(slamDamage * 1.2f);
+                        if (!targetHealth.IsDead) targetHealth.ApplyStun(1.25f);
+                    }
                     break;
 
-                default: // Drowned: heavier control pressure with a shorter stun.
-                    targetHealth.TakeDamage(slamDamage * 1.35f);
-                    if (!targetHealth.IsDead) targetHealth.ApplyStun(0.8f);
+                default: // Drowned: heavier area hit with a shorter control effect.
+                    if (targetInsideImpact)
+                    {
+                        targetHealth.TakeDamage(slamDamage * 1.35f);
+                        if (!targetHealth.IsDead) targetHealth.ApplyStun(0.8f);
+                    }
                     break;
+            }
+        }
+
+        private float SpecialImpactRadius()
+        {
+            switch (bossProfile)
+            {
+                case 1: return 3.8f; // Verdant's special is a self-heal, but its warning remains compact.
+                case 2: return 5.2f; // Thunder has the widest damaging shockwave.
+                case 3: return 4.2f; // Drowned trades radius for stronger control pressure.
+                default: return 4.6f; // Ashen.
             }
         }
 
@@ -283,7 +306,7 @@ namespace ShinobiLegacy.Enemies
         private void UpdateAttackTelegraph()
         {
             if (attackTelegraph == null) return;
-            float radius = specialWindup ? specialRange : slamRange + 0.8f;
+            float radius = specialWindup ? SpecialImpactRadius() : slamRange + 0.8f;
             float progress = windupTotal > 0f ? 1f - Mathf.Clamp01(windupRemaining / windupTotal) : 1f;
             float pulseSpeed = Mathf.Lerp(5f, 19f, progress);
             float pulse = 1f + Mathf.Sin(Time.time * pulseSpeed) * Mathf.Lerp(0.025f, 0.075f, progress);
