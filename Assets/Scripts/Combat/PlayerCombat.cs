@@ -127,8 +127,19 @@ namespace ShinobiLegacy.Combat
             if (animationBridge != null) animationBridge.PlayAttack();
             damagedThisCast.Clear();
             float damage = GetScaledDamage(attackDamage);
-            if (!TryHitLockedTarget(damage))
+            CombatantHealth lockedTarget = targetLock != null ? targetLock.CurrentTarget : null;
+            bool focusedHit = TryHitLockedTarget(damage);
+            if (focusedHit)
+            {
+                if (abilityVfx != null && lockedTarget != null)
+                    abilityVfx.PlayMeleeImpact(lockedTarget.transform.position + Vector3.up * 0.9f, transform.forward);
+            }
+            else
+            {
                 HitTargets(attackRange, attackRadius, damage);
+                if (abilityVfx != null)
+                    abilityVfx.PlayMeleeSwing(transform.position + Vector3.up * 1.05f, transform.forward);
+            }
         }
 
         private bool TryHitLockedTarget(float damage)
