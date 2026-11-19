@@ -506,3 +506,10 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Strong knockbacks now apply a short stagger window to the affected combatant. The duration scales modestly with knockback strength and is capped at 0.34 seconds.
 - Standard enemy AI pauses movement and cancels any pending melee wind-up while staggered, then resumes normal behavior automatically. Player and boss controllers do not consume this enemy-only AI pause.
 - This adds a brief hit-confirmation window without introducing physics ragdolls or long crowd-control locks. Timing and combat balance still require Unity Play Mode and Android device testing.
+
+
+## Visible enemy stagger pose
+
+- The enemy AI now forwards its stagger state to the procedural motion layer. During the short impact pause, the enemy holds a distinct arm-and-torso recoil pose instead of only freezing its movement.
+- The pose is driven by the existing rig transforms and is cleared automatically when the stagger window ends. It adds no physics bodies, animation assets or per-frame allocations.
+- This remains a blockout motion cue; pose readability and transition timing need Unity Play Mode and Android validation.
