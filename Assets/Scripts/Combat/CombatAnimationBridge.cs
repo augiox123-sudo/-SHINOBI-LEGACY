@@ -82,6 +82,18 @@ namespace ShinobiLegacy.Combat
                 current.SetBool(IsDeadHash, value);
         }
 
+        public void PlayWindup(bool heavy)
+        {
+            ShinobiProceduralMotion motion = ResolveProceduralMotion();
+            if (motion != null) motion.PlayWindup(heavy);
+        }
+
+        public void CancelWindup()
+        {
+            ShinobiProceduralMotion motion = ResolveProceduralMotion();
+            if (motion != null) motion.CancelWindup();
+        }
+
         public void PlayAttack(float activeDuration = 0.28f)
         {
             ShinobiProceduralMotion motion = ResolveProceduralMotion();
