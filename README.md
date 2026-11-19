@@ -33,7 +33,9 @@ The generated scene uses primitive geometry as a functional blockout, not final 
 ## Implemented in source
 - Player health and damage handling.
 - Basic melee attack (Space in Editor/PC, on-screen button on mobile).
-- Chakra technique (Q in Editor/PC, on-screen button on mobile).
+- Chakra Burst skill with chakra cost and cooldown (Q in Editor/PC, on-screen button on mobile).
+- Fire Style skill with chakra cost, forward hit detection and cooldown (E in Editor/PC, on-screen button on mobile).
+- Health and chakra bars with skill cooldown feedback in the generated HUD.
 - Chakra regeneration and technique cost.
 - Three training enemies that detect, approach and attack the player.
 - Enemy health and death handling.
