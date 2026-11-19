@@ -116,8 +116,9 @@ namespace ShinobiLegacy.Items
         private LootRarity RollRarity()
         {
             float roll = Random.value;
-            if (guaranteedRareChance && roll < 0.08f) return LootRarity.Legendary;
-            if (roll < 0.015f) return LootRarity.Legendary;
+            float legendaryChance = legendaryChanceOverride >= 0f ? legendaryChanceOverride :
+                (guaranteedRareChance ? 0.08f : 0.015f);
+            if (roll < legendaryChance) return LootRarity.Legendary;
             if (roll < 0.07f) return LootRarity.Epic;
             if (roll < 0.22f) return LootRarity.Rare;
             if (roll < 0.52f) return LootRarity.Uncommon;
