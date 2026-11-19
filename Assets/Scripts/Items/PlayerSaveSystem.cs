@@ -52,10 +52,11 @@ namespace ShinobiLegacy.Items
             if (inventory != null) inventory.ItemEquipped += OnItemEquipped;
             if (equipment != null) equipment.EquipmentChanged += Save;
             if (playerCombat != null) playerCombat.AbilityProgressChanged += Save;
+            if (progression != null) progression.ProgressChanged += OnProgressChanged;
             ready = true;
         }
 
-        private void OnInventoryChanged(InventoryItem item)
+        private void OnProgressChanged(int level, int experience, int required)\n        {\n            if (ready) Save();\n        }\n\n        private void OnInventoryChanged(InventoryItem item)
         {
             if (ready) Save();
         }
@@ -143,6 +144,7 @@ namespace ShinobiLegacy.Items
             if (inventory != null) inventory.ItemEquipped -= OnItemEquipped;
             if (equipment != null) equipment.EquipmentChanged -= Save;
             if (playerCombat != null) playerCombat.AbilityProgressChanged -= Save;
+            if (progression != null) progression.ProgressChanged -= OnProgressChanged;
         }
     }
 }
