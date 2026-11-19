@@ -31,6 +31,7 @@ namespace ShinobiLegacy.Editor
         [MenuItem("Tools/Shinobi Legacy/Validate Android First Test")]
         public static void ValidateAndroidFirstTest()
         {
+            ConfigureAndroidPlayer();
             if (ValidateFirstTestProject())
                 Debug.Log("SHINOBI LEGACY: Android first-test validation passed. The required scenes, player controls, camera and combat objects were found.");
         }
@@ -38,13 +39,13 @@ namespace ShinobiLegacy.Editor
         [MenuItem("Tools/Shinobi Legacy/Build Android First Test APK")]
         public static void BuildFirstTestApk()
         {
+            ConfigureAndroidPlayer();
             if (!ValidateFirstTestProject())
             {
                 Debug.LogError("SHINOBI LEGACY: APK build cancelled because project validation failed. Fix the errors above and run validation again.");
                 return;
             }
 
-            ConfigureAndroidPlayer();
             if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android)
             {
                 bool switched = EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.Android, BuildTarget.Android);
@@ -60,7 +61,7 @@ namespace ShinobiLegacy.Editor
                 .Select(scene => scene.path)
                 .ToArray();
 
-            if (scenes.Length < 2 || scenes[0] != VillageScene || !scenes.Contains(ArenaScene))
+            if (scenes.Length < 2 || scenes[0] != VillageScene || scenes[1] != ArenaScene)
             {
                 Debug.LogError("SHINOBI LEGACY: Build Settings must contain SafeVillage first and PrototypeArena second. Run Prepare Android First Test again.");
                 return;
@@ -101,13 +102,13 @@ namespace ShinobiLegacy.Editor
             EditorBuildSettingsScene[] buildScenes = EditorBuildSettings.scenes;
             if (buildScenes.Length < 2 ||
                 !buildScenes[0].enabled || buildScenes[0].path != VillageScene ||
-                !buildScenes.Any(scene => scene.enabled && scene.path == ArenaScene))
+                !buildScenes[1].enabled || buildScenes[1].path != ArenaScene)
             {
                 errors.Add("Build Settings must have SafeVillage enabled as scene 1 and PrototypeArena enabled.");
             }
 
-            if (string.IsNullOrWhiteSpace(PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.Android)))
-                errors.Add("Android application identifier is empty.");
+            if (PlayerSettings.GetApplicationIdentifier(BuildTargetGroup.Android) != "com.shinobilegacy.game")
+                errors.Add("Android application identifier must be com.shinobilegacy.game.");
 
             if (errors.Count == 0)
                 return true;
