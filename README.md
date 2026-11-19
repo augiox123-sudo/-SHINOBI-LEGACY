@@ -196,5 +196,7 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
   4. **The Drowned Oath** — defeat the Drowned Temple elite champion.
 - Each stage requires its region to be unlocked. Only one story contract can be active at a time.
 - Quest stage, active state and kill progress are stored locally. Completing a stage grants level-scaled coins and XP, then unlocks the next contract in the chain.
+- Every chapter also grants a guaranteed unique legendary relic with its own equipment slot, secondary stats and skill modifier: Meteor Flame, Wind Vortex, Thunderstorm or Water Prison. If the inventory is full, the relic drops beside the player rather than being discarded.
+- The mission board shows a short story briefing and previews the guaranteed legendary reward for each chapter.
 - Regional patrol and champion defeats now advance both the optional bounty contract and the active story quest when their region and enemy type match.
 - The quest board currently uses Unity's immediate-mode GUI as a functional prototype. It still needs a polished mobile UI, authored NPC model/animation, voiced dialogue and narrative cutscenes.
