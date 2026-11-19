@@ -184,3 +184,17 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - This is a first gameplay implementation using placeholder models and color cues. Dedicated attack animations, arena telegraphs, elemental VFX and balance testing remain outstanding.
 
 - Regional patrols now mix distinct combat roles: durable **Vanguards**, mobile **Hunters**, fast-attacking **Assassins**, plus additional Raider/Sentinel variants when patrol size is increased. Roles have different health, movement, damage, attack cadence and visual tint.
+
+
+## Village story quest chain
+
+- A new original **Mission Officer** NPC stands outside the Village Mission Office. Entering the interaction area opens the mission board; leaving the area closes it.
+- The board offers a four-stage regional story chain:
+  1. **Ashes on the Wind** — defeat 6 enemies in Ashen Ruins.
+  2. **Roots Beneath the Canopy** — defeat 6 enemies in Verdant Forest.
+  3. **Silence of the Storm** — defeat 8 enemies in Thunder Shrine.
+  4. **The Drowned Oath** — defeat the Drowned Temple elite champion.
+- Each stage requires its region to be unlocked. Only one story contract can be active at a time.
+- Quest stage, active state and kill progress are stored locally. Completing a stage grants level-scaled coins and XP, then unlocks the next contract in the chain.
+- Regional patrol and champion defeats now advance both the optional bounty contract and the active story quest when their region and enemy type match.
+- The quest board currently uses Unity's immediate-mode GUI as a functional prototype. It still needs a polished mobile UI, authored NPC model/animation, voiced dialogue and narrative cutscenes.
