@@ -46,6 +46,12 @@ namespace ShinobiLegacy.Items
             string[] slots = { "Weapon", "Chest", "Accessory", "Weapon", "Hands" };
             int index = Random.Range(0, names.Length);
             InventoryItem item = new InventoryItem(names[index], rarity, power, slots[index]);
+            if (rarity == LootRarity.Legendary)
+            {
+                string[] legendaryEffects = { "fire_wave", "fire_dragon", "fire_burst", "burst_storm", "burst_guard" };
+                item.abilityModifier = legendaryEffects[Random.Range(0, legendaryEffects.Length)];
+                item.itemName += " [" + GetModifierName(item.abilityModifier) + "]";
+            }
 
             GameObject orb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             orb.transform.position = transform.position + Vector3.up * 0.45f;
@@ -57,6 +63,19 @@ namespace ShinobiLegacy.Items
             body.useGravity = false;
             LootPickup pickup = orb.AddComponent<LootPickup>();
             pickup.Configure(item);
+        }
+
+        private static string GetModifierName(string id)
+        {
+            switch (id)
+            {
+                case "fire_wave": return "Flame Wave";
+                case "fire_dragon": return "Twin Dragons";
+                case "fire_burst": return "Inferno Impact";
+                case "burst_storm": return "Chakra Tempest";
+                case "burst_guard": return "Guardian Pulse";
+                default: return "Awakened Technique";
+            }
         }
 
         private LootRarity RollRarity()
