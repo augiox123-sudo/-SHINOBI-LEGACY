@@ -18,7 +18,12 @@ namespace ShinobiLegacy.CameraSystem
             float blend = 1f - Mathf.Exp(-followSharpness * Time.deltaTime);
             transform.position = Vector3.Lerp(transform.position, desiredPosition, blend);
             Vector3 lookPoint = target.position + Vector3.up * lookHeight;
-            transform.rotation = Quaternion.LookRotation(lookPoint - transform.position);
+            Vector3 lookDirection = lookPoint - transform.position;
+            if (lookDirection.sqrMagnitude > 0.001f)
+            {
+                Quaternion desiredRotation = Quaternion.LookRotation(lookDirection, Vector3.up);
+                transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, blend);
+            }
         }
     }
 }
