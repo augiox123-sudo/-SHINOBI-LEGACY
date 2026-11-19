@@ -112,7 +112,11 @@ namespace ShinobiLegacy.Enemies
             if (health.IsStunned)
             {
                 attackPending = false;
-                if (animationBridge != null) animationBridge.SetMoveSpeed(0f);
+                if (animationBridge != null)
+                {
+                    animationBridge.CancelWindup();
+                    animationBridge.SetMoveSpeed(0f);
+                }
                 return;
             }
             if (target == null)
@@ -207,6 +211,7 @@ namespace ShinobiLegacy.Enemies
                 nextAttackTime = Time.time + attackCooldown;
                 attackPending = true;
                 attackWindupRemaining = attackWindup;
+                if (animationBridge != null) animationBridge.PlayWindup(behavior == 2);
             }
         }
 
