@@ -52,6 +52,15 @@ namespace ShinobiLegacy.UI
                 string fire = combat.FireCooldownRemaining > 0f
                     ? combat.FireCooldownRemaining.ToString("0.0") + "s"
                     : "READY";
+                string lightning = combat.LightningCooldownRemaining > 0f
+                    ? combat.LightningCooldownRemaining.ToString("0.0") + "s"
+                    : "READY";
+                string water = combat.WaterCooldownRemaining > 0f
+                    ? combat.WaterCooldownRemaining.ToString("0.0") + "s"
+                    : "READY";
+                string wind = combat.WindCooldownRemaining > 0f
+                    ? combat.WindCooldownRemaining.ToString("0.0") + "s"
+                    : "READY";
                 EquipmentManager gear = combat.GetComponent<EquipmentManager>();
                 string burstMod = gear != null ? gear.GetAbilityModifier("burst") : string.Empty;
                 string fireMod = gear != null ? gear.GetAbilityModifier("fire") : string.Empty;
@@ -62,11 +71,11 @@ namespace ShinobiLegacy.UI
                     (string.IsNullOrEmpty(burstMod) ? "" : " [" + ModifierLabel(burstMod) + "]") +
                     "    FIRE R" + combat.FireRank + ": " + fire +
                     (string.IsNullOrEmpty(fireMod) ? "" : " [" + ModifierLabel(fireMod) + "]") +
-                    "    LIGHTNING R" + combat.LightningRank +
+                    "    LIGHTNING R" + combat.LightningRank + ": " + lightning +
                     (string.IsNullOrEmpty(lightningMod) ? "" : " [" + ModifierLabel(lightningMod) + "]") +
-                    "    WATER R" + combat.WaterRank +
+                    "    WATER R" + combat.WaterRank + ": " + water +
                     (string.IsNullOrEmpty(waterMod) ? "" : " [" + ModifierLabel(waterMod) + "]") +
-                    "    WIND R" + combat.WindRank +
+                    "    WIND R" + combat.WindRank + ": " + wind +
                     (string.IsNullOrEmpty(windMod) ? "" : " [" + ModifierLabel(windMod) + "]") +
                     (gear != null && gear.LegendarySynergyActive ? "    LEGENDARY SYNERGY +10%" : "");
             }
