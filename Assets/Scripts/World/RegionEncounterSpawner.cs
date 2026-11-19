@@ -80,13 +80,24 @@ namespace ShinobiLegacy.World
             {
                 float angle = i * Mathf.PI * 2f / patrolSize;
                 Vector3 offset = new Vector3(Mathf.Cos(angle) * 12f, 1f, Mathf.Sin(angle) * 12f);
+                string[] roles = { "Vanguard", "Hunter", "Assassin", "Raider", "Sentinel" };
+                float[] healthScales = { 1.65f, 0.9f, 0.72f, 1.1f, 1.35f };
+                float[] speedScales = { 0.72f, 1.18f, 1.42f, 1f, 0.82f };
+                float[] damageScales = { 1.45f, 0.92f, 1.15f, 1f, 1.25f };
+                float[] cooldownScales = { 1.3f, 0.9f, 0.68f, 1f, 1.15f };
+                int role = i % roles.Length;
                 GameObject enemy = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                enemy.name = regionId + "_" + enemyFaction.Replace(" ", "_") + "_" + (i + 1);
+                enemy.name = regionId + "_" + roles[role] + "_" + (i + 1);
                 enemy.transform.position = transform.position + offset;
+                enemy.transform.localScale = Vector3.one * (role == 0 || role == 4 ? 1.12f : 0.96f);
                 Renderer renderer = enemy.GetComponent<Renderer>();
                 Shader shader = Shader.Find("Universal Render Pipeline/Lit");
                 if (shader == null) shader = Shader.Find("Standard");
-                Material material = new Material(shader) { color = enemyColor };
+                Color roleTint = role == 0 ? new Color(0.72f, 0.72f, 0.72f) :
+                    role == 1 ? new Color(0.35f, 0.85f, 0.75f) :
+                    role == 2 ? new Color(0.9f, 0.28f, 0.22f) :
+                    role == 3 ? new Color(0.85f, 0.58f, 0.2f) : new Color(0.55f, 0.55f, 0.95f);
+                Material material = new Material(shader) { color = Color.Lerp(enemyColor, roleTint, 0.42f) };
                 renderer.material = material;
                 Object.Destroy(enemy.GetComponent<CapsuleCollider>());
 
@@ -94,9 +105,11 @@ namespace ShinobiLegacy.World
                 controller.height = 2f;
                 controller.radius = 0.42f;
                 CombatantHealth health = enemy.AddComponent<CombatantHealth>();
-                health.SetMaxHealth(100f + level * 22f);
+                health.SetMaxHealth((100f + level * 22f) * healthScales[role]);
                 EnemyCombatAI ai = enemy.AddComponent<EnemyCombatAI>();
-                ai.Configure(2.2f + level * 0.025f, 10f + level * 2.2f, 1.5f, 24f + level * 2f);
+                ai.Configure((2.2f + level * 0.025f) * speedScales[role],
+                    (10f + level * 2.2f) * damageScales[role],
+                    1.5f * cooldownScales[role], 24f + level * 2f);
                 ai.SetTarget(player);
 
                 EnemyRewardDrop rewards = enemy.AddComponent<EnemyRewardDrop>();
