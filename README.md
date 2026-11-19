@@ -116,3 +116,18 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - The village gate is the initial unlocked destination. Central Market, Village Administration and Training Grounds unlock when the player explores close enough to their markers.
 - Unlocks are stored locally. Fast travel moves the player to the selected discovered point and saves the current player data.
 - This is the first local prototype of the map/travel system. A full illustrated world map, multiple connected regions, dungeon maps and server-backed account saves remain future work.
+
+
+## Legendary ability transformations and mastery
+
+- Legendary gear now carries a serialized ability-modifier affix. The modifier is active only while that legendary item is equipped; removing it restores the base skill behaviour.
+- Legendary loot rolls one of five first-pass skill transformations:
+  - **Flame Wave** (fire_wave): Fire Style travels through three wider damage zones.
+  - **Twin Dragons** (fire_dragon): Fire Style launches two parallel flame lanes.
+  - **Inferno Impact** (fire_burst): Fire Style detonates in an area around its first impact.
+  - **Chakra Tempest** (burst_storm): Chakra Burst creates two broader overlapping pulses.
+  - **Guardian Pulse** (burst_guard): Chakra Burst also restores 18% of the player's maximum health.
+- Skills also have independent mastery ranks from 1 to 5. Each successful cast records use; every 20 casts at the current rank advances mastery and increases that skill's damage by 5%.
+- Ability ranks, use counts, and legendary affixes on carried/equipped gear are included in the local save.
+- The combat HUD displays skill rank and the active legendary modifier.
+- These are first-pass gameplay transformations using the current combat hit logic. Dedicated animated chakra/fire VFX, unique animation sets, further skills and multi-item legendary synergy are planned for the next combat-art pass.
