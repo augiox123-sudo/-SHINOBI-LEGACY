@@ -38,6 +38,7 @@ The generated scene uses primitive geometry as a functional blockout, not final 
 - Health and chakra bars with skill cooldown feedback in the generated HUD.
 - Chakra regeneration and technique cost.
 - Three training enemies that detect, approach and attack the player.
+- Stone Guardian boss with a telegraphed heavy slam and a dedicated boss health bar.
 - Enemy health and death handling.
 - Prototype arena is registered as the first build scene.
 
