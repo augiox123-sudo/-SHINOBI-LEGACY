@@ -43,7 +43,7 @@ namespace ShinobiLegacy.Enemies
 
         private void Update()
         {
-            if (health == null || health.IsDead || target == null) return;
+            if (health == null || health.IsDead || health.IsStunned || target == null) return;
             Vector3 offset = target.position - transform.position;
             offset.y = 0f;
             float distance = offset.magnitude;
