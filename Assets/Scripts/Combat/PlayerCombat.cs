@@ -56,6 +56,9 @@ namespace ShinobiLegacy.Combat
         public int LightningRank => lightningRank;
         public int WaterRank => waterRank;
         public int WindRank => windRank;
+        public int LightningUses => lightningUses;
+        public int WaterUses => waterUses;
+        public int WindUses => windUses;
         public int BurstRank => burstRank;
         public int FireRank => fireRank;
         public int BurstUses => burstUses;
