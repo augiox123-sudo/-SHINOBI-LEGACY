@@ -116,6 +116,7 @@ namespace ShinobiLegacy.UI
                 overlayRect.offsetMax = Vector2.zero;
                 Image overlay = overlayObject.GetComponent<Image>();
                 overlay.sprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/UISprite.psd");
+                overlayObject.transform.SetAsFirstSibling();
                 overlay.type = Image.Type.Filled;
                 overlay.fillMethod = Image.FillMethod.Radial360;
                 overlay.fillOrigin = (int)Image.Origin360.Top;
