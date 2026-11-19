@@ -268,6 +268,22 @@ The repository now includes an automated first-test scene and APK workflow for U
 6. Run **Tools → Shinobi Legacy → Build Android First Test APK**.
 7. The development APK is written to `Builds/Android/SHINOBI_LEGACY_FirstTest.apk`. In the running test build, the **COMBAT TEST** button switches from the village to the prototype arena, and **VILLAGE HUB** returns to the village.
 
+### Build the APK through GitHub Actions
+
+A cloud build workflow is available at `.github/workflows/android-first-test.yml`. It runs when game source, packages or project settings change on `main`, and it can also be started manually from the repository's **Actions** tab.
+
+The workflow uses GameCI with the exact Unity Editor version in this project. It regenerates the two test scenes, runs the same project validation, builds an ARM64 development APK and uploads it as the artifact **SHINOBI-LEGACY-Android-FirstTest**.
+
+**One-time license setup is required:**
+
+1. Obtain a Unity Personal license file (`.ulf`). GameCI's official activation guide explains how to request the GitHub runner activation file and convert it into a Unity license: https://game.ci/docs/github/activation/
+2. In this GitHub repository, open **Settings → Secrets and variables → Actions → New repository secret**.
+3. Set the secret name to `UNITY_LICENSE` and paste the full contents of the `.ulf` license file as its value. Do not commit the license file to the repository.
+4. Open **Actions → Android first-test APK → Run workflow**. After a successful run, download the APK from the workflow run's **Artifacts** section.
+
+If `UNITY_LICENSE` is not configured, the workflow deliberately skips the Unity build and shows a notice. It does not report a fake successful APK build.
+
+
 The first-test player is configured for landscape, ARM64, Android API 26+, automatic installed target SDK selection, Gamma color space, IL2CPP, incremental garbage collection and Android optimized frame pacing. Incremental GC spreads collection work over smaller slices, while optimized frame pacing aims to distribute frames more evenly; neither guarantees a fixed FPS on a device. The runtime target remains 30 FPS with shadows disabled. This is a development test build, not a store release.
 
 The validation step also checks that Android Build Support is installed in the Editor, both scenes have no missing-script components, the main camera is orthographic, and the EventSystem has its legacy Standalone Input Module for the current touch UI.
