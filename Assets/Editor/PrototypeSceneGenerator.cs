@@ -39,7 +39,8 @@ namespace ShinobiLegacy.Editor
             player.AddComponent<CombatantHealth>();
             PlayerCombat playerCombat = player.AddComponent<PlayerCombat>();
             PlayerProgression progression = player.AddComponent<PlayerProgression>();
-            player.AddComponent<PlayerInventory>();
+            PlayerInventory inventory = player.AddComponent<PlayerInventory>();
+            EquipmentManager equipment = player.AddComponent<EquipmentManager>();
 
             GameObject cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
@@ -142,6 +143,7 @@ namespace ShinobiLegacy.Editor
             CreateActionButton(canvasObject.transform, "ATTACK", new Vector2(-180f, 125f), new Vector2(150f, 110f), () => playerCombat.BasicAttack());
             CreateActionButton(canvasObject.transform, "CHAKRA BURST", new Vector2(-350f, 245f), new Vector2(155f, 100f), () => playerCombat.CastChakraBurst());
             CreateActionButton(canvasObject.transform, "FIRE STYLE", new Vector2(-180f, 265f), new Vector2(135f, 90f), () => playerCombat.CastFireStyle());
+            CreateActionButton(canvasObject.transform, "EQUIP BEST", new Vector2(-180f, 390f), new Vector2(150f, 76f), () => inventory.EquipBest(equipment));
 
             Image healthFill = CreateBar(canvasObject.transform, "Health Bar", new Vector2(35f, -35f),
                 new Vector2(420f, 30f), new Color(0.78f, 0.12f, 0.12f, 1f));
@@ -227,7 +229,7 @@ namespace ShinobiLegacy.Editor
             CombatHud hud = canvasObject.AddComponent<CombatHud>();
             hud.Configure(player.GetComponent<CombatantHealth>(), playerCombat, healthFill, chakraFill, statusText);
             ProgressionHud progressionHud = canvasObject.AddComponent<ProgressionHud>();
-            progressionHud.Configure(progression, player.GetComponent<PlayerInventory>(), progressionText);
+            progressionHud.Configure(progression, inventory, progressionText, equipment);
 
             if (!AssetDatabase.IsValidFolder("Assets/Scenes")) AssetDatabase.CreateFolder("Assets", "Scenes");
             EditorSceneManager.MarkSceneDirty(scene);
