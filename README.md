@@ -170,3 +170,15 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - Entering an unlocked region activates a three-enemy patrol. Clearing the patrol summons a stronger regional champion with a guaranteed item drop and a 12% legendary chance. The patrol cycle can respawn after the player leaves the area and the respawn delay passes.
 - Regional bounty contracts can be accepted from the world map. One contract can be active at a time; defeat 10 enemies in the selected region to receive level-scaled coins and XP. Contract progress is stored locally.
 - These regions and encounters are functional source-level blockouts. They still need authored 3D environments, unique enemy/boss models, animations, audio, and full Unity runtime validation.
+
+
+## Dungeon boss phase mechanics
+
+- Dungeon bosses and regional elite champions now enter **Phase II** when their health falls to 55%. Their movement and basic slam attacks become faster and more dangerous.
+- Each region has a distinct Phase II ability:
+  - **Ashen Ruins:** a high-damage burst strike.
+  - **Verdant Forest:** the boss regenerates 8% of its maximum health.
+  - **Thunder Shrine:** a heavy strike that briefly stuns the player.
+  - **Drowned Temple:** a water-force strike that briefly interrupts the player.
+- Bosses visibly change color during their second phase and telegraph special attacks with a longer wind-up, giving the player a reaction window.
+- This is a first gameplay implementation using placeholder models and color cues. Dedicated attack animations, arena telegraphs, elemental VFX and balance testing remain outstanding.
