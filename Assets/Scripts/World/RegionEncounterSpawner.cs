@@ -23,6 +23,7 @@ namespace ShinobiLegacy.World
         private readonly List<GameObject> activeEnemies = new List<GameObject>();
         private Transform player;
         private bool encounterStarted;
+        private bool championActive;
         private float respawnAt;
 
         public void Configure(string id, string faction, Color color, int level, int count)
@@ -69,6 +70,7 @@ namespace ShinobiLegacy.World
         {
             if (player == null) return;
             encounterStarted = true;
+            championActive = false;
             activeEnemies.Clear();
 
             PlayerProgression progression = player.GetComponent<PlayerProgression>();
@@ -109,8 +111,50 @@ namespace ShinobiLegacy.World
             activeEnemies.RemoveAll(enemy => enemy == null ||
                 enemy.GetComponent<CombatantHealth>() == null ||
                 enemy.GetComponent<CombatantHealth>().IsDead);
-            if (activeEnemies.Count == 0)
-                respawnAt = Time.time + respawnDelay;
+            if (activeEnemies.Count > 0) return;
+
+            if (!championActive)
+            {
+                SpawnRegionalChampion();
+                return;
+            }
+
+            respawnAt = Time.time + respawnDelay;
+            Debug.Log("SHINOBI LEGACY: Regional champion defeated in " + regionId);
+        }
+
+        private void SpawnRegionalChampion()
+        {
+            championActive = true;
+            Vector3 position = transform.position + new Vector3(0f, 1.4f, 25f);
+            GameObject champion = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            champion.name = regionId + "_Elite_Champion";
+            champion.transform.position = position;
+            champion.transform.localScale = new Vector3(1.45f, 1.5f, 1.45f);
+
+            Renderer renderer = champion.GetComponent<Renderer>();
+            Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null) shader = Shader.Find("Standard");
+            renderer.material = new Material(shader) { color = Color.Lerp(enemyColor, Color.yellow, 0.42f) };
+            Object.Destroy(champion.GetComponent<CapsuleCollider>());
+
+            CharacterController controller = champion.AddComponent<CharacterController>();
+            controller.height = 2.4f;
+            controller.radius = 0.58f;
+            CombatantHealth health = champion.AddComponent<CombatantHealth>();
+            PlayerProgression progression = player != null ? player.GetComponent<PlayerProgression>() : null;
+            int level = progression != null ? progression.Level : requiredLevel;
+            health.SetMaxHealth(650f + level * 95f);
+
+            BossCombatAI boss = champion.AddComponent<BossCombatAI>();
+            boss.SetTarget(player);
+
+            EnemyRewardDrop rewards = champion.AddComponent<EnemyRewardDrop>();
+            rewards.Configure(progression, 180 + level * 30, 1f, true);
+            rewards.SetLegendaryChance(0.12f);
+            health.Died += OnPatrolEnemyDied;
+            activeEnemies.Add(champion);
+            Debug.Log("SHINOBI LEGACY: Elite champion appeared in " + regionId);
         }
     }
 }
