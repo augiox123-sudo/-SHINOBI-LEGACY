@@ -13,6 +13,14 @@ namespace ShinobiLegacy.Combat
         [SerializeField] private float attackRadius = 1.15f;
         [SerializeField] private float attackCooldown = 0.55f;
 
+        [Header("Basic attack combo")]
+        [SerializeField] private float comboResetWindow = 1.2f;
+        [SerializeField] private float comboFinisherCooldown = 0.72f;
+        [SerializeField] private float comboSecondDamageMultiplier = 1.12f;
+        [SerializeField] private float comboFinisherDamageMultiplier = 1.35f;
+        private int comboStep;
+        private float lastBasicAttackTime = -10f;
+
         [Header("Chakra burst")]
         [SerializeField] private float burstDamage = 65f;
         [SerializeField] private float burstRange = 5.5f;
@@ -123,10 +131,20 @@ namespace ShinobiLegacy.Combat
         public void BasicAttack()
         {
             if (Time.time < nextAttackTime) return;
-            nextAttackTime = Time.time + attackCooldown;
+
+            // A short input gap restarts the chain; otherwise each accepted attack
+            // advances to the next strike, with the third hit acting as a finisher.
+            if (Time.time - lastBasicAttackTime > comboResetWindow) comboStep = 0;
+            int currentStep = comboStep;
+            comboStep = (comboStep + 1) % 3;
+            lastBasicAttackTime = Time.time;
+            nextAttackTime = Time.time + (currentStep == 2 ? comboFinisherCooldown : attackCooldown);
+
             if (animationBridge != null) animationBridge.PlayAttack();
             damagedThisCast.Clear();
-            float damage = GetScaledDamage(attackDamage);
+            float comboMultiplier = currentStep == 1 ? comboSecondDamageMultiplier :
+                currentStep == 2 ? comboFinisherDamageMultiplier : 1f;
+            float damage = GetScaledDamage(attackDamage) * comboMultiplier;
             CombatantHealth lockedTarget = targetLock != null ? targetLock.CurrentTarget : null;
             bool focusedHit = TryHitLockedTarget(damage);
             if (focusedHit)
