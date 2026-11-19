@@ -55,13 +55,19 @@ namespace ShinobiLegacy.UI
                 EquipmentManager gear = combat.GetComponent<EquipmentManager>();
                 string burstMod = gear != null ? gear.GetAbilityModifier("burst") : string.Empty;
                 string fireMod = gear != null ? gear.GetAbilityModifier("fire") : string.Empty;
+                string lightningMod = gear != null ? gear.GetAbilityModifier("lightning") : string.Empty;
+                string waterMod = gear != null ? gear.GetAbilityModifier("water") : string.Empty;
+                string windMod = gear != null ? gear.GetAbilityModifier("wind") : string.Empty;
                 statusText.text = "BURST R" + combat.BurstRank + ": " + burst +
                     (string.IsNullOrEmpty(burstMod) ? "" : " [" + ModifierLabel(burstMod) + "]") +
                     "    FIRE R" + combat.FireRank + ": " + fire +
                     (string.IsNullOrEmpty(fireMod) ? "" : " [" + ModifierLabel(fireMod) + "]") +
                     "    LIGHTNING R" + combat.LightningRank +
+                    (string.IsNullOrEmpty(lightningMod) ? "" : " [" + ModifierLabel(lightningMod) + "]") +
                     "    WATER R" + combat.WaterRank +
+                    (string.IsNullOrEmpty(waterMod) ? "" : " [" + ModifierLabel(waterMod) + "]") +
                     "    WIND R" + combat.WindRank +
+                    (string.IsNullOrEmpty(windMod) ? "" : " [" + ModifierLabel(windMod) + "]") +
                     (gear != null && gear.LegendarySynergyActive ? "    LEGENDARY SYNERGY +10%" : "");
             }
         }
@@ -77,6 +83,12 @@ namespace ShinobiLegacy.UI
                 case "burst_storm": return "Chakra Tempest";
                 case "burst_guard": return "Guardian Pulse";
                 case "burst_chain": return "Chain Lightning";
+                case "lightning_chain": return "Lightning Chain";
+                case "lightning_storm": return "Thunderstorm";
+                case "water_prison": return "Water Prison";
+                case "water_torrent": return "Water Torrent";
+                case "wind_vortex": return "Wind Vortex";
+                case "wind_blade": return "Wind Blade";
                 default: return id;
             }
         }
