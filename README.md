@@ -139,3 +139,7 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - Chakra Tempest briefly stuns enemies for 0.8 seconds. Stun interrupts regular enemy movement/attacks and can cancel a boss wind-up.
 - Equipping at least two legendary items with ability affixes activates Legendary Synergy, increasing technique damage by 10%. The combat HUD reports when this bonus is active.
 - These effects are implemented in gameplay logic; visual burn, stun, flame trails, impact bursts and chakra shockwave effects still need dedicated VFX and animation work.
+
+
+- Two additional legendary affixes are available: **Chain Lightning** (Chakra Burst jumps to up to three nearby enemies with reduced damage per jump and a brief stun) and **Meteor Flame** (Fire Style detonates in a larger, harder-hitting burning impact zone).
+- Equipping a replacement item now returns the previously equipped item to the inventory instead of silently deleting it.
