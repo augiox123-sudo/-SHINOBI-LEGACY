@@ -25,6 +25,7 @@ namespace ShinobiLegacy.Enemies
         private CombatantHealth health;
         private float nextSlamTime;
         private float windupRemaining;
+        private float windupTotal;
         private bool windingUp;
         private bool phaseTwo;
         private bool specialWindup;
@@ -163,6 +164,7 @@ namespace ShinobiLegacy.Enemies
                 windingUp = true;
                 specialWindup = true;
                 windupRemaining = windupDuration * 1.25f;
+                windupTotal = windupRemaining;
                 nextSpecialTime = Time.time + specialCooldown;
                 if (bodyRenderer != null) SetBodyColor(ProfileColor());
                 SetTelegraphVisible(true);
@@ -181,6 +183,7 @@ namespace ShinobiLegacy.Enemies
                 windingUp = true;
                 specialWindup = false;
                 windupRemaining = windupDuration;
+                windupTotal = windupRemaining;
                 nextSlamTime = Time.time + slamCooldown;
                 if (bodyRenderer != null) SetBodyColor(new Color(1f, 0.55f, 0.08f));
                 SetTelegraphVisible(true);
@@ -269,14 +272,19 @@ namespace ShinobiLegacy.Enemies
         {
             if (attackTelegraph == null) return;
             float radius = specialWindup ? specialRange : slamRange + 0.8f;
-            float pulse = 1f + Mathf.Sin(Time.time * 9f) * 0.035f;
+            float progress = windupTotal > 0f ? 1f - Mathf.Clamp01(windupRemaining / windupTotal) : 1f;
+            float pulseSpeed = Mathf.Lerp(5f, 19f, progress);
+            float pulse = 1f + Mathf.Sin(Time.time * pulseSpeed) * Mathf.Lerp(0.025f, 0.075f, progress);
             for (int i = 0; i < TelegraphSegments; i++)
             {
                 float angle = i * Mathf.PI * 2f / TelegraphSegments;
                 attackTelegraph.SetPosition(i, new Vector3(Mathf.Cos(angle) * radius * pulse, 0.12f, Mathf.Sin(angle) * radius * pulse));
             }
+            float lineWidth = Mathf.Lerp(0.09f, 0.2f, progress);
+            attackTelegraph.startWidth = lineWidth;
+            attackTelegraph.endWidth = lineWidth * 0.72f;
             Color warning = specialWindup ? ProfileColor() : new Color(1f, 0.28f, 0.06f);
-            warning.a = 0.9f;
+            warning.a = Mathf.Lerp(0.55f, 1f, progress);
             attackTelegraph.startColor = warning;
             attackTelegraph.endColor = warning;
         }
