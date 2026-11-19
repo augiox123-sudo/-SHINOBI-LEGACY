@@ -149,6 +149,8 @@ namespace ShinobiLegacy.Editor
             respawn.SetSafeSpawn(safeSpawn.transform);
 
             GameObject hud = new GameObject("Village Mobile HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            ShinobiLegacy.UI.TestSceneTravelButton sceneTravel = hud.AddComponent<ShinobiLegacy.UI.TestSceneTravelButton>();
+            sceneTravel.Configure("PrototypeArena", "COMBAT TEST");
             Canvas canvas = hud.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             CanvasScaler scaler = hud.GetComponent<CanvasScaler>();
