@@ -25,6 +25,12 @@ namespace ShinobiLegacy.Items
             public int fireRank = 1;
             public int burstUses;
             public int fireUses;
+            public int lightningRank = 1;
+            public int waterRank = 1;
+            public int windRank = 1;
+            public int lightningUses;
+            public int waterUses;
+            public int windUses;
             public int playerLevel = 1;
             public int playerExperience;
         }
@@ -94,6 +100,9 @@ namespace ShinobiLegacy.Items
                 fireRank = playerCombat != null ? playerCombat.FireRank : 1,
                 burstUses = playerCombat != null ? playerCombat.BurstUses : 0,
                 fireUses = playerCombat != null ? playerCombat.FireUses : 0,
+                lightningRank = playerCombat != null ? playerCombat.LightningRank : 1,
+                waterRank = playerCombat != null ? playerCombat.WaterRank : 1,
+                windRank = playerCombat != null ? playerCombat.WindRank : 1,
                 playerLevel = progression != null ? progression.Level : 1,
                 playerExperience = progression != null ? progression.Experience : 0
             };
@@ -111,7 +120,8 @@ namespace ShinobiLegacy.Items
                 if (wallet != null) wallet.SetCoins(data.coins);
                 if (inventory != null) inventory.RestoreItems(data.inventory);
                 if (equipment != null) equipment.RestoreEquipment(data.equipped);
-                if (playerCombat != null) playerCombat.RestoreAbilityProgress(data.burstRank, data.fireRank, data.burstUses, data.fireUses);
+                if (playerCombat != null) playerCombat.RestoreAbilityProgress(data.burstRank, data.fireRank, data.burstUses, data.fireUses,
+                    data.lightningRank, data.waterRank, data.windRank, data.lightningUses, data.waterUses, data.windUses);
                 if (progression != null) progression.RestoreProgress(data.playerLevel, data.playerExperience);
             }
             catch (Exception exception)
