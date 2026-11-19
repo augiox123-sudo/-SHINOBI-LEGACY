@@ -109,7 +109,7 @@ namespace ShinobiLegacy.Enemies
         private void Update()
         {
             if (health == null || health.IsDead) return;
-            if (health.IsStunned)
+            if (health.IsStunned || health.IsStaggered)
             {
                 attackPending = false;
                 if (animationBridge != null)
