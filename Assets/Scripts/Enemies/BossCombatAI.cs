@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using ShinobiLegacy.Combat;
 using ShinobiLegacy.Items;
 using ShinobiLegacy.Player;
@@ -230,11 +231,65 @@ namespace ShinobiLegacy.Enemies
             if (availableSlots <= 0) return;
 
             int spawnCount = Mathf.Min(2, availableSlots);
+            nextSummonTime = Time.time + SummonInterval;
+            StartCoroutine(ShowSummonWarningsAndSpawn(spawnCount));
+        }
+
+        private IEnumerator ShowSummonWarningsAndSpawn(int spawnCount)
+        {
+            Vector3[] spawnPositions = new Vector3[spawnCount];
+            LineRenderer[] warningRings = new LineRenderer[spawnCount];
+
             for (int i = 0; i < spawnCount; i++)
             {
                 float side = i == 0 ? -1f : 1f;
-                Vector3 spawnPosition = transform.position + transform.right * (side * 2.4f) + transform.forward * 1.6f;
-                GameObject minion = Instantiate(summonTemplate, spawnPosition, Quaternion.identity);
+                Vector3 position = transform.position + transform.right * (side * 2.4f) + transform.forward * 1.6f;
+                position.y = 0.08f;
+                spawnPositions[i] = position;
+                warningRings[i] = CreateSummonWarning(position);
+            }
+
+            const float warningDuration = 0.9f;
+            float elapsed = 0f;
+            while (elapsed < warningDuration)
+            {
+                if (health == null || health.IsDead || target == null || !phaseTwo)
+                {
+                    DestroySummonWarnings(warningRings);
+                    yield break;
+                }
+
+                CombatantHealth targetHealth = target.GetComponent<CombatantHealth>();
+                Vector3 flatOffset = target.position - transform.position;
+                flatOffset.y = 0f;
+                if (targetHealth == null || targetHealth.IsDead || flatOffset.magnitude > detectionRange)
+                {
+                    DestroySummonWarnings(warningRings);
+                    yield break;
+                }
+
+                elapsed += Time.deltaTime;
+                float pulse = 1f + Mathf.Sin(Time.time * 18f) * 0.08f;
+                for (int i = 0; i < warningRings.Length; i++)
+                {
+                    LineRenderer ring = warningRings[i];
+                    if (ring == null) continue;
+                    ring.widthMultiplier = Mathf.Lerp(0.08f, 0.17f, elapsed / warningDuration);
+                    ring.transform.position = spawnPositions[i] + Vector3.up * (0.025f + pulse * 0.01f);
+                }
+                yield return null;
+            }
+
+            DestroySummonWarnings(warningRings);
+            if (health == null || health.IsDead || target == null || summonTemplate == null) yield break;
+
+            int spawned = 0;
+            for (int i = 0; i < spawnPositions.Length; i++)
+            {
+                if (activeSummons.Count >= MaxActiveSummons) break;
+                Vector3 position = spawnPositions[i];
+                position.y = transform.position.y;
+                GameObject minion = Instantiate(summonTemplate, position, Quaternion.identity);
                 minion.name = "Guardian_Summoned_Raider_" + (++summonWave);
                 minion.SetActive(false);
 
@@ -252,10 +307,41 @@ namespace ShinobiLegacy.Enemies
                 CombatantHealth minionHealth = minion.GetComponent<CombatantHealth>();
                 if (minionHealth != null) minionHealth.SetMaxHealth(85f);
                 activeSummons.Add(minion);
+                spawned++;
             }
 
-            nextSummonTime = Time.time + SummonInterval;
-            Debug.Log("SHINOBI LEGACY: Stone Guardian summoned " + spawnCount + " raider(s).");
+            if (spawned > 0)
+                Debug.Log("SHINOBI LEGACY: Stone Guardian summoned " + spawned + " raider(s).");
+        }
+
+        private LineRenderer CreateSummonWarning(Vector3 position)
+        {
+            GameObject ringObject = new GameObject("Boss_Summon_Warning");
+            ringObject.transform.position = position;
+            LineRenderer ring = ringObject.AddComponent<LineRenderer>();
+            ring.useWorldSpace = false;
+            ring.loop = true;
+            ring.positionCount = TelegraphSegments;
+            ring.numCapVertices = 2;
+            ring.widthMultiplier = 0.08f;
+            ring.sharedMaterial = telegraphMaterial;
+            Color warning = new Color(0.72f, 0.28f, 1f, 0.9f);
+            ring.startColor = warning;
+            ring.endColor = warning;
+            const float radius = 0.95f;
+            for (int i = 0; i < TelegraphSegments; i++)
+            {
+                float angle = i * Mathf.PI * 2f / TelegraphSegments;
+                ring.SetPosition(i, new Vector3(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle) * radius));
+            }
+            return ring;
+        }
+
+        private void DestroySummonWarnings(LineRenderer[] rings)
+        {
+            if (rings == null) return;
+            for (int i = 0; i < rings.Length; i++)
+                if (rings[i] != null) Destroy(rings[i].gameObject);
         }
 
         private void PerformSlam()
