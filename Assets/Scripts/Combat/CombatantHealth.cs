@@ -11,6 +11,7 @@ namespace ShinobiLegacy.Combat
         [SerializeField] private bool destroyOnDeath;
         private float currentHealth;
         private EquipmentManager equipment;
+        private CombatAnimationBridge animationBridge;
         private float invulnerableUntil;
         private Coroutine burnRoutine;
         private float stunnedUntil;
@@ -32,12 +33,15 @@ namespace ShinobiLegacy.Combat
         {
             currentHealth = maxHealth;
             equipment = GetComponent<EquipmentManager>();
+            animationBridge = GetComponent<CombatAnimationBridge>();
+            if (animationBridge == null) animationBridge = gameObject.AddComponent<CombatAnimationBridge>();
         }
 
         public void TakeDamage(float amount)
         {
             if (IsDead || amount <= 0f || Time.time < invulnerableUntil) return;
             if (equipment == null) equipment = GetComponent<EquipmentManager>();
+            if (animationBridge != null) animationBridge.TriggerHit();
             float incomingDamage = amount;
             if (equipment != null) incomingDamage = Mathf.Max(1f, amount - equipment.Defense);
             currentHealth = Mathf.Max(0f, currentHealth - incomingDamage);
@@ -88,6 +92,7 @@ namespace ShinobiLegacy.Combat
         {
             if (IsDead) return;
             IsDead = true;
+            if (animationBridge != null) animationBridge.SetDead(true);
             if (burnRoutine != null) StopCoroutine(burnRoutine);
             burnRoutine = null;
             Died?.Invoke();
