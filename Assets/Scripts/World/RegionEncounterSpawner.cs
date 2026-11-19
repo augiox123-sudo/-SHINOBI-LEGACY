@@ -124,6 +124,8 @@ namespace ShinobiLegacy.World
         {
             RegionalBountySystem bounty = player != null ? player.GetComponent<RegionalBountySystem>() : null;
             if (bounty != null) bounty.RegisterKill(regionId);
+            VillageQuestSystem storyQuests = player != null ? player.GetComponent<VillageQuestSystem>() : null;
+            if (storyQuests != null) storyQuests.RegisterEnemyDefeated(regionId, championActive);
 
             activeEnemies.RemoveAll(enemy => enemy == null ||
                 enemy.GetComponent<CombatantHealth>() == null ||
