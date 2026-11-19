@@ -105,3 +105,14 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - The save updates when currency, inventory or equipment changes and is also written when the app is paused or closed.
 - The generated Safe Village player now receives the save component automatically.
 - This is currently a device-local prototype save using PlayerPrefs. It is not cloud synchronization, account security or a server-authoritative multiplayer save.
+
+
+## Safe-zone respawn and fast travel
+
+- The Safe Village player now has a health component and a respawn controller. On death, the character returns to the village safe spawn after a short delay, is restored to full health and receives temporary damage protection.
+- Death does not remove inventory, currency or equipped items. The player save is written when death occurs and after respawn.
+- Local autosave also writes a checkpoint every 30 seconds, as well as on app pause/quit and item, currency or equipment changes.
+- Added a **WORLD MAP** overlay with a stylized village map and clickable fast-travel markers. The unlocked destinations are also listed below the map.
+- The village gate is the initial unlocked destination. Central Market, Village Administration and Training Grounds unlock when the player explores close enough to their markers.
+- Unlocks are stored locally. Fast travel moves the player to the selected discovered point and saves the current player data.
+- This is the first local prototype of the map/travel system. A full illustrated world map, multiple connected regions, dungeon maps and server-backed account saves remain future work.
