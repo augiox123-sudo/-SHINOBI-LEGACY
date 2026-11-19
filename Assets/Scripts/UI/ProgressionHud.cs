@@ -48,8 +48,14 @@ namespace ShinobiLegacy.UI
             if (status == null || progression == null) return;
             int count = inventory != null ? inventory.Count : 0;
             int power = equipment != null ? equipment.TotalPower : 0;
+            float crit = equipment != null ? equipment.CriticalChance * 100f : 0f;
+            float bonusDamage = equipment != null ? equipment.BonusDamagePercent * 100f : 0f;
+            float defense = equipment != null ? equipment.Defense : 0f;
             status.text = "LEVEL " + progression.Level + "   XP " + progression.Experience + "/" +
-                progression.ExperienceToNextLevel + "   ITEMS " + count + "   GEAR POWER " + power;
+                progression.ExperienceToNextLevel + "   ITEMS " + count + "   GEAR POWER " + power +
+                "   BONUS DMG +" + bonusDamage.ToString("0.0") + "%" +
+                "   CRIT " + crit.ToString("0.0") + "%" +
+                "   DEF " + defense.ToString("0");
         }
     }
 }
