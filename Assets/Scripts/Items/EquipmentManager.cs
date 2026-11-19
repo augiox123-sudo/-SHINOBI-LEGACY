@@ -52,6 +52,20 @@ namespace ShinobiLegacy.Items
             return true;
         }
 
+        public bool UpgradeEquipped(string slot, int powerIncrease, float damageIncrease, float defenseIncrease, float critIncrease, float critDamageIncrease)
+        {
+            InventoryItem item = GetEquipped(slot);
+            if (item == null || item.upgradeLevel >= 10) return false;
+            item.power += Mathf.Max(1, powerIncrease);
+            item.bonusDamagePercent += Mathf.Max(0f, damageIncrease);
+            item.bonusDefense += Mathf.Max(0f, defenseIncrease);
+            item.bonusCriticalChance += Mathf.Max(0f, critIncrease);
+            item.bonusCriticalDamage += Mathf.Max(0f, critDamageIncrease);
+            item.upgradeLevel++;
+            EquipmentChanged?.Invoke();
+            return true;
+        }
+
         public string GetAbilityModifier(string abilityId)
         {
             foreach (InventoryItem item in equipped.Values)
