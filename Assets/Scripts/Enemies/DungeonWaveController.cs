@@ -27,6 +27,7 @@ namespace ShinobiLegacy.Enemies
         private bool completed;
         private Text selectionLabel;
         private Button difficultyButton;
+        private Button[] themeButtons = new Button[4];
 
         public bool IsRunning => running;
         public int CurrentWave => currentWave;
@@ -144,7 +145,7 @@ namespace ShinobiLegacy.Enemies
             boss.transform.localScale = new Vector3(1.7f, 1.65f, 1.7f);
             Renderer renderer = boss.GetComponent<Renderer>();
             Material material = CreateMaterial();
-            material.color = new Color(0.72f, 0.12f, 0.055f);
+            material.color = BossColor();
             renderer.material = material;
             Object.Destroy(boss.GetComponent<CapsuleCollider>());
 
@@ -192,6 +193,18 @@ namespace ShinobiLegacy.Enemies
                 case DungeonTheme.ThunderShrine: return new Color(0.28f, 0.22f, 0.58f);
                 case DungeonTheme.DrownedTemple: return new Color(0.08f, 0.36f, 0.48f);
                 default: return new Color(0.48f, 0.12f, 0.18f);
+            }
+        }
+
+
+        private Color BossColor()
+        {
+            switch (selectedTheme)
+            {
+                case DungeonTheme.VerdantForest: return new Color(0.22f, 0.42f, 0.12f);
+                case DungeonTheme.ThunderShrine: return new Color(0.34f, 0.24f, 0.72f);
+                case DungeonTheme.DrownedTemple: return new Color(0.08f, 0.42f, 0.58f);
+                default: return new Color(0.72f, 0.12f, 0.055f);
             }
         }
 
@@ -261,13 +274,13 @@ namespace ShinobiLegacy.Enemies
         {
             if (statusLabel == null) return;
             Transform parent = statusLabel.transform.parent;
-            CreateSelectionButton(parent, "ASHEN", new Vector2(-315f, -165f),
+            themeButtons[0] = CreateSelectionButton(parent, "ASHEN", new Vector2(-315f, -165f),
                 () => SelectTheme(DungeonTheme.AshenRuins));
-            CreateSelectionButton(parent, "FOREST", new Vector2(-105f, -165f),
+            themeButtons[1] = CreateSelectionButton(parent, "FOREST", new Vector2(-105f, -165f),
                 () => SelectTheme(DungeonTheme.VerdantForest));
-            CreateSelectionButton(parent, "THUNDER", new Vector2(105f, -165f),
+            themeButtons[2] = CreateSelectionButton(parent, "THUNDER", new Vector2(105f, -165f),
                 () => SelectTheme(DungeonTheme.ThunderShrine));
-            CreateSelectionButton(parent, "TEMPLE", new Vector2(315f, -165f),
+            themeButtons[3] = CreateSelectionButton(parent, "TEMPLE", new Vector2(315f, -165f),
                 () => SelectTheme(DungeonTheme.DrownedTemple));
             difficultyButton = CreateSelectionButton(parent, "DIFFICULTY: NORMAL",
                 new Vector2(0f, -220f), CycleDifficulty);
@@ -328,6 +341,8 @@ namespace ShinobiLegacy.Enemies
             Text label = difficultyButton.GetComponentInChildren<Text>();
             if (label != null) label.text = "DIFFICULTY: " + DifficultyName();
             difficultyButton.interactable = !running;
+            for (int i = 0; i < themeButtons.Length; i++)
+                if (themeButtons[i] != null) themeButtons[i].interactable = !running;
         }
 
         private void SetStatus(string value)
