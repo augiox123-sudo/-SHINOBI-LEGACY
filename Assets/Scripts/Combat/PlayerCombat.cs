@@ -179,14 +179,25 @@ namespace ShinobiLegacy.Combat
             damagedThisCast.Clear();
             Vector3 origin = transform.position + Vector3.up * 1.1f + transform.forward * 0.5f;
             float damage = GetScaledDamage(76f) * (1f + (lightningRank - 1) * 0.05f);
-            if (Physics.SphereCast(origin, 0.85f, transform.forward, out RaycastHit hit, 10f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            string modifier = equipment != null ? equipment.GetAbilityModifier("lightning") : string.Empty;
+            if (Physics.SphereCast(origin, modifier == "lightning_storm" ? 1.25f : 0.85f,
+                transform.forward, out RaycastHit hit, 10f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
             {
                 CombatantHealth target = hit.collider.GetComponentInParent<CombatantHealth>();
-                if (target != null && target.transform != transform)
+                if (target != null && target.transform != transform && !target.IsDead)
                 {
-                    ApplyDamageOnce(target, damage, false);
-                    target.ApplyStun(1.1f);
-                    if (abilityVfx != null) abilityVfx.PlayLightning(origin, target.transform.position + Vector3.up);
+                    ApplyDamageOnce(target, damage * (modifier == "lightning_storm" ? 1.18f : 1f), false);
+                    target.ApplyStun(modifier == "lightning_storm" ? 1.65f : 1.1f);
+                    Vector3 impact = target.transform.position + Vector3.up;
+                    if (abilityVfx != null) abilityVfx.PlayLightning(origin, impact);
+                    if (modifier == "lightning_chain")
+                        ChainLightningFrom(target, damage * 0.82f, 3, 5f);
+                    else if (modifier == "lightning_storm")
+                    {
+                        DamageArea(target.transform.position, 3.4f, damage * 0.62f, false);
+                        StunTargetsInFront(5f, 3.4f, 0.55f);
+                        if (abilityVfx != null) abilityVfx.PlayLightningStorm(target.transform.position);
+                    }
                 }
             }
             RecordElementUse(0);
@@ -201,10 +212,14 @@ namespace ShinobiLegacy.Combat
             damagedThisCast.Clear();
             Vector3 origin = transform.position + Vector3.up * 0.7f + transform.forward * 2f;
             float damage = GetScaledDamage(43f) * (1f + (waterRank - 1) * 0.05f);
+            string modifier = equipment != null ? equipment.GetAbilityModifier("water") : string.Empty;
+            float radiusBonus = modifier == "water_torrent" ? 0.8f : 0f;
+            float waterDamage = damage * (modifier == "water_torrent" ? 1.22f : 1f);
             for (int step = 0; step < 3; step++)
             {
                 Vector3 center = origin + transform.forward * (step * 2.3f);
-                int count = Physics.OverlapSphereNonAlloc(center, 1.65f + step * 0.15f, hitBuffer, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+                float radius = 1.65f + step * 0.15f + radiusBonus;
+                int count = Physics.OverlapSphereNonAlloc(center, radius, hitBuffer, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
                 for (int i = 0; i < count; i++)
                 {
                     Collider hit = hitBuffer[i];
@@ -213,14 +228,20 @@ namespace ShinobiLegacy.Combat
                         CombatantHealth target = hit.GetComponentInParent<CombatantHealth>();
                         if (target != null && target.transform != transform && !target.IsDead)
                         {
-                            ApplyDamageOnce(target, damage, false);
-                            target.ApplyStun(0.22f);
+                            ApplyDamageOnce(target, waterDamage, false);
+                            target.ApplyStun(modifier == "water_prison" ? 1.15f : 0.22f);
                         }
                     }
                     hitBuffer[i] = null;
                 }
             }
-            if (abilityVfx != null) abilityVfx.PlayWater(origin, transform.forward, 7f);
+            if (modifier == "water_prison")
+            {
+                Vector3 prisonCenter = origin + transform.forward * 3.5f;
+                StunTargetsInFront(6f, 2.5f, 1.15f);
+                if (abilityVfx != null) abilityVfx.PlayWaterPrison(prisonCenter);
+            }
+            if (abilityVfx != null) abilityVfx.PlayWater(origin, transform.forward, 7f, modifier);
             RecordElementUse(1);
             ResourcesChanged?.Invoke();
         }
@@ -233,24 +254,67 @@ namespace ShinobiLegacy.Combat
             damagedThisCast.Clear();
             Vector3 center = transform.position + Vector3.up + transform.forward * 3.1f;
             float damage = GetScaledDamage(58f) * (1f + (windRank - 1) * 0.05f);
-            int count = Physics.OverlapSphereNonAlloc(center, 3.1f, hitBuffer, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
-            for (int i = 0; i < count; i++)
+            string modifier = equipment != null ? equipment.GetAbilityModifier("wind") : string.Empty;
+            if (modifier == "wind_blade")
             {
-                Collider hit = hitBuffer[i];
-                if (hit != null)
-                {
-                    CombatantHealth target = hit.GetComponentInParent<CombatantHealth>();
-                    if (target != null && target.transform != transform && !target.IsDead)
-                    {
-                        ApplyDamageOnce(target, damage, false);
-                        target.ApplyStun(0.18f);
-                    }
-                }
-                hitBuffer[i] = null;
+                for (int step = 1; step <= 4; step++)
+                    DamageArea(transform.position + Vector3.up + transform.forward * (step * 1.8f),
+                        1.65f, damage * 0.78f, false);
             }
-            if (abilityVfx != null) abilityVfx.PlayWind(center, transform.forward);
+            else
+            {
+                float radius = modifier == "wind_vortex" ? 4.6f : 3.1f;
+                int count = Physics.OverlapSphereNonAlloc(center, radius, hitBuffer, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+                for (int i = 0; i < count; i++)
+                {
+                    Collider hit = hitBuffer[i];
+                    if (hit != null)
+                    {
+                        CombatantHealth target = hit.GetComponentInParent<CombatantHealth>();
+                        if (target != null && target.transform != transform && !target.IsDead)
+                        {
+                            ApplyDamageOnce(target, damage * (modifier == "wind_vortex" ? 0.9f : 1f), false);
+                            target.ApplyStun(modifier == "wind_vortex" ? 0.65f : 0.18f);
+                        }
+                    }
+                    hitBuffer[i] = null;
+                }
+            }
+            if (abilityVfx != null) abilityVfx.PlayWind(center, transform.forward, modifier);
             RecordElementUse(2);
             ResourcesChanged?.Invoke();
+        }
+
+        private void ChainLightningFrom(CombatantHealth firstTarget, float baseDamage, int maxJumps, float jumpRadius)
+        {
+            CombatantHealth previous = firstTarget;
+            Vector3 searchCenter = firstTarget.transform.position + Vector3.up;
+            for (int jump = 0; jump < maxJumps; jump++)
+            {
+                int count = Physics.OverlapSphereNonAlloc(searchCenter, jumpRadius, chainBuffer,
+                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+                CombatantHealth closest = null;
+                float closestDistance = float.MaxValue;
+                for (int i = 0; i < count; i++)
+                {
+                    Collider hit = chainBuffer[i];
+                    if (hit == null) continue;
+                    CombatantHealth candidate = hit.GetComponentInParent<CombatantHealth>();
+                    if (candidate == null || candidate.IsDead || candidate.transform == transform ||
+                        damagedThisCast.Contains(candidate)) continue;
+                    float distance = (candidate.transform.position - searchCenter).sqrMagnitude;
+                    if (distance < closestDistance) { closestDistance = distance; closest = candidate; }
+                    chainBuffer[i] = null;
+                }
+                if (closest == null) break;
+                if (abilityVfx != null)
+                    abilityVfx.PlayLightning(previous.transform.position + Vector3.up, closest.transform.position + Vector3.up);
+                ApplyDamageOnce(closest, baseDamage * Mathf.Pow(0.72f, jump), false);
+                closest.ApplyStun(0.45f);
+                previous = closest;
+                searchCenter = closest.transform.position + Vector3.up;
+            }
+            for (int i = 0; i < chainBuffer.Length; i++) chainBuffer[i] = null;
         }
 
         private void RecordElementUse(int element)
