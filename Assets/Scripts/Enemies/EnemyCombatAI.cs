@@ -40,6 +40,9 @@ namespace ShinobiLegacy.Enemies
         private MaterialPropertyBlock hitBlock;
         private Coroutine hitFlashRoutine;
         private readonly RaycastHit[] meleeHitBuffer = new RaycastHit[16];
+        private LineRenderer attackTelegraph;
+        private Material telegraphMaterial;
+        private const int TelegraphSegments = 25;
         private static readonly int BaseColorProperty = Shader.PropertyToID("_BaseColor");
         private static readonly int ColorProperty = Shader.PropertyToID("_Color");
 
@@ -94,12 +97,18 @@ namespace ShinobiLegacy.Enemies
                 originalLegacyColors[i] = supportsLegacyColor[i] ? material.GetColor(ColorProperty) : Color.white;
             }
             hitBlock = new MaterialPropertyBlock();
+            CreateAttackTelegraph();
             health.Died += OnDied;
             health.HealthChanged += OnHealthChanged;
         }
 
         private void OnDestroy()
         {
+            if (telegraphMaterial != null)
+            {
+                if (Application.isPlaying) Destroy(telegraphMaterial);
+                else DestroyImmediate(telegraphMaterial);
+            }
             if (health != null)
             {
                 health.Died -= OnDied;
@@ -109,6 +118,8 @@ namespace ShinobiLegacy.Enemies
 
         private void Update()
         {
+            if (attackPending) UpdateAttackTelegraph();
+            else SetAttackTelegraphVisible(false);
             if (health == null || health.IsDead) return;
             if (animationBridge != null) animationBridge.SetStaggered(health.IsStaggered);
             if (health.IsStunned || health.IsStaggered)
@@ -172,6 +183,7 @@ namespace ShinobiLegacy.Enemies
                 if (attackWindupRemaining <= 0f)
                 {
                     attackPending = false;
+                    SetAttackTelegraphVisible(false);
                     if (target != null)
                     {
                         CombatantHealth liveTarget = target.GetComponent<CombatantHealth>();
@@ -225,6 +237,8 @@ namespace ShinobiLegacy.Enemies
                 nextAttackTime = Time.time + attackCooldown;
                 attackPending = true;
                 attackWindupRemaining = attackWindup;
+                SetAttackTelegraphVisible(true);
+                UpdateAttackTelegraph();
                 if (animationBridge != null) animationBridge.PlayWindup(behavior == 2);
             }
         }
@@ -330,8 +344,70 @@ namespace ShinobiLegacy.Enemies
             }
         }
 
+        private void CreateAttackTelegraph()
+        {
+            GameObject warningObject = new GameObject("Enemy_Melee_Telegraph");
+            warningObject.transform.SetParent(transform, false);
+            attackTelegraph = warningObject.AddComponent<LineRenderer>();
+            attackTelegraph.useWorldSpace = false;
+            attackTelegraph.loop = false;
+            attackTelegraph.positionCount = TelegraphSegments;
+            attackTelegraph.numCapVertices = 2;
+            attackTelegraph.numCornerVertices = 2;
+            attackTelegraph.startWidth = 0.075f;
+            attackTelegraph.endWidth = 0.075f;
+            Shader shader = Shader.Find("Sprites/Default");
+            if (shader == null)
+            {
+                attackTelegraph.enabled = false;
+                return;
+            }
+            telegraphMaterial = new Material(shader);
+            attackTelegraph.material = telegraphMaterial;
+            attackTelegraph.startColor = new Color(1f, 0.48f, 0.08f, 0.7f);
+            attackTelegraph.endColor = attackTelegraph.startColor;
+            attackTelegraph.enabled = false;
+        }
+
+        private void UpdateAttackTelegraph()
+        {
+            if (attackTelegraph == null || !attackTelegraph.enabled) return;
+            float progress = attackWindup > 0f
+                ? 1f - Mathf.Clamp01(attackWindupRemaining / attackWindup)
+                : 1f;
+            float radius = attackRange + 0.18f;
+            float pulse = 1f + Mathf.Sin(Time.time * Mathf.Lerp(6f, 18f, progress)) *
+                Mathf.Lerp(0.015f, 0.055f, progress);
+            const float halfAngle = 65f;
+            for (int i = 0; i < TelegraphSegments; i++)
+            {
+                float t = i / (float)(TelegraphSegments - 1);
+                float angle = Mathf.Lerp(-halfAngle, halfAngle, t) * Mathf.Deg2Rad;
+                attackTelegraph.SetPosition(i, new Vector3(
+                    Mathf.Sin(angle) * radius * pulse,
+                    0.09f,
+                    Mathf.Cos(angle) * radius * pulse + 0.35f));
+            }
+
+            float width = Mathf.Lerp(0.065f, behavior == 2 ? 0.17f : 0.12f, progress);
+            attackTelegraph.startWidth = width;
+            attackTelegraph.endWidth = width * 0.72f;
+            Color warning = behavior == 2
+                ? new Color(1f, 0.18f, 0.06f)
+                : new Color(1f, 0.58f, 0.12f);
+            warning.a = Mathf.Lerp(0.48f, 0.95f, progress);
+            attackTelegraph.startColor = warning;
+            attackTelegraph.endColor = warning;
+        }
+
+        private void SetAttackTelegraphVisible(bool visible)
+        {
+            if (attackTelegraph != null) attackTelegraph.enabled = visible;
+        }
+
         private void OnDied()
         {
+            SetAttackTelegraphVisible(false);
             enabled = false;
             if (hitFlashRoutine != null)
             {
