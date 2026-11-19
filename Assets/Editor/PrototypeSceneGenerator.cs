@@ -9,6 +9,7 @@ using ShinobiLegacy.CameraSystem;
 using ShinobiLegacy.Combat;
 using ShinobiLegacy.Enemies;
 using ShinobiLegacy.UI;
+using ShinobiLegacy.Items;
 
 namespace ShinobiLegacy.Editor
 {
@@ -37,6 +38,8 @@ namespace ShinobiLegacy.Editor
             player.AddComponent<PlayerMotor>();
             player.AddComponent<CombatantHealth>();
             PlayerCombat playerCombat = player.AddComponent<PlayerCombat>();
+            PlayerProgression progression = player.AddComponent<PlayerProgression>();
+            player.AddComponent<PlayerInventory>();
 
             GameObject cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
@@ -78,7 +81,9 @@ namespace ShinobiLegacy.Editor
                 enemyController.height = 2f;
                 enemyController.radius = 0.42f;
                 enemyController.center = Vector3.zero;
-                enemy.AddComponent<CombatantHealth>();
+                CombatantHealth enemyHealth = enemy.AddComponent<CombatantHealth>();
+                EnemyRewardDrop enemyRewards = enemy.AddComponent<EnemyRewardDrop>();
+                enemyRewards.Configure(progression, 35, 0.72f, false);
                 EnemyCombatAI ai = enemy.AddComponent<EnemyCombatAI>();
                 ai.SetTarget(player.transform);
             }
@@ -96,6 +101,8 @@ namespace ShinobiLegacy.Editor
             bossController.center = Vector3.zero;
             CombatantHealth bossHealth = boss.AddComponent<CombatantHealth>();
             bossHealth.SetMaxHealth(550f);
+            EnemyRewardDrop bossRewards = boss.AddComponent<EnemyRewardDrop>();
+            bossRewards.Configure(progression, 250, 1f, true);
             BossCombatAI bossAI = boss.AddComponent<BossCombatAI>();
             bossAI.SetTarget(player.transform);
 
