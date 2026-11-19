@@ -445,3 +445,11 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - The four guardian profiles now resolve their phase-two special differently: Ashen deals a heavy burst followed by a short burn, Verdant restores 10% of its own maximum health, Thunder deals moderate damage and applies a longer stun, and Drowned deals a heavier controlled hit with a shorter stun.
 - Each effect is checked against the player's alive state before it is applied. The existing windup telegraph and encounter-range checks remain in place.
 - These are distinct gameplay effects built on the current health/status system; profile tuning, readability, balance and actual combat timing still require Unity Play Mode and Android testing.
+
+## Dodgeable boss phase-two specials
+
+- Phase-two damaging specials now resolve against a close-range impact radius instead of hitting the player anywhere inside the boss's full detection/special range.
+- The warning ring uses the same profile-specific radius as the final hit check: Ashen 4.6 units, Thunder 5.2 units, and Drowned 4.2 units. Thunder has the widest damaging zone; Drowned trades area for control pressure.
+- Ashen's burn and Thunder/Drowned control effects are only applied when the player remains inside the impact zone when the windup ends. Moving clear of the warning area avoids the damaging special.
+- Verdant retains its defensive self-heal special; its short warning radius communicates the local recovery action rather than a player damage zone.
+- This is gameplay/source logic only. Telegraph readability, actual dodge timing, balance and collision behavior still need Unity Play Mode and Android device testing.
