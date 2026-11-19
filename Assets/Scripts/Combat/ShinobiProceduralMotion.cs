@@ -30,7 +30,7 @@ namespace ShinobiLegacy.Combat
         private int comboStrike;
         private float hitTimer;
         private float hitPauseTimer;
-        private bool heavyHit;
+        private int hitTier;
         private bool staggered;
         private float abilityTimer;
         private float heavyAttackTimer;
@@ -86,13 +86,14 @@ namespace ShinobiLegacy.Combat
             attackTimer = 0f;
         }
 
-        public void PlayHit(bool heavy = false)
+        public void PlayHit(int tier = 1)
         {
             if (dead) return;
-            heavyHit = heavy;
-            hitTimer = heavy ? 0.26f : 0.18f;
+            hitTier = Mathf.Clamp(tier, 1, 3);
+            hitTimer = hitTier == 3 ? 0.26f : hitTier == 2 ? 0.22f : 0.18f;
             // Freeze only this visual rig for a few milliseconds; never pause global gameplay time.
-            hitPauseTimer = Mathf.Max(hitPauseTimer, heavy ? 0.075f : 0.04f);
+            float pause = hitTier == 3 ? 0.075f : hitTier == 2 ? 0.055f : 0.04f;
+            hitPauseTimer = Mathf.Max(hitPauseTimer, pause);
         }
 
         public void SetStaggered(bool value)
@@ -148,8 +149,9 @@ namespace ShinobiLegacy.Combat
             float comboRightZ = comboStrike == 1 ? -24f : comboStrike == 2 ? 22f : -8f;
             float comboLeftZ = comboStrike == 2 ? -18f : comboStrike == 3 ? 12f : 0f;
             float comboTorsoYaw = comboStrike == 1 ? -13f : comboStrike == 2 ? 15f : -25f;
-            float hitWeight = hitTimer > 0f ? Mathf.Sin((1f - hitTimer / (heavyHit ? 0.26f : 0.18f)) * Mathf.PI) : 0f;
-            float hitArmAngle = heavyHit ? 28f : 12f;
+            float hitDuration = hitTier == 3 ? 0.26f : hitTier == 2 ? 0.22f : 0.18f;
+            float hitWeight = hitTimer > 0f ? Mathf.Sin((1f - hitTimer / hitDuration) * Mathf.PI) : 0f;
+            float hitArmAngle = hitTier == 3 ? 28f : hitTier == 2 ? 20f : 12f;
             float abilityWeight = abilityTimer > 0f ? Mathf.Sin((1f - abilityTimer / 0.42f) * Mathf.PI) : 0f;
             float heavyWeight = heavyAttackTimer > 0f ? Mathf.Sin((1f - heavyAttackTimer / 0.62f) * Mathf.PI) : 0f;
             float windupProgress = windupTimer > 0f ? 1f - windupTimer / (heavyWindup ? 0.56f : 0.32f) : 0f;
@@ -167,7 +169,7 @@ namespace ShinobiLegacy.Combat
             transform.localPosition = basePosition + Vector3.up * bob;
             if (torso != null)
             {
-                float recoil = hitWeight * (heavyHit ? 24f : 12f);
+                float recoil = hitWeight * (hitTier == 3 ? 24f : hitTier == 2 ? 18f : 12f);
                 float windupLean = windupWeight * (heavyWindup ? 14f : 6f);
                 torso.localRotation = torsoBase * Quaternion.Euler(recoil + abilityWeight * -8f + heavyWeight * 18f + windupLean + staggerWeight * 18f + comboWeight * (comboStrike == 3 ? 18f : 7f), comboWeight * comboTorsoYaw, 0f);
             }
