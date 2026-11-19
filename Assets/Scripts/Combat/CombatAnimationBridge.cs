@@ -125,6 +125,16 @@ namespace ShinobiLegacy.Combat
             Trigger(AbilityHash);
         }
 
+        public void PlayHeavyAttack()
+        {
+            ShinobiProceduralMotion motion = ResolveProceduralMotion();
+            if (motion != null) motion.PlayHeavyAttack();
+            Trigger(AttackHash);
+            if (attackStateRoutine != null) StopCoroutine(attackStateRoutine);
+            if (ResolveAnimator() != null && boolParameters.Contains(IsAttackingHash))
+                attackStateRoutine = StartCoroutine(AttackState(0.48f));
+        }
+
         private void Trigger(int parameterHash)
         {
             Animator current = ResolveAnimator();
