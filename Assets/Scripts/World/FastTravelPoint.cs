@@ -1,0 +1,38 @@
+using UnityEngine;
+
+namespace ShinobiLegacy.World
+{
+    [RequireComponent(typeof(SphereCollider))]
+    public sealed class FastTravelPoint : MonoBehaviour
+    {
+        public string pointId = "village_gate";
+        public string displayName = "Village Gate";
+        [Min(1f)] public float unlockRadius = 7f;
+
+        private string PreferenceKey => "SL_FAST_TRAVEL_UNLOCKED_" + pointId;
+
+        public bool IsUnlocked => PlayerPrefs.GetInt(PreferenceKey, 0) == 1;
+
+        private void Awake()
+        {
+            SphereCollider trigger = GetComponent<SphereCollider>();
+            trigger.isTrigger = true;
+            trigger.radius = unlockRadius;
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            FastTravelMapUI map = other.GetComponent<FastTravelMapUI>();
+            if (map == null) map = other.GetComponentInParent<FastTravelMapUI>();
+            if (map != null) Unlock();
+        }
+
+        public void Unlock()
+        {
+            if (IsUnlocked) return;
+            PlayerPrefs.SetInt(PreferenceKey, 1);
+            PlayerPrefs.Save();
+            Debug.Log("Fast travel unlocked: " + displayName);
+        }
+    }
+}
