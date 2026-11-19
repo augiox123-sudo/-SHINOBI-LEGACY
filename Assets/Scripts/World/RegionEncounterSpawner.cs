@@ -151,6 +151,10 @@ namespace ShinobiLegacy.World
 
             BossCombatAI boss = champion.AddComponent<BossCombatAI>();
             boss.SetTarget(player);
+            int profile = regionId == "verdant_forest" ? 1 :
+                regionId == "thunder_shrine" ? 2 :
+                regionId == "drowned_temple" ? 3 : 0;
+            boss.ConfigureProfile(profile);
 
             EnemyRewardDrop rewards = champion.AddComponent<EnemyRewardDrop>();
             rewards.Configure(progression, 180 + level * 30, 1f, true);
