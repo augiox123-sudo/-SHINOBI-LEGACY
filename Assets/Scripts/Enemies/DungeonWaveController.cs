@@ -319,9 +319,30 @@ namespace ShinobiLegacy.Enemies
             return button;
         }
 
+        private int RequiredLevelForTheme(DungeonTheme theme)
+        {
+            switch (theme)
+            {
+                case DungeonTheme.VerdantForest: return 10;
+                case DungeonTheme.ThunderShrine: return 18;
+                case DungeonTheme.DrownedTemple: return 28;
+                default: return 5;
+            }
+        }
+
+        private bool IsThemeUnlocked(DungeonTheme theme)
+        {
+            return GetPlayerLevel() >= RequiredLevelForTheme(theme);
+        }
+
         private void SelectTheme(DungeonTheme theme)
         {
             if (running) return;
+            if (!IsThemeUnlocked(theme))
+            {
+                SetStatus("REGION LOCKED  |  REQUIRED LEVEL " + RequiredLevelForTheme(theme));
+                return;
+            }
             selectedTheme = theme;
             RefreshSelectionLabel();
             SetStatus(ThemeName() + " READY  |  " + DifficultyName());
@@ -341,8 +362,21 @@ namespace ShinobiLegacy.Enemies
             Text label = difficultyButton.GetComponentInChildren<Text>();
             if (label != null) label.text = "DIFFICULTY: " + DifficultyName();
             difficultyButton.interactable = !running;
+            DungeonTheme[] themes =
+            {
+                DungeonTheme.AshenRuins, DungeonTheme.VerdantForest,
+                DungeonTheme.ThunderShrine, DungeonTheme.DrownedTemple
+            };
+            string[] labels = { "ASHEN", "FOREST", "THUNDER", "TEMPLE" };
             for (int i = 0; i < themeButtons.Length; i++)
-                if (themeButtons[i] != null) themeButtons[i].interactable = !running;
+            {
+                if (themeButtons[i] == null) continue;
+                bool unlocked = IsThemeUnlocked(themes[i]);
+                themeButtons[i].interactable = !running && unlocked;
+                Text themeLabel = themeButtons[i].GetComponentInChildren<Text>();
+                if (themeLabel != null)
+                    themeLabel.text = unlocked ? labels[i] : labels[i] + "  LV " + RequiredLevelForTheme(themes[i]);
+            }
         }
 
         private void SetStatus(string value)
