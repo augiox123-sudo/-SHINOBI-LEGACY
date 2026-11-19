@@ -149,6 +149,28 @@ namespace ShinobiLegacy.Editor
             BossCombatAI bossAI = boss.AddComponent<BossCombatAI>();
             bossAI.SetTarget(player.transform);
 
+            // Keep an inactive, fully configured enemy template so the boss can
+            // summon fresh raiders even after the original arena enemies are defeated.
+            GameObject summonTemplate = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            summonTemplate.name = "Guardian_Summon_Template";
+            summonTemplate.transform.position = new Vector3(0f, -100f, 0f);
+            summonTemplate.GetComponent<Renderer>().sharedMaterial = MakeMaterial("Summoned Raider Material", new Color(0.28f, 0.22f, 0.42f));
+            summonTemplate.GetComponent<Renderer>().enabled = false;
+            ShinobiCharacterVisualBuilder.BuildEnemy(summonTemplate.transform, false, 2);
+            Object.DestroyImmediate(summonTemplate.GetComponent<CapsuleCollider>());
+            CharacterController summonController = summonTemplate.AddComponent<CharacterController>();
+            summonController.height = 2f;
+            summonController.radius = 0.42f;
+            summonController.center = Vector3.zero;
+            summonTemplate.AddComponent<CombatantHealth>();
+            EnemyRewardDrop summonRewards = summonTemplate.AddComponent<EnemyRewardDrop>();
+            summonRewards.Configure(progression, 45, 0.85f, false);
+            EnemyCombatAI summonAI = summonTemplate.AddComponent<EnemyCombatAI>();
+            summonAI.ConfigureBehavior(1);
+            summonAI.SetTarget(player.transform);
+            summonTemplate.SetActive(false);
+            bossAI.ConfigureSummons(summonTemplate, progression);
+
             // Mobile touch joystick (visible in Game view and on Android).
             GameObject canvasObject = new GameObject("Mobile HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             ShinobiLegacy.UI.TestSceneTravelButton sceneTravel = canvasObject.AddComponent<ShinobiLegacy.UI.TestSceneTravelButton>();
