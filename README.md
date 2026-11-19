@@ -389,3 +389,7 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Mobile startup now reads the same saved 30/60 FPS and shadow preferences as the in-game Graphics Settings menu.
 - Scene changes no longer force the mobile bootstrap back to 30 FPS and shadows OFF after the player has selected different settings.
 - Default remains 30 FPS with shadows OFF for entry-level Android devices; user selections are retained through PlayerPrefs.
+
+### Enemy AI death-state cleanup
+- Enemies now drop their player target when the target has died, preventing pointless chase and attack updates.
+- Enemy death stops any active hit-flash coroutine, restores renderer property colors, disables the CharacterController, and then completes the existing short death-removal delay.
