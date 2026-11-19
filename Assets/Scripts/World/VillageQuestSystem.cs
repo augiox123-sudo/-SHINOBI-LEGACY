@@ -47,6 +47,8 @@ namespace ShinobiLegacy.World
         private int progress;
         private bool active;
         private bool boardVisible;
+        private string lastCompletedQuest = string.Empty;
+        private float completionNoticeUntil;
         private PlayerWallet wallet;
         private PlayerProgression progression;
         private WorldRegionProgression regions;
@@ -97,6 +99,8 @@ namespace ShinobiLegacy.World
             if (progression != null) progression.AddExperience(xp);
             GrantStoryRelic(questIndex, level);
 
+            lastCompletedQuest = QuestNames[questIndex];
+            completionNoticeUntil = Time.time + 7f;
             Debug.Log("SHINOBI LEGACY: Story quest complete: " + QuestNames[questIndex] +
                 " | +" + coins + " coins | +" + xp + " XP | story relic granted");
             questIndex++;
@@ -144,9 +148,27 @@ namespace ShinobiLegacy.World
 
         private void OnGUI()
         {
+            if (active && questIndex < QuestRegions.Length)
+            {
+                Rect journal = new Rect(18f, 110f, Mathf.Min(360f, Screen.width - 36f), 82f);
+                GUI.Box(journal, "STORY JOURNAL");
+                GUI.Label(new Rect(journal.x + 12f, journal.y + 27f, journal.width - 24f, 22f),
+                    QuestNames[questIndex] + "  |  " + progress + " / " + RequiredKills[questIndex]);
+                GUI.Label(new Rect(journal.x + 12f, journal.y + 49f, journal.width - 24f, 22f),
+                    QuestDescriptions[questIndex]);
+            }
+
+            if (Time.time < completionNoticeUntil)
+            {
+                Rect notice = new Rect((Screen.width - 440f) * 0.5f, 24f, 440f, 76f);
+                GUI.Box(notice, "STORY CHAPTER COMPLETE");
+                GUI.Label(new Rect(notice.x + 12f, notice.y + 30f, notice.width - 24f, 28f),
+                    lastCompletedQuest + "  |  Legendary relic acquired");
+            }
+
             if (!boardVisible) return;
             float width = Mathf.Min(540f, Screen.width - 32f);
-            Rect panel = new Rect((Screen.width - width) * 0.5f, Screen.height * 0.18f, width, 300f);
+            Rect panel = new Rect((Screen.width - width) * 0.5f, Screen.height * 0.18f, width, 330f);
             GUI.Box(panel, "VILLAGE MISSION OFFICE");
 
             GUILayout.BeginArea(new Rect(panel.x + 18f, panel.y + 36f, panel.width - 36f, panel.height - 48f));
