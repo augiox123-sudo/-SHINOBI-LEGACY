@@ -49,3 +49,15 @@ The generated scene uses primitive geometry as a functional blockout, not final 
 4. Loot, inventory, equipment and progression.
 5. Quests, dungeons and boss encounters.
 6. Android profiling, optimization and APK testing.
+
+
+## RPG progression and loot prototype
+
+- Player XP and level progression with increasing XP requirements and a health increase on level-up.
+- Training enemies grant 35 XP and have a 72% chance to drop an item.
+- Stone Guardian grants 250 XP and always drops one item.
+- Loot has Common, Uncommon, Rare, Epic and Legendary rarity tiers, with randomized item power.
+- Walk into a dropped orb to collect it; collected items are stored in the prototype inventory (60 slots).
+- The HUD displays player level, current XP and inventory item count.
+
+This is still a Unity source prototype. It has not yet been compiled or tested in the Unity Editor, and no APK has been produced.
