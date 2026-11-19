@@ -52,6 +52,7 @@ namespace ShinobiLegacy.Combat
         public float BurstCooldownDuration => burstCooldown;
         public float FireCooldownDuration => fireCooldown;
         public event Action ResourcesChanged;
+        public event Action AbilityProgressChanged;
 
         private void Awake()
         {
@@ -170,6 +171,7 @@ namespace ShinobiLegacy.Combat
                 fireUses++;
                 if (fireRank < 5 && fireUses >= fireRank * 20) fireRank++;
             }
+            AbilityProgressChanged?.Invoke();
         }
 
         public void RestoreAbilityProgress(int savedBurstRank, int savedFireRank, int savedBurstUses, int savedFireUses)
