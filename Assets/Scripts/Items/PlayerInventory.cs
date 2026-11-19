@@ -49,6 +49,21 @@ namespace ShinobiLegacy.Items
             return true;
         }
 
+        public bool UpgradeAt(int index, int powerIncrease, float damageIncrease, float defenseIncrease, float critIncrease, float critDamageIncrease)
+        {
+            if (index < 0 || index >= items.Count) return false;
+            InventoryItem item = items[index];
+            if (item == null || item.upgradeLevel >= 10) return false;
+            item.power += Mathf.Max(1, powerIncrease);
+            item.bonusDamagePercent += Mathf.Max(0f, damageIncrease);
+            item.bonusDefense += Mathf.Max(0f, defenseIncrease);
+            item.bonusCriticalChance += Mathf.Max(0f, critIncrease);
+            item.bonusCriticalDamage += Mathf.Max(0f, critDamageIncrease);
+            item.upgradeLevel++;
+            ItemAdded?.Invoke(item);
+            return true;
+        }
+
         public bool RemoveAt(int index)
         {
             if (index < 0 || index >= items.Count) return false;
