@@ -97,6 +97,7 @@ namespace ShinobiLegacy.Combat
             {
                 HitTargets(burstRange, burstRadius * 1.45f, damage * 0.72f);
                 HitTargets(burstRange * 0.82f, burstRadius * 1.2f, damage * 0.42f);
+                StunTargetsInFront(burstRange, burstRadius * 1.45f, 0.8f);
             }
             else
             {
@@ -164,6 +165,22 @@ namespace ShinobiLegacy.Combat
             }
         }
 
+        private void StunTargetsInFront(float range, float radius, float duration)
+        {
+            Vector3 center = transform.position + Vector3.up + transform.forward * range * 0.55f;
+            int count = Physics.OverlapSphereNonAlloc(center, radius, hitBuffer,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < count; i++)
+            {
+                Collider hit = hitBuffer[i];
+                if (hit == null) continue;
+                CombatantHealth target = hit.GetComponentInParent<CombatantHealth>();
+                if (target != null && target.transform != transform && !target.IsDead)
+                    target.ApplyStun(duration);
+                hitBuffer[i] = null;
+            }
+        }
+
         private void ApplyDamageOnce(CombatantHealth target, float damage, bool applyBurn)
         {
             if (target == null || target.IsDead || !damagedThisCast.Add(target)) return;
@@ -212,7 +229,7 @@ namespace ShinobiLegacy.Combat
                 if (hit == null) continue;
                 CombatantHealth health = hit.GetComponentInParent<CombatantHealth>();
                 if (health != null && !health.IsDead && health.transform != transform)
-                    health.TakeDamage(damage);
+                    ApplyDamageOnce(health, damage, false);
                 hitBuffer[i] = null;
             }
         }
