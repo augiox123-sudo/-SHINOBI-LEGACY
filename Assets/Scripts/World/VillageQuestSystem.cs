@@ -48,6 +48,7 @@ namespace ShinobiLegacy.World
         private bool active;
         private bool boardVisible;
         private bool nearby;
+        private Vector2 boardScroll;
         private string lastCompletedQuest = string.Empty;
         private float completionNoticeUntil;
         private PlayerWallet wallet;
@@ -181,30 +182,38 @@ namespace ShinobiLegacy.World
             }
 
             if (!boardVisible) return;
-            float width = Mathf.Min(540f, Screen.width - 32f);
-            Rect panel = new Rect((Screen.width - width) * 0.5f, Screen.height * 0.18f, width, 330f);
+            float width = Mathf.Max(220f, Mathf.Min(540f, Screen.width - 32f));
+            float panelHeight = Mathf.Max(240f, Mathf.Min(440f, Screen.height - 32f));
+            Rect panel = new Rect((Screen.width - width) * 0.5f, (Screen.height - panelHeight) * 0.5f, width, panelHeight);
             GUI.Box(panel, "VILLAGE MISSION OFFICE");
 
-            GUILayout.BeginArea(new Rect(panel.x + 18f, panel.y + 36f, panel.width - 36f, panel.height - 48f));
+            GUILayout.BeginArea(new Rect(panel.x + 14f, panel.y + 34f, panel.width - 28f, panel.height - 46f));
+            float contentHeight = panel.height - 112f;
+            boardScroll = GUILayout.BeginScrollView(boardScroll, GUILayout.Height(contentHeight));
+            GUIStyle wrappedLabel = new GUIStyle(GUI.skin.label) { wordWrap = true };
             if (questIndex >= QuestRegions.Length)
             {
-                GUILayout.Label("All current regional story contracts are complete.");
+                GUILayout.Label("All current regional story contracts are complete.", wrappedLabel);
             }
             else
             {
-                GUILayout.Label("CONTRACT " + (questIndex + 1) + " / " + QuestRegions.Length + "  |  " + QuestNames[questIndex]);
-                GUILayout.Label(QuestDescriptions[questIndex]);
-                GUILayout.Label(OfficerBriefings[questIndex]);
-                GUILayout.Label("GUARANTEED REWARD: " + RelicNames[questIndex] + " [LEGENDARY]");
+                GUILayout.Label("CONTRACT " + (questIndex + 1) + " / " + QuestRegions.Length + "  |  " + QuestNames[questIndex], wrappedLabel);
+                GUILayout.Space(6f);
+                GUILayout.Label(QuestDescriptions[questIndex], wrappedLabel);
+                GUILayout.Space(6f);
+                GUILayout.Label(OfficerBriefings[questIndex], wrappedLabel);
+                GUILayout.Space(8f);
+                GUILayout.Label("GUARANTEED REWARD: " + RelicNames[questIndex] + " [LEGENDARY]", wrappedLabel);
                 int requiredLevel = WorldRegionProgression.Regions[questIndex + 1].requiredLevel;
                 bool unlocked = regions != null && regions.IsUnlocked(QuestRegions[questIndex]);
                 if (active)
-                    GUILayout.Label("PROGRESS: " + progress + " / " + RequiredKills[questIndex]);
+                    GUILayout.Label("PROGRESS: " + progress + " / " + RequiredKills[questIndex], wrappedLabel);
                 else if (!unlocked)
-                    GUILayout.Label("LOCKED: Reach level " + requiredLevel + " to unlock this region.");
+                    GUILayout.Label("LOCKED: Reach level " + requiredLevel + " to unlock this region.", wrappedLabel);
                 else if (GUILayout.Button("ACCEPT STORY CONTRACT", GUILayout.Height(48f)))
                     AcceptCurrentQuest();
             }
+            GUILayout.EndScrollView();
             if (GUILayout.Button("CLOSE", GUILayout.Height(40f))) boardVisible = false;
             GUILayout.EndArea();
         }
