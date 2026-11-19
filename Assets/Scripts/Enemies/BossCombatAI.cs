@@ -1,5 +1,8 @@
 using UnityEngine;
 using ShinobiLegacy.Combat;
+using ShinobiLegacy.Items;
+using ShinobiLegacy.Player;
+using System.Collections.Generic;
 
 namespace ShinobiLegacy.Enemies
 {
@@ -40,6 +43,19 @@ namespace ShinobiLegacy.Enemies
         private LineRenderer attackTelegraph;
         private Material telegraphMaterial;
         private const int TelegraphSegments = 48;
+        private const int MaxActiveSummons = 2;
+        private const float SummonInterval = 19f;
+        private GameObject summonTemplate;
+        private PlayerProgression summonProgression;
+        private readonly List<GameObject> activeSummons = new List<GameObject>(MaxActiveSummons);
+        private float nextSummonTime;
+        private int summonWave;
+
+        public void ConfigureSummons(GameObject template, PlayerProgression progression)
+        {
+            summonTemplate = template;
+            summonProgression = progression;
+        }
 
         public void SetTarget(Transform value) => target = value;
 
@@ -125,6 +141,7 @@ namespace ShinobiLegacy.Enemies
                 slamDamage *= 1.3f;
                 slamCooldown = Mathf.Max(1.8f, slamCooldown * 0.72f);
                 if (bodyRenderer != null) SetBodyColor(ProfileColor());
+                nextSummonTime = Time.time + 2.5f;
                 Debug.Log("SHINOBI LEGACY: Boss entered phase two: " + gameObject.name);
             }
 
@@ -146,6 +163,7 @@ namespace ShinobiLegacy.Enemies
             }
 
             Face(offset.normalized);
+            if (phaseTwo) TrySummonMinions();
 
             if (windingUp)
             {
@@ -189,6 +207,55 @@ namespace ShinobiLegacy.Enemies
                 SetTelegraphVisible(true);
                 UpdateAttackTelegraph();
             }
+        }
+
+        private void TrySummonMinions()
+        {
+            if (summonTemplate == null || summonProgression == null || Time.time < nextSummonTime) return;
+
+            for (int i = activeSummons.Count - 1; i >= 0; i--)
+            {
+                GameObject summon = activeSummons[i];
+                if (summon == null)
+                {
+                    activeSummons.RemoveAt(i);
+                    continue;
+                }
+
+                CombatantHealth summonHealth = summon.GetComponent<CombatantHealth>();
+                if (summonHealth == null || summonHealth.IsDead) activeSummons.RemoveAt(i);
+            }
+
+            int availableSlots = MaxActiveSummons - activeSummons.Count;
+            if (availableSlots <= 0) return;
+
+            int spawnCount = Mathf.Min(2, availableSlots);
+            for (int i = 0; i < spawnCount; i++)
+            {
+                float side = i == 0 ? -1f : 1f;
+                Vector3 spawnPosition = transform.position + transform.right * (side * 2.4f) + transform.forward * 1.6f;
+                GameObject minion = Instantiate(summonTemplate, spawnPosition, Quaternion.identity);
+                minion.name = "Guardian_Summoned_Raider_" + (++summonWave);
+                minion.SetActive(false);
+
+                EnemyCombatAI minionAI = minion.GetComponent<EnemyCombatAI>();
+                if (minionAI != null)
+                {
+                    minionAI.ConfigureBehavior(summonWave % 2);
+                    minionAI.SetTarget(target);
+                }
+
+                EnemyRewardDrop rewards = minion.GetComponent<EnemyRewardDrop>();
+                if (rewards != null) rewards.Configure(summonProgression, 45, 0.85f, false);
+
+                minion.SetActive(true);
+                CombatantHealth minionHealth = minion.GetComponent<CombatantHealth>();
+                if (minionHealth != null) minionHealth.SetMaxHealth(85f);
+                activeSummons.Add(minion);
+            }
+
+            nextSummonTime = Time.time + SummonInterval;
+            Debug.Log("SHINOBI LEGACY: Stone Guardian summoned " + spawnCount + " raider(s).");
         }
 
         private void PerformSlam()
