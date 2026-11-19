@@ -47,6 +47,7 @@ namespace ShinobiLegacy.World
         private int progress;
         private bool active;
         private bool boardVisible;
+        private bool nearby;
         private string lastCompletedQuest = string.Empty;
         private float completionNoticeUntil;
         private PlayerWallet wallet;
@@ -71,6 +72,12 @@ namespace ShinobiLegacy.World
         }
 
         public void SetBoardVisible(bool visible) => boardVisible = visible;
+
+        public void SetNearby(bool value)
+        {
+            nearby = value;
+            if (!nearby) boardVisible = false;
+        }
 
         public void AcceptCurrentQuest()
         {
@@ -164,6 +171,13 @@ namespace ShinobiLegacy.World
                 GUI.Box(notice, "STORY CHAPTER COMPLETE");
                 GUI.Label(new Rect(notice.x + 12f, notice.y + 30f, notice.width - 24f, 28f),
                     lastCompletedQuest + "  |  Legendary relic acquired");
+            }
+
+            if (nearby && !boardVisible)
+            {
+                Rect talkButton = new Rect((Screen.width - 280f) * 0.5f, Screen.height - 112f, 280f, 54f);
+                if (GUI.Button(talkButton, "TALK TO MISSION OFFICER"))
+                    boardVisible = true;
             }
 
             if (!boardVisible) return;
