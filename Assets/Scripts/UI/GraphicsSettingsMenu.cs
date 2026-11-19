@@ -20,7 +20,7 @@ namespace ShinobiLegacy.UI
         private int targetFps = 30;
         private bool shadowsEnabled;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
             if (FindObjectOfType<GraphicsSettingsMenu>() != null) return;
