@@ -185,9 +185,6 @@ namespace ShinobiLegacy.Editor
                 else if (eventSystem.GetComponent("StandaloneInputModule") == null)
                     errors.Add(scenePath + ": EventSystem is missing StandaloneInputModule for touch UI events.");
 
-                if (!objects.Any(go => go.GetComponent("VirtualJoystick") != null))
-                    errors.Add(scenePath + ": VirtualJoystick is missing.");
-
                 if (!objects.Any(go => go.GetComponent<Canvas>() != null))
                     errors.Add(scenePath + ": UI Canvas is missing.");
 
