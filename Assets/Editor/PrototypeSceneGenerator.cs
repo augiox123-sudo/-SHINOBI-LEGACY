@@ -3,7 +3,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;\nusing UnityEngine.UI;\nusing UnityEngine.EventSystems;
 using ShinobiLegacy.Player;
-using ShinobiLegacy.CameraSystem;
+using ShinobiLegacy.CameraSystem;\nusing ShinobiLegacy.Combat;\nusing ShinobiLegacy.Enemies;
 
 namespace ShinobiLegacy.Editor
 {
@@ -29,7 +29,7 @@ namespace ShinobiLegacy.Editor
             motorCollider.height = 2f;
             motorCollider.radius = 0.42f;
             motorCollider.center = Vector3.zero;
-            player.AddComponent<PlayerMotor>();
+            player.AddComponent<PlayerMotor>();\n            player.AddComponent<CombatantHealth>();\n            PlayerCombat playerCombat = player.AddComponent<PlayerCombat>();
 
             GameObject cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
@@ -57,6 +57,23 @@ namespace ShinobiLegacy.Editor
                 rock.transform.position = new Vector3(Mathf.Cos(angle) * 10f, 0.5f, Mathf.Sin(angle) * 10f);
                 rock.transform.localScale = new Vector3(1.4f, 1f, 1.4f);
                 rock.GetComponent<Renderer>().sharedMaterial = MakeMaterial("Stone", new Color(0.28f, 0.31f, 0.30f));
+            }
+
+            // Three simple melee enemies for the first combat test.
+            for (int i = 0; i < 3; i++)
+            {
+                GameObject enemy = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                enemy.name = "TrainingEnemy_" + (i + 1);
+                enemy.transform.position = new Vector3((i - 1) * 3.2f, 1f, 6f + (i % 2) * 1.5f);
+                enemy.GetComponent<Renderer>().sharedMaterial = MakeMaterial("Enemy Material", new Color(0.55f, 0.12f, 0.12f));
+                Object.DestroyImmediate(enemy.GetComponent<CapsuleCollider>());
+                CharacterController enemyController = enemy.AddComponent<CharacterController>();
+                enemyController.height = 2f;
+                enemyController.radius = 0.42f;
+                enemyController.center = Vector3.zero;
+                enemy.AddComponent<CombatantHealth>();
+                EnemyCombatAI ai = enemy.AddComponent<EnemyCombatAI>();
+                ai.SetTarget(player.transform);
             }
 
             // Mobile touch joystick (visible in Game view and on Android).
@@ -92,12 +109,46 @@ namespace ShinobiLegacy.Editor
             joystickHandle.GetComponent<Image>().color = new Color(0.35f, 0.72f, 0.9f, 0.8f);
             joystickBase.GetComponent<VirtualJoystick>().Configure(baseRect, handleRect, player.GetComponent<PlayerMotor>());
 
+            CreateActionButton(canvasObject.transform, "Basic Attack", new Vector2(-190f, 150f), new Vector2(145f, 100f), () => playerCombat.BasicAttack());
+            CreateActionButton(canvasObject.transform, "Chakra", new Vector2(-350f, 265f), new Vector2(120f, 85f), () => playerCombat.CastTechnique());
+
             if (!AssetDatabase.IsValidFolder("Assets/Scenes")) AssetDatabase.CreateFolder("Assets", "Scenes");
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/PrototypeArena.unity");
             AssetDatabase.SaveAssets();
             Selection.activeGameObject = player;
             Debug.Log("SHINOBI LEGACY: 3D prototype scene created.");
+        }
+
+        private static void CreateActionButton(Transform parent, string label, Vector2 position, Vector2 size, UnityEngine.Events.UnityAction action)
+        {
+            GameObject buttonObject = new GameObject(label + " Button", typeof(RectTransform), typeof(Image), typeof(Button));
+            buttonObject.transform.SetParent(parent, false);
+            RectTransform rect = buttonObject.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(1f, 0f);
+            rect.anchorMax = new Vector2(1f, 0f);
+            rect.pivot = new Vector2(1f, 0f);
+            rect.anchoredPosition = position;
+            rect.sizeDelta = size;
+            Image image = buttonObject.GetComponent<Image>();
+            image.color = new Color(0.12f, 0.24f, 0.36f, 0.78f);
+            Button button = buttonObject.GetComponent<Button>();
+            button.onClick.AddListener(action);
+
+            GameObject textObject = new GameObject("Label", typeof(RectTransform), typeof(Text));
+            textObject.transform.SetParent(buttonObject.transform, false);
+            RectTransform textRect = textObject.GetComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+            Text text = textObject.GetComponent<Text>();
+            text.text = label;
+            text.alignment = TextAnchor.MiddleCenter;
+            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            text.fontSize = 22;
+            text.color = Color.white;
+            text.raycastTarget = false;
         }
 
         private static Material MakeMaterial(string materialName, Color color)
