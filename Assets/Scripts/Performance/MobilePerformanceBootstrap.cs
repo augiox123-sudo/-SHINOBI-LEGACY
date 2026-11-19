@@ -8,9 +8,14 @@ namespace ShinobiLegacy.Performance
     /// </summary>
     public sealed class MobilePerformanceBootstrap : MonoBehaviour
     {
+        private const string FpsPreferenceKey = "SL_Graphics_FPS";
+        private const string ShadowsPreferenceKey = "SL_Graphics_Shadows";
+
         private void Awake()
         {
-            Application.targetFrameRate = 30;
+            int targetFps = PlayerPrefs.GetInt(FpsPreferenceKey, 30) == 60 ? 60 : 30;
+            bool shadowsEnabled = PlayerPrefs.GetInt(ShadowsPreferenceKey, 0) == 1;
+            Application.targetFrameRate = targetFps;
             QualitySettings.vSyncCount = 0;
 
             if (Debug.isDebugBuild && GetComponent<MobilePerformanceOverlay>() == null)
@@ -19,8 +24,8 @@ namespace ShinobiLegacy.Performance
             if (!Application.isMobilePlatform) return;
 
             QualitySettings.antiAliasing = 0;
-            QualitySettings.shadows = ShadowQuality.Disable;
-            QualitySettings.shadowDistance = 0f;
+            QualitySettings.shadows = shadowsEnabled ? ShadowQuality.All : ShadowQuality.Disable;
+            QualitySettings.shadowDistance = shadowsEnabled ? 35f : 0f;
             QualitySettings.lodBias = 0.75f;
             QualitySettings.maximumLODLevel = 1;
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
