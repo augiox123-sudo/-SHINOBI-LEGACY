@@ -350,3 +350,5 @@ Record device model, Android version, build date, test duration, observed FPS (i
 ## Focused basic attacks
 
 When the player has an enemy selected with the mobile target-lock control, a basic attack now prioritizes that selected enemy if it is within melee reach. If the selected enemy is out of reach or no target is selected, the existing forward-area attack remains as a fallback. This keeps target lock useful without changing the area behavior of Chakra and elemental abilities.
+
+Focused melee attacks also rotate the player toward the currently locked enemy before applying the strike, making target-lock attacks directionally consistent.
