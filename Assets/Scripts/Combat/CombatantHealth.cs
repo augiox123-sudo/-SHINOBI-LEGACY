@@ -61,6 +61,12 @@ namespace ShinobiLegacy.Combat
             HealthChanged?.Invoke(currentHealth, maxHealth);
         }
 
+        public void GrantTemporaryInvulnerability(float duration)
+        {
+            if (IsDead) return;
+            invulnerableUntil = Mathf.Max(invulnerableUntil, Time.time + Mathf.Max(0f, duration));
+        }
+
         public void ApplyKnockbackFrom(Vector3 sourcePosition, float strength = 3.2f, float duration = 0.14f)
         {
             if (IsDead) return;
