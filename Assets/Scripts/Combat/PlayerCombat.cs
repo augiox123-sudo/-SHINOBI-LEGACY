@@ -116,7 +116,25 @@ namespace ShinobiLegacy.Combat
             if (Time.time < nextAttackTime) return;
             nextAttackTime = Time.time + attackCooldown;
             damagedThisCast.Clear();
-            HitTargets(attackRange, attackRadius, GetScaledDamage(attackDamage));
+            float damage = GetScaledDamage(attackDamage);
+            if (!TryHitLockedTarget(damage))
+                HitTargets(attackRange, attackRadius, damage);
+        }
+
+        private bool TryHitLockedTarget(float damage)
+        {
+            if (targetLock == null) targetLock = GetComponent<EnemyTargetLockSystem>();
+            CombatantHealth target = targetLock != null ? targetLock.CurrentTarget : null;
+            if (target == null || target.IsDead) return false;
+
+            Vector3 offset = target.transform.position - transform.position;
+            offset.y = 0f;
+            float reach = attackRange + attackRadius;
+            if (offset.sqrMagnitude > reach * reach) return false;
+
+            // A locked target takes the focused basic strike instead of the wide fallback sweep.
+            ApplyDamageOnce(target, damage, false);
+            return true;
         }
 
         public void CastChakraBurst()
