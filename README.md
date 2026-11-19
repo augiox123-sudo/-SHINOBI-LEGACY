@@ -398,3 +398,8 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Boss AI now clears a missing or defeated target and hides its attack telegraph instead of continuing encounter logic against a dead player.
 - Stun interruption also clears the special-attack windup state, preventing stale special-attack state from carrying into the next action.
 - Slam and special attacks recheck that the player is alive before applying damage or control effects; boss death safely disables its CharacterController when present.
+
+### Animator integration foundation
+- Added an optional `CombatAnimationBridge` that connects gameplay events to an authored Unity Animator Controller through `MoveSpeed`, `IsAttacking`, `IsDead`, `Attack`, `Hit`, and `Ability` parameters.
+- The bridge checks which parameter names and types actually exist before setting them, and safely does nothing when a character has no Animator or controller.
+- Player movement and combat, combatant hit/death events, and enemy/boss movement and attacks now feed the bridge. This is an integration layer only: animation clips, rigged 3D character models, and Animator Controller assets still need to be authored and assigned.
