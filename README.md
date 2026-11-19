@@ -393,3 +393,8 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 ### Enemy AI death-state cleanup
 - Enemies now drop their player target when the target has died, preventing pointless chase and attack updates.
 - Enemy death stops any active hit-flash coroutine, restores renderer property colors, disables the CharacterController, and then completes the existing short death-removal delay.
+
+### Boss target and interrupted-attack safeguards
+- Boss AI now clears a missing or defeated target and hides its attack telegraph instead of continuing encounter logic against a dead player.
+- Stun interruption also clears the special-attack windup state, preventing stale special-attack state from carrying into the next action.
+- Slam and special attacks recheck that the player is alive before applying damage or control effects; boss death safely disables its CharacterController when present.
