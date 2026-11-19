@@ -12,6 +12,8 @@ namespace ShinobiLegacy.Items
         public LootRarity rarity;
         public int power;
         public string slot;
+        // Optional legendary skill modifier id, e.g. fire_wave or burst_storm.
+        public string abilityModifier;
 
         public InventoryItem(string name, LootRarity itemRarity, int itemPower, string itemSlot)
         {
@@ -19,6 +21,7 @@ namespace ShinobiLegacy.Items
             rarity = itemRarity;
             power = itemPower;
             slot = itemSlot;
+            abilityModifier = string.Empty;
         }
     }
 }
