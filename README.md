@@ -372,3 +372,7 @@ Enemy damage feedback now iterates renderer arrays by index and reuses the preco
 ## Boss visual material efficiency
 
 Boss color changes now use a cached `MaterialPropertyBlock` and the shader's supported `_BaseColor` or `_Color` property. The boss AI no longer accesses `Renderer.material` during combat, avoiding an unnecessary per-boss material instance while keeping phase, attack-warning, and stun color feedback.
+
+## Mobile target-lock control cleanup
+
+Target cycling is now provided only by the shared Canvas combat controls. The duplicate IMGUI `NEXT TARGET` button was removed from `EnemyTargetLockSystem.OnGUI`; the target marker and target health panel remain. This avoids showing two target-cycle controls on mobile and keeps interactive combat input in one UI system.
