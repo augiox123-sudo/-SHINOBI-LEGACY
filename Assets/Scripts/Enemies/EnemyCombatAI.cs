@@ -15,6 +15,18 @@ namespace ShinobiLegacy.Enemies
         [SerializeField] private float attackDamage = 9f;
         [SerializeField] private float attackCooldown = 1.6f;
         [SerializeField] private float turnSpeed = 540f;
+        [SerializeField] private float attackWindup = 0.28f;
+        [SerializeField] private float skirmisherPreferredRange = 3.4f;
+        [SerializeField] private float dodgeInterval = 2.8f;
+
+        // 0 Hunter, 1 Skirmisher, 2 Brute.
+        private int behavior;
+        private float attackWindupRemaining;
+        private bool attackPending;
+        private float nextDodgeTime;
+        private float dodgeRemaining;
+        private float dodgeDirection = 1f;
+        private float orbitDirection = 1f;
 
         private CharacterController controller;
         private CombatAnimationBridge animationBridge;
@@ -31,6 +43,27 @@ namespace ShinobiLegacy.Enemies
         private static readonly int ColorProperty = Shader.PropertyToID("_Color");
 
         public void SetTarget(Transform value) => target = value;
+
+        public void ConfigureBehavior(int value)
+        {
+            behavior = Mathf.Clamp(value, 0, 2);
+            if (behavior == 1)
+            {
+                moveSpeed *= 1.08f;
+                attackDamage *= 0.82f;
+                attackCooldown *= 0.92f;
+                attackRange = Mathf.Max(attackRange, 2.05f);
+                skirmisherPreferredRange = 3.4f;
+            }
+            else if (behavior == 2)
+            {
+                moveSpeed *= 0.78f;
+                attackDamage *= 1.55f;
+                attackCooldown *= 1.28f;
+                attackRange = Mathf.Max(attackRange, 2f);
+                attackWindup = 0.52f;
+            }
+        }
 
         public void Configure(float speed, float damage, float cooldown, float range)
         {
@@ -93,17 +126,67 @@ namespace ShinobiLegacy.Enemies
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, desired, turnSpeed * Time.deltaTime);
             }
 
-            if (animationBridge != null) animationBridge.SetMoveSpeed(distance > attackRange ? moveSpeed : 0f);
-            if (distance > attackRange)
+            if (attackPending)
             {
-                Vector3 direction = offset.normalized;
-                controller.Move((direction * moveSpeed + Vector3.down * 2f) * Time.deltaTime);
+                attackWindupRemaining -= Time.deltaTime;
+                if (animationBridge != null) animationBridge.SetMoveSpeed(0f);
+                if (attackWindupRemaining <= 0f)
+                {
+                    attackPending = false;
+                    if (target != null)
+                    {
+                        CombatantHealth liveTarget = target.GetComponent<CombatantHealth>();
+                        Vector3 check = target.position - transform.position;
+                        check.y = 0f;
+                        if (liveTarget != null && !liveTarget.IsDead && check.magnitude <= attackRange + 0.25f)
+                        {
+                            if (animationBridge != null) animationBridge.PlayAttack();
+                            liveTarget.TakeDamage(attackDamage);
+                        }
+                    }
+                }
+                return;
             }
-            else if (Time.time >= nextAttackTime)
+
+            Vector3 moveDirection = Vector3.zero;
+            bool shouldAttack = false;
+            if (behavior == 1)
+            {
+                float preferred = skirmisherPreferredRange;
+                if (distance > preferred + 0.65f) moveDirection = offset.normalized;
+                else if (distance < preferred - 0.65f) moveDirection = -offset.normalized;
+                else moveDirection = Vector3.Cross(Vector3.up, offset.normalized) * orbitDirection;
+
+                if (Time.time >= nextDodgeTime && distance < 5.2f)
+                {
+                    dodgeRemaining = 0.32f;
+                    dodgeDirection = Random.value > 0.5f ? 1f : -1f;
+                    orbitDirection = -orbitDirection;
+                    nextDodgeTime = Time.time + dodgeInterval + Random.Range(0f, 0.8f);
+                }
+                if (dodgeRemaining > 0f)
+                {
+                    dodgeRemaining -= Time.deltaTime;
+                    moveDirection = Vector3.Cross(Vector3.up, offset.normalized) * dodgeDirection * 2.1f;
+                }
+                shouldAttack = distance <= attackRange;
+            }
+            else
+            {
+                shouldAttack = distance <= attackRange;
+                if (!shouldAttack) moveDirection = offset.normalized;
+            }
+
+            float moveMagnitude = moveDirection.magnitude;
+            if (animationBridge != null) animationBridge.SetMoveSpeed(moveMagnitude > 0.05f ? moveSpeed : 0f);
+            if (moveMagnitude > 0.05f)
+                controller.Move((moveDirection.normalized * moveSpeed + Vector3.down * 2f) * Time.deltaTime);
+
+            if (shouldAttack && Time.time >= nextAttackTime)
             {
                 nextAttackTime = Time.time + attackCooldown;
-                if (animationBridge != null) animationBridge.PlayAttack();
-                targetHealth.TakeDamage(attackDamage);
+                attackPending = true;
+                attackWindupRemaining = attackWindup;
             }
         }
 
