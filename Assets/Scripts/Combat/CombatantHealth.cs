@@ -16,7 +16,9 @@ namespace ShinobiLegacy.Combat
         private Coroutine burnRoutine;
         private CombatantHitReaction hitReaction;
         private float stunnedUntil;
+        private float staggeredUntil;
         public bool IsStunned => Time.time < stunnedUntil;
+        public bool IsStaggered => Time.time < staggeredUntil;
 
         public float CurrentHealth => currentHealth;
         public float MaxHealth => maxHealth;
@@ -68,7 +70,12 @@ namespace ShinobiLegacy.Combat
             direction.y = 0f;
             if (direction.sqrMagnitude < 0.0001f) direction = -transform.forward;
             hitReaction.ApplyImpulse(direction, strength, duration);
-            if (strength >= 2.3f && animationBridge != null) animationBridge.TriggerHeavyHit();
+            if (strength >= 2.3f)
+            {
+                float staggerDuration = Mathf.Clamp(0.12f + strength * 0.055f, 0.16f, 0.34f);
+                staggeredUntil = Mathf.Max(staggeredUntil, Time.time + staggerDuration);
+                if (animationBridge != null) animationBridge.TriggerHeavyHit();
+            }
         }
 
         public void ApplyStun(float duration)
