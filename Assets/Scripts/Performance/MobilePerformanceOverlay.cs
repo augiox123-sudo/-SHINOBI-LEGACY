@@ -18,7 +18,6 @@ namespace ShinobiLegacy.Performance
         private float sampleFps;
         private float averageFps;
         private float minimumFps;
-        private float nextRefreshTime;
         private bool visible = true;
         private string diagnosticText = "Collecting performance data...";
 
@@ -30,7 +29,6 @@ namespace ShinobiLegacy.Performance
                 return;
             }
 
-            DontDestroyOnLoad(gameObject);
         }
 
         private void Update()
@@ -59,7 +57,6 @@ namespace ShinobiLegacy.Performance
 
             framesInInterval = 0;
             intervalElapsed = 0f;
-            nextRefreshTime = Time.unscaledTime + 0.5f;
             diagnosticText =
                 "FPS now: " + sampleFps.ToString("0") +
                 "   10s avg: " + averageFps.ToString("0") +
@@ -85,7 +82,7 @@ namespace ShinobiLegacy.Performance
             float y = 12f;
             if (visible)
             {
-                GUI.Box(new Rect(x, y, panelWidth, panelHeight), "SHINOBI LEGACY • PERFORMANCE");
+                GUI.Box(new Rect(x, y, panelWidth, panelHeight), "SHINOBI LEGACY - PERFORMANCE");
                 GUI.Label(new Rect(x + 10f, y + 25f, panelWidth - 20f, panelHeight - 32f), diagnosticText);
                 if (GUI.Button(new Rect(x + panelWidth - 30f, y + 3f, 24f, 20f), "–"))
                     visible = false;
