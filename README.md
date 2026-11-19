@@ -143,3 +143,12 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 
 - Two additional legendary affixes are available: **Chain Lightning** (Chakra Burst jumps to up to three nearby enemies with reduced damage per jump and a brief stun) and **Meteor Flame** (Fire Style detonates in a larger, harder-hitting burning impact zone).
 - Equipping a replacement item now returns the previously equipped item to the inventory instead of silently deleting it.
+
+
+### First-pass real-time ability VFX
+
+- Added `AbilityVfxController`, automatically attached to the player combat component at runtime.
+- Fire Style now emits directional elemental particle streams; Flame Wave emits three impact bursts; Twin Dragons emits two parallel streams; Inferno Impact and Meteor Flame create distinct impact bursts and expanding ground shockwaves.
+- Chakra Burst emits a chakra burst and ground shockwave. Chakra Tempest adds a second forward pulse; Guardian Pulse uses a green chakra treatment.
+- Chain Lightning draws a short jagged LineRenderer bolt between each chained target and emits a small impact spark at the destination.
+- Effects use lightweight runtime-generated Unity Particle Systems and simple geometry, with no external asset dependency. They are functional placeholder VFX, not final authored AAA-quality effects; dedicated meshes, textures, animation curves, audio and mobile GPU profiling remain required.
