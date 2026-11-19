@@ -15,6 +15,12 @@ namespace ShinobiLegacy.Combat
         public event Action<float, float> HealthChanged;
         public event Action Died;
 
+        public void SetMaxHealth(float value)
+        {
+            maxHealth = Mathf.Max(1f, value);
+            currentHealth = maxHealth;
+        }
+
         private void Awake() => currentHealth = maxHealth;
 
         public void TakeDamage(float amount)
