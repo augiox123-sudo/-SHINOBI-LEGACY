@@ -461,3 +461,11 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Raiders use the existing Hunter/Skirmisher enemy AI, target the player, have 85 health, and grant 45 XP with an 85% loot-drop chance. Their inactive scene template remains available even after the original training enemies are defeated.
 - Summoning is bounded to two active raiders to limit mobile CPU and memory load. The summon logic only runs while the boss has a live target and is within its encounter range.
 - This is source-level implementation. Spawn placement, enemy navigation, reward behavior, scene generation and performance still require Unity compilation and Play Mode/device testing.
+
+
+## Heavy guardian attack motion
+
+- Added a dedicated heavy-attack motion cue to the procedural character motion layer. The boss drives both arms into a stronger downward swing, adds a brief torso lean, and triggers the Animator attack event when an authored controller is present.
+- Stone Guardian slam and phase-two special attacks now use this heavy-attack cue instead of the lighter generic attack/ability motion.
+- The motion is deliberately lightweight and reuses the existing procedural rig transforms; it does not add meshes, particles or per-frame allocations.
+- This remains a blockout animation pass. The motion timing and silhouette need Unity Play Mode review, and a final boss requires authored rigging, animation clips, impact VFX/audio and Android profiling.
