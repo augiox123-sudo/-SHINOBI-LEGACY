@@ -60,6 +60,16 @@ namespace ShinobiLegacy.Editor
             CreateBuilding("Equipment Forge", new Vector3(-43f, 0f, -25f), new Vector3(18f, 7f, 15f), new Color(0.35f, 0.36f, 0.38f));
             CreateBuilding("Mission Office", new Vector3(43f, 0f, -25f), new Vector3(18f, 7f, 15f), new Color(0.48f, 0.34f, 0.22f));
 
+            // Original mission officer NPC and interaction zone outside the mission office.
+            GameObject missionOfficer = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            missionOfficer.name = "NPC_Village_Mission_Officer";
+            missionOfficer.transform.position = new Vector3(43f, 1.1f, -38f);
+            missionOfficer.transform.localScale = new Vector3(0.82f, 1.15f, 0.82f);
+            missionOfficer.GetComponent<Renderer>().sharedMaterial = accentMat;
+            Object.DestroyImmediate(missionOfficer.GetComponent<CapsuleCollider>());
+            missionOfficer.AddComponent<VillageQuestGiver>();
+            CreateLabel("MISSION OFFICER", new Vector3(43f, 4.1f, -38f), 1.4f);
+
             // Monument ridge behind the administration district. Abstract stone medallions only.
             GameObject ridge = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             ridge.name = "Village_Leader_Monument_Ridge";
@@ -108,6 +118,7 @@ namespace ShinobiLegacy.Editor
             player.AddComponent<PlayerProgression>();
             player.AddComponent<WorldRegionProgression>();
             player.AddComponent<RegionalBountySystem>();
+            player.AddComponent<VillageQuestSystem>();
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerWallet>();
             player.AddComponent<PlayerForgeSystem>();
