@@ -98,6 +98,7 @@ namespace ShinobiLegacy.Editor
             player.AddComponent<PlayerWallet>();
             player.AddComponent<EquipmentManager>();
             player.AddComponent<CombatantHealth>();
+            player.AddComponent<PlayerCombat>();
             player.AddComponent<PlayerSaveSystem>();
             PlayerRespawnController respawn = player.AddComponent<PlayerRespawnController>();
             player.AddComponent<FastTravelMapUI>();
