@@ -143,6 +143,7 @@ namespace ShinobiLegacy.Items
                     result[i] = new InventoryItem(item.itemName, item.rarity, item.power, item.slot)
                     {
                         abilityModifier = item.abilityModifier,
+                        upgradeLevel = item.upgradeLevel,
                         bonusDamagePercent = item.bonusDamagePercent,
                         bonusDefense = item.bonusDefense,
                         bonusCriticalChance = item.bonusCriticalChance,
