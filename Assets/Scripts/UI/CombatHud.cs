@@ -97,13 +97,13 @@ namespace ShinobiLegacy.UI
                 (string.IsNullOrEmpty(burstMod) ? "" : " [" + ModifierLabel(burstMod) + "]") +
                 "    FIRE R" + combat.FireRank + ": " + fire +
                 (string.IsNullOrEmpty(fireMod) ? "" : " [" + ModifierLabel(fireMod) + "]") +
-                "    LIGHTNING R" + combat.LightningRank + ": " + lightning +
+                "    LIGHT R" + combat.LightningRank + ": " + lightning +
                 (string.IsNullOrEmpty(lightningMod) ? "" : " [" + ModifierLabel(lightningMod) + "]") +
-                "    WATER R" + combat.WaterRank + ": " + water +
+                "\nWATER R" + combat.WaterRank + ": " + water +
                 (string.IsNullOrEmpty(waterMod) ? "" : " [" + ModifierLabel(waterMod) + "]") +
                 "    WIND R" + combat.WindRank + ": " + wind +
                 (string.IsNullOrEmpty(windMod) ? "" : " [" + ModifierLabel(windMod) + "]") +
-                (cachedEquipment != null && cachedEquipment.LegendarySynergyActive ? "    LEGENDARY SYNERGY +10%" : "");
+                (cachedEquipment != null && cachedEquipment.LegendarySynergyActive ? "    |    LEGENDARY SYNERGY +10%" : "");
         }
 
         private static string CooldownLabel(float remaining)
