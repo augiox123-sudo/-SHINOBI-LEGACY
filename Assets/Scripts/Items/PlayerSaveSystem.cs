@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using ShinobiLegacy.Combat;
 
 namespace ShinobiLegacy.Items
 {
@@ -19,11 +20,16 @@ namespace ShinobiLegacy.Items
             public int coins;
             public InventoryItem[] inventory;
             public InventoryItem[] equipped;
+            public int burstRank = 1;
+            public int fireRank = 1;
+            public int burstUses;
+            public int fireUses;
         }
 
         private PlayerWallet wallet;
         private PlayerInventory inventory;
         private EquipmentManager equipment;
+        private PlayerCombat playerCombat;
         private bool ready;
         [SerializeField] private float autosaveInterval = 30f;
         private float autosaveTimer;
@@ -33,6 +39,7 @@ namespace ShinobiLegacy.Items
             wallet = GetComponent<PlayerWallet>();
             inventory = GetComponent<PlayerInventory>();
             equipment = GetComponent<EquipmentManager>();
+            playerCombat = GetComponent<PlayerCombat>();
 
             Load();
             if (wallet != null) wallet.CoinsChanged += Save;
@@ -70,7 +77,11 @@ namespace ShinobiLegacy.Items
             {
                 coins = wallet != null ? wallet.Coins : 0,
                 inventory = inventory != null ? Copy(inventory.Items) : new InventoryItem[0],
-                equipped = equipment != null ? equipment.GetEquippedItems() : new InventoryItem[0]
+                equipped = equipment != null ? equipment.GetEquippedItems() : new InventoryItem[0],
+                burstRank = playerCombat != null ? playerCombat.BurstRank : 1,
+                fireRank = playerCombat != null ? playerCombat.FireRank : 1,
+                burstUses = playerCombat != null ? playerCombat.BurstUses : 0,
+                fireUses = playerCombat != null ? playerCombat.FireUses : 0
             };
             PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(data));
             PlayerPrefs.Save();
@@ -86,6 +97,7 @@ namespace ShinobiLegacy.Items
                 if (wallet != null) wallet.SetCoins(data.coins);
                 if (inventory != null) inventory.RestoreItems(data.inventory);
                 if (equipment != null) equipment.RestoreEquipment(data.equipped);
+                if (playerCombat != null) playerCombat.RestoreAbilityProgress(data.burstRank, data.fireRank, data.burstUses, data.fireUses);
             }
             catch (Exception exception)
             {
@@ -100,7 +112,7 @@ namespace ShinobiLegacy.Items
             {
                 InventoryItem item = source[i];
                 if (item != null)
-                    result[i] = new InventoryItem(item.itemName, item.rarity, item.power, item.slot);
+                    result[i] = new InventoryItem(item.itemName, item.rarity, item.power, item.slot) { abilityModifier = item.abilityModifier };
             }
             return result;
         }
