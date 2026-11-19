@@ -27,7 +27,7 @@ namespace ShinobiLegacy.UI
         private void Update()
         {
             if (bossHealth != null && root != null)
-                root.SetActive(!bossHealth.IsDead && bossHealth.CurrentHealth < bossHealth.MaxHealth);
+                root.SetActive(!bossHealth.IsDead);
         }
 
         private void UpdateBar(float current, float maximum)
