@@ -10,6 +10,7 @@ namespace ShinobiLegacy.Combat
         [SerializeField] private bool destroyOnDeath;
         private float currentHealth;
         private EquipmentManager equipment;
+        private float invulnerableUntil;
 
         public float CurrentHealth => currentHealth;
         public float MaxHealth => maxHealth;
@@ -31,13 +32,21 @@ namespace ShinobiLegacy.Combat
 
         public void TakeDamage(float amount)
         {
-            if (IsDead || amount <= 0f) return;
+            if (IsDead || amount <= 0f || Time.time < invulnerableUntil) return;
             if (equipment == null) equipment = GetComponent<EquipmentManager>();
             float incomingDamage = amount;
             if (equipment != null) incomingDamage = Mathf.Max(1f, amount - equipment.Defense);
             currentHealth = Mathf.Max(0f, currentHealth - incomingDamage);
             HealthChanged?.Invoke(currentHealth, maxHealth);
             if (currentHealth <= 0f) Die();
+        }
+
+        public void ReviveAtFullHealth(float invulnerabilitySeconds = 3f)
+        {
+            IsDead = false;
+            currentHealth = maxHealth;
+            invulnerableUntil = Time.time + Mathf.Max(0f, invulnerabilitySeconds);
+            HealthChanged?.Invoke(currentHealth, maxHealth);
         }
 
         public void Restore(float amount)
