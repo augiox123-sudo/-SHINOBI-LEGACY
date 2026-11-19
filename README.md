@@ -352,3 +352,7 @@ Record device model, Android version, build date, test duration, observed FPS (i
 When the player has an enemy selected with the mobile target-lock control, a basic attack now prioritizes that selected enemy if it is within melee reach. If the selected enemy is out of reach or no target is selected, the existing forward-area attack remains as a fallback. This keeps target lock useful without changing the area behavior of Chakra and elemental abilities.
 
 Focused melee attacks also rotate the player toward the currently locked enemy before applying the strike, making target-lock attacks directionally consistent.
+
+## Enemy hit-flash restoration fix
+
+Fixed the enemy hit-flash color restoration guard to validate the two color arrays actually initialized by the AI component. This removes a stale field reference that could otherwise prevent the enemy visual restoration method from compiling.
