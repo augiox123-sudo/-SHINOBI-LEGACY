@@ -196,8 +196,14 @@ namespace ShinobiLegacy.Combat
                     CombatantHealth candidate = candidateCollider.GetComponentInParent<CombatantHealth>();
                     if (candidate != null && candidate.transform != transform && !candidate.IsDead)
                     {
-                        float distance = (candidate.transform.position - searchCenter).sqrMagnitude;
-                        if (distance < nearestDistance)
+                        Vector3 toCandidate = candidate.transform.position - transform.position;
+                        toCandidate.y = 0f;
+                        float distance = toCandidate.sqrMagnitude;
+                        // Keep acquisition in front of the shinobi; do not select enemies behind
+                        // the player just because they happen to be closer to the search sphere.
+                        if (distance > 0.01f &&
+                            Vector3.Dot(transform.forward, toCandidate.normalized) >= 0.2f &&
+                            distance < nearestDistance)
                         {
                             nearestDistance = distance;
                             primaryTarget = candidate;
