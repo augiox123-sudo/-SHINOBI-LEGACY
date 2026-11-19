@@ -10,6 +10,7 @@ namespace ShinobiLegacy.Combat
     public sealed class AbilityVfxController : MonoBehaviour
     {
         private static Material particleMaterial;
+        private static Material lineMaterial;
 
         public void PlayFire(Vector3 origin, Vector3 direction, float range, string modifier)
         {
@@ -73,7 +74,7 @@ namespace ShinobiLegacy.Combat
             line.useWorldSpace = true;
             line.startWidth = 0.16f;
             line.endWidth = 0.035f;
-            line.material = GetParticleMaterial();
+            line.material = GetLineMaterial();
             line.startColor = new Color(0.35f, 0.85f, 1f, 1f);
             line.endColor = new Color(0.75f, 0.95f, 1f, 0.15f);
             Vector3 delta = to - from;
@@ -103,6 +104,7 @@ namespace ShinobiLegacy.Combat
             var main = ps.main;
             main.startLifetime = Mathf.Clamp(range / Mathf.Max(1f, speed), 0.35f, 1.4f);
             ps.Emit(count);
+            ps.Play();
             Destroy(effect, 1.8f);
         }
 
@@ -114,23 +116,41 @@ namespace ShinobiLegacy.Combat
             shape.shapeType = ParticleSystemShapeType.Sphere;
             shape.radius = Mathf.Max(0.15f, size * 0.35f);
             ps.Emit(count);
+            ps.Play();
             Destroy(effect, lifetime + 0.5f);
         }
 
         private static void EmitRing(Vector3 position, float radius, Color color)
         {
-            GameObject ring = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            ring.name = "VFX_ChakraShockwave";
+            GameObject ring = new GameObject("VFX_ChakraShockwave");
             ring.transform.position = position;
-            ring.transform.localScale = new Vector3(radius * 2f, 0.035f, radius * 2f);
-            Collider collider = ring.GetComponent<Collider>();
-            if (collider != null) Destroy(collider);
-            Renderer renderer = ring.GetComponent<Renderer>();
-            renderer.material = GetParticleMaterial();
-            renderer.material.color = new Color(color.r, color.g, color.b, 0.65f);
-            ring.transform.localScale = Vector3.zero;
-            ring.AddComponent<ShockwaveFade>().Initialize(radius * 2f, 0.22f);
-            Destroy(ring, 0.3f);
+            LineRenderer line = ring.AddComponent<LineRenderer>();
+            const int segments = 48;
+            line.positionCount = segments;
+            line.loop = true;
+            line.useWorldSpace = false;
+            line.startWidth = 0.16f;
+            line.endWidth = 0.035f;
+            line.material = GetLineMaterial();
+            line.startColor = new Color(color.r, color.g, color.b, 0.8f);
+            line.endColor = new Color(color.r, color.g, color.b, 0.15f);
+            for (int i = 0; i < segments; i++)
+            {
+                float angle = i * Mathf.PI * 2f / segments;
+                line.SetPosition(i, new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * radius);
+            }
+            ring.transform.localScale = Vector3.one * 0.08f;
+            ring.AddComponent<ShockwaveFade>().Initialize(1f, 0.24f);
+            Destroy(ring, 0.35f);
+        }
+
+        private static Material GetLineMaterial()
+        {
+            if (lineMaterial != null) return lineMaterial;
+            Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
+            if (shader == null) shader = Shader.Find("Sprites/Default");
+            lineMaterial = new Material(shader);
+            return lineMaterial;
         }
 
         private static GameObject CreateParticleObject(string objectName, Vector3 position, Color color,
