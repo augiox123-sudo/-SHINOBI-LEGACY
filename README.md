@@ -380,3 +380,7 @@ Target cycling is now provided only by the shared Canvas combat controls. The du
 ## Mobile ability control compile fix
 
 The shared `MobileAbilityControls.CreateButton` method now makes cooldown and resource-state callbacks optional. This fixes the target-lock button call, which intentionally supplies only its label, position, action, and color, while all six combat ability buttons continue to provide cooldown and chakra callbacks.
+
+## Player movement input safety
+
+`PlayerMotor.SetMovementEnabled(false)` now clears the last virtual-joystick input immediately. The motor also clears external movement input when disabled and on component shutdown. This prevents a stale touch direction from being applied when movement is re-enabled after a dialogue, UI lock, pause, or other control transition.
