@@ -23,7 +23,7 @@ namespace ShinobiLegacy.World
         {
             const int buttonWidth = 150;
             const int buttonHeight = 52;
-            if (GUI.Button(new Rect(Screen.width - buttonWidth - 22, 22, buttonWidth, buttonHeight), "WORLD MAP"))
+            if (GUI.Button(new Rect(22, 22, buttonWidth, buttonHeight), "WORLD MAP"))
                 mapOpen = !mapOpen;
 
             if (!mapOpen) return;
