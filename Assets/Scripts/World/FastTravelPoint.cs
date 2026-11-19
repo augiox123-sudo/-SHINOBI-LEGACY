@@ -7,11 +7,22 @@ namespace ShinobiLegacy.World
     {
         public string pointId = "village_gate";
         public string displayName = "Village Gate";
+        [Tooltip("Optional region ID. A point remains hidden until its region is unlocked.")]
+        public string regionId = "";
         [Min(1f)] public float unlockRadius = 7f;
 
         private string PreferenceKey => "SL_FAST_TRAVEL_UNLOCKED_" + pointId;
 
-        public bool IsUnlocked => PlayerPrefs.GetInt(PreferenceKey, 0) == 1;
+        public bool IsUnlocked
+        {
+            get
+            {
+                if (PlayerPrefs.GetInt(PreferenceKey, 0) != 1) return false;
+                if (string.IsNullOrEmpty(regionId)) return true;
+                WorldRegionProgression regions = FindObjectOfType<WorldRegionProgression>();
+                return regions != null && regions.IsUnlocked(regionId);
+            }
+        }
 
         private void Awake()
         {
