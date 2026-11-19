@@ -46,6 +46,7 @@ namespace ShinobiLegacy.Items
             string[] slots = { "Weapon", "Chest", "Accessory", "Weapon", "Hands" };
             int index = Random.Range(0, names.Length);
             InventoryItem item = new InventoryItem(names[index], rarity, power, slots[index]);
+            RollSecondaryStats(item);
             if (rarity == LootRarity.Legendary)
             {
                 string[] legendaryEffects = {
@@ -69,6 +70,20 @@ namespace ShinobiLegacy.Items
             body.useGravity = false;
             LootPickup pickup = orb.AddComponent<LootPickup>();
             pickup.Configure(item);
+        }
+
+        private static void RollSecondaryStats(InventoryItem item)
+        {
+            float tier = (int)item.rarity + 1;
+            item.bonusDamagePercent = Random.Range(0f, 0.008f * tier);
+            item.bonusDefense = Random.Range(0f, 0.75f * tier);
+            item.bonusCriticalChance = Random.Range(0f, 0.006f * tier);
+            item.bonusCriticalDamage = Random.Range(0f, 0.025f * tier);
+            if (item.rarity == LootRarity.Legendary)
+            {
+                item.bonusDamagePercent += 0.025f;
+                item.bonusCriticalChance += 0.015f;
+            }
         }
 
         private static string GetModifierName(string id)
