@@ -187,6 +187,15 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 
 
 
+## Enemy target lock
+
+- Player scenes attach `EnemyTargetLockSystem`.
+- Nearby living enemies are discovered using a reusable, fixed-size physics overlap buffer.
+- The system automatically selects a nearby enemy in the player's forward field and retains the target until it dies or leaves the acquisition range.
+- A screen-space target marker, enemy name and health bar are displayed. The **NEXT TARGET** control cycles through nearby enemies and supports touch input through Unity's immediate-mode GUI.
+- Target scanning is throttled; the system does not allocate a new collider array each scan.
+- This is a first functional targeting pass. Camera framing, target-button placement and enemy selection feel still require testing on different Android aspect ratios.
+
 ## Mobile combat optimization pass
 
 - Lightning target acquisition now rejects enemies behind the player and chooses the nearest valid enemy in the forward combat area.
