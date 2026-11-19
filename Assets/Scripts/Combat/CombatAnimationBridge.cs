@@ -130,6 +130,13 @@ namespace ShinobiLegacy.Combat
             Trigger(HitHash);
         }
 
+        public void TriggerHeavyHit()
+        {
+            ShinobiProceduralMotion motion = ResolveProceduralMotion();
+            if (motion != null) motion.PlayHit(true);
+            Trigger(HitHash);
+        }
+
         public void TriggerAbility()
         {
             ShinobiProceduralMotion motion = ResolveProceduralMotion();
