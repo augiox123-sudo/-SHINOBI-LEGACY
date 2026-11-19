@@ -274,14 +274,18 @@ A cloud build workflow is available at `.github/workflows/android-first-test.yml
 
 The workflow uses GameCI with the exact Unity Editor version in this project. It regenerates the two test scenes, runs the same project validation, builds an ARM64 development APK and uploads it as the artifact **SHINOBI-LEGACY-Android-FirstTest**.
 
-**One-time license setup is required:**
+**One-time Unity Personal license setup is required:**
 
-1. Obtain a Unity Personal license file (`.ulf`). GameCI's official activation guide explains how to request the GitHub runner activation file and convert it into a Unity license: https://game.ci/docs/github/activation/
-2. In this GitHub repository, open **Settings → Secrets and variables → Actions → New repository secret**.
-3. Set the secret name to `UNITY_LICENSE` and paste the full contents of the `.ulf` license file as its value. Do not commit the license file to the repository.
-4. Open **Actions → Android first-test APK → Run workflow**. After a successful run, download the APK from the workflow run's **Artifacts** section.
+1. Install Unity Hub on a computer, sign in to the Unity account you will use for the build, then open **Unity Hub → Preferences/Settings → Licenses → Add → Get a free Personal license**. Complete activation and confirm that a `.ulf` license file has been created. GameCI's current guide lists the usual file locations and activation details: https://game.ci/docs/github/activation/
+2. In this GitHub repository, open **Settings → Secrets and variables → Actions** and create these three repository secrets:
+   - `UNITY_LICENSE` — the complete contents of the `.ulf` license file.
+   - `UNITY_EMAIL` — the email address of the Unity account.
+   - `UNITY_PASSWORD` — the password for that Unity account.
+3. Never put these values in source files, commits, issues or chat. Keep them only in GitHub Actions secrets.
+4. After copying the license file, sign out of Unity Hub on the local computer as described by GameCI so the Personal license seat is released for the build runner.
+5. Open **Actions → Android first-test APK → Run workflow**. After a successful run, download the APK from the workflow run's **Artifacts** section.
 
-If `UNITY_LICENSE` is not configured, the workflow deliberately skips the Unity build and shows a notice. It does not report a fake successful APK build.
+The workflow checks that all three secrets are present. If one or more are missing, it deliberately skips the Unity build and shows a notice; it does not report a fake successful APK build.
 
 
 The first-test player is configured for landscape, ARM64, Android API 26+, automatic installed target SDK selection, Gamma color space, IL2CPP, incremental garbage collection and Android optimized frame pacing. Incremental GC spreads collection work over smaller slices, while optimized frame pacing aims to distribute frames more evenly; neither guarantees a fixed FPS on a device. The runtime target remains 30 FPS with shadows disabled. This is a development test build, not a store release.
