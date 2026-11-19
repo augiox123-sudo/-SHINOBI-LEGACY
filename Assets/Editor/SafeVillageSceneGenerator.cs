@@ -84,6 +84,17 @@ namespace ShinobiLegacy.Editor
             CreateTrainingGround();
             CreateForestLine();
 
+            // Four explorable regional outposts connected to the world map.
+            // These are scalable blockout zones; final terrain, foliage and authored art come later.
+            CreateRegionOutpost("ASHEN RUINS", "ashen_ruins", new Vector3(-190f, 0f, 0f),
+                new Color(0.34f, 0.19f, 0.16f), "THE ASHEN WARDEN");
+            CreateRegionOutpost("VERDANT FOREST", "verdant_forest", new Vector3(190f, 0f, 0f),
+                new Color(0.12f, 0.29f, 0.14f), "THE ROOTBOUND COLOSSUS");
+            CreateRegionOutpost("THUNDER SHRINE", "thunder_shrine", new Vector3(0f, 0f, 190f),
+                new Color(0.2f, 0.18f, 0.38f), "RAIJIN'S BROKEN AVATAR");
+            CreateRegionOutpost("DROWNED TEMPLE", "drowned_temple", new Vector3(0f, 0f, -190f),
+                new Color(0.08f, 0.25f, 0.34f), "THE ABYSSAL GUARDIAN");
+
             // Playable village arrival point, wallet, inventory and isometric camera.
             GameObject player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             player.name = "Player_Village_Hub";
@@ -184,7 +195,8 @@ namespace ShinobiLegacy.Editor
         }
 
 
-        private static FastTravelPoint CreateFastTravelPoint(string id, string displayName, Vector3 position)
+        private static FastTravelPoint CreateFastTravelPoint(string id, string displayName, Vector3 position,
+            string regionId = "")
         {
             GameObject pointObject = new GameObject("FastTravel_" + id);
             pointObject.transform.position = position;
@@ -194,8 +206,53 @@ namespace ShinobiLegacy.Editor
             FastTravelPoint point = pointObject.AddComponent<FastTravelPoint>();
             point.pointId = id;
             point.displayName = displayName;
+            point.regionId = regionId;
             point.unlockRadius = 7f;
             return point;
+        }
+
+        private static void CreateRegionOutpost(string regionName, string regionId, Vector3 center,
+            Color terrainColor, string bossName)
+        {
+            Material terrain = MakeMaterial(regionName + " Terrain", terrainColor);
+            GameObject island = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            island.name = "Region_" + regionId + "_Terrain";
+            island.transform.position = center;
+            island.transform.localScale = new Vector3(8f, 1f, 8f);
+            island.GetComponent<Renderer>().sharedMaterial = terrain;
+
+            Material stone = MakeMaterial(regionName + " Stone", Color.Lerp(terrainColor, Color.gray, 0.55f));
+            Material accent = MakeMaterial(regionName + " Portal Accent", new Color(0.25f, 0.72f, 0.9f));
+            for (int i = 0; i < 8; i++)
+            {
+                float angle = i * Mathf.PI * 2f / 8f;
+                Vector3 offset = new Vector3(Mathf.Cos(angle) * 34f, 1.4f, Mathf.Sin(angle) * 34f);
+                GameObject rock = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                rock.name = "Region_" + regionId + "_BoundaryRock_" + (i + 1);
+                rock.transform.position = center + offset;
+                rock.transform.rotation = Quaternion.Euler(0f, i * 23f, 0f);
+                rock.transform.localScale = new Vector3(5f, 2.8f, 4f);
+                rock.GetComponent<Renderer>().sharedMaterial = stone;
+            }
+
+            GameObject altar = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            altar.name = "Region_" + regionId + "_DungeonAltar";
+            altar.transform.position = center + new Vector3(0f, 0.65f, 18f);
+            altar.transform.localScale = new Vector3(8f, 0.65f, 8f);
+            altar.GetComponent<Renderer>().sharedMaterial = accent;
+
+            GameObject bossMarker = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            bossMarker.name = "Region_" + regionId + "_BossMonument";
+            bossMarker.transform.position = center + new Vector3(0f, 5f, 34f);
+            bossMarker.transform.localScale = new Vector3(3f, 10f, 3f);
+            bossMarker.GetComponent<Renderer>().sharedMaterial = stone;
+
+            CreateLabel(regionName, center + new Vector3(0f, 4f, -34f), 2.2f);
+            CreateLabel("DUNGEON: " + regionName, center + new Vector3(0f, 3f, 18f), 1.2f);
+            CreateLabel("BOSS: " + bossName, center + new Vector3(0f, 12f, 34f), 1.1f);
+
+            FastTravelPoint travel = CreateFastTravelPoint(regionId, regionName,
+                center + new Vector3(0f, 1f, -8f), regionId);
         }
 
         private static void CreateMaterials()
