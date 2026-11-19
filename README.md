@@ -70,3 +70,11 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - Weapon power increases basic and chakra skill damage.
 - Non-weapon equipment adds defense and reduces incoming damage.
 - Current equipment power is displayed in the HUD.
+
+
+## Safe village hub blockout
+
+- Added an editor scene generator at **Tools → Shinobi Legacy → Create Safe Village Hub**.
+- The generated hub has a guarded main gate, perimeter walls, forest edge, central market square, six named merchant stalls, residential blocks, academy, hospital, forge, mission office, training ground and a high ridge monument.
+- The layout uses original placeholder geometry and abstract monument details. Merchant stands are visual placeholders at this stage; vendor dialogue, buy/sell UI, currency, player spawn and travel links are not implemented yet.
+- The generator saves `Assets/Scenes/SafeVillage.unity` and adds it to Build Settings alongside the prototype arena.
