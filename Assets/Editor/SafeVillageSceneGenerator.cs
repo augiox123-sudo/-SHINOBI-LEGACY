@@ -7,6 +7,8 @@ using UnityEngine.EventSystems;
 using ShinobiLegacy.Player;
 using ShinobiLegacy.CameraSystem;
 using ShinobiLegacy.Items;
+using ShinobiLegacy.Combat;
+using ShinobiLegacy.World;
 
 namespace ShinobiLegacy.Editor
 {
@@ -95,8 +97,15 @@ namespace ShinobiLegacy.Editor
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerWallet>();
             player.AddComponent<EquipmentManager>();
+            player.AddComponent<CombatantHealth>();
             player.AddComponent<PlayerSaveSystem>();
+            PlayerRespawnController respawn = player.AddComponent<PlayerRespawnController>();
+            player.AddComponent<FastTravelMapUI>();
             player.AddComponent<VillageShopUI>();
+
+            GameObject safeSpawn = new GameObject("Safe_Respawn_Point");
+            safeSpawn.transform.position = new Vector3(0f, 1f, -58f);
+            respawn.SetSafeSpawn(safeSpawn.transform);
 
             GameObject hud = new GameObject("Village Mobile HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             Canvas canvas = hud.GetComponent<Canvas>();
@@ -148,6 +157,13 @@ namespace ShinobiLegacy.Editor
             CreateMarker("CENTRAL MARKET", new Vector3(0f, 0.2f, 0f));
             CreateMarker("ADMINISTRATION", new Vector3(0f, 0.2f, 57f));
 
+            // Discoverable fast-travel network. The gate is the first unlocked destination.
+            FastTravelPoint gateTravel = CreateFastTravelPoint("village_gate", "Village Gate", new Vector3(0f, 1f, -58f));
+            gateTravel.Unlock();
+            CreateFastTravelPoint("central_market", "Central Market", new Vector3(0f, 1f, 0f));
+            CreateFastTravelPoint("administration", "Village Administration", new Vector3(0f, 1f, 48f));
+            CreateFastTravelPoint("training_grounds", "Training Grounds", new Vector3(0f, 1f, -48f));
+
             if (!AssetDatabase.IsValidFolder("Assets/Scenes")) AssetDatabase.CreateFolder("Assets", "Scenes");
             const string scenePath = "Assets/Scenes/SafeVillage.unity";
             EditorSceneManager.MarkSceneDirty(scene);
@@ -159,6 +175,21 @@ namespace ShinobiLegacy.Editor
             };
             AssetDatabase.SaveAssets();
             Debug.Log("SHINOBI LEGACY: Safe Village hub created with player spawn, isometric camera, wallet and vendor buy/sell interaction.");
+        }
+
+
+        private static FastTravelPoint CreateFastTravelPoint(string id, string displayName, Vector3 position)
+        {
+            GameObject pointObject = new GameObject("FastTravel_" + id);
+            pointObject.transform.position = position;
+            SphereCollider trigger = pointObject.AddComponent<SphereCollider>();
+            trigger.isTrigger = true;
+            trigger.radius = 7f;
+            FastTravelPoint point = pointObject.AddComponent<FastTravelPoint>();
+            point.pointId = id;
+            point.displayName = displayName;
+            point.unlockRadius = 7f;
+            return point;
         }
 
         private static void CreateMaterials()
