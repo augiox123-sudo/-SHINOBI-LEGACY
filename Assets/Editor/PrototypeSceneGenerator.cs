@@ -155,6 +155,19 @@ namespace ShinobiLegacy.Editor
             statusRect.pivot = new Vector2(0f, 1f);
             statusRect.anchoredPosition = new Vector2(35f, -112f);
             statusRect.sizeDelta = new Vector2(650f, 36f);
+            GameObject progressionObject = new GameObject("Progression Status", typeof(RectTransform), typeof(Text));
+            progressionObject.transform.SetParent(canvasObject.transform, false);
+            RectTransform progressionRect = progressionObject.GetComponent<RectTransform>();
+            progressionRect.anchorMin = new Vector2(0f, 1f);
+            progressionRect.anchorMax = new Vector2(0f, 1f);
+            progressionRect.pivot = new Vector2(0f, 1f);
+            progressionRect.anchoredPosition = new Vector2(35f, -155f);
+            progressionRect.sizeDelta = new Vector2(700f, 32f);
+            Text progressionText = progressionObject.GetComponent<Text>();
+            progressionText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            progressionText.fontSize = 20;
+            progressionText.color = new Color(1f, 0.86f, 0.58f);
+            progressionText.raycastTarget = false;
             Text statusText = statusObject.GetComponent<Text>();
             statusText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             statusText.fontSize = 20;
@@ -213,6 +226,8 @@ namespace ShinobiLegacy.Editor
 
             CombatHud hud = canvasObject.AddComponent<CombatHud>();
             hud.Configure(player.GetComponent<CombatantHealth>(), playerCombat, healthFill, chakraFill, statusText);
+            ProgressionHud progressionHud = canvasObject.AddComponent<ProgressionHud>();
+            progressionHud.Configure(progression, player.GetComponent<PlayerInventory>(), progressionText);
 
             if (!AssetDatabase.IsValidFolder("Assets/Scenes")) AssetDatabase.CreateFolder("Assets", "Scenes");
             EditorSceneManager.MarkSceneDirty(scene);
