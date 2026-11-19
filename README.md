@@ -376,3 +376,7 @@ Boss color changes now use a cached `MaterialPropertyBlock` and the shader's sup
 ## Mobile target-lock control cleanup
 
 Target cycling is now provided only by the shared Canvas combat controls. The duplicate IMGUI `NEXT TARGET` button was removed from `EnemyTargetLockSystem.OnGUI`; the target marker and target health panel remain. This avoids showing two target-cycle controls on mobile and keeps interactive combat input in one UI system.
+
+## Mobile ability control compile fix
+
+The shared `MobileAbilityControls.CreateButton` method now makes cooldown and resource-state callbacks optional. This fixes the target-lock button call, which intentionally supplies only its label, position, action, and color, while all six combat ability buttons continue to provide cooldown and chakra callbacks.
