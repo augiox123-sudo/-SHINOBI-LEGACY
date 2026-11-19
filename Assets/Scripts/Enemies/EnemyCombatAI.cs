@@ -161,6 +161,7 @@ namespace ShinobiLegacy.Enemies
                         {
                             if (animationBridge != null) animationBridge.PlayAttack();
                             liveTarget.TakeDamage(attackDamage);
+                            if (!liveTarget.IsDead) liveTarget.ApplyKnockbackFrom(transform.position, 1.8f, 0.10f);
                         }
                     }
                 }
