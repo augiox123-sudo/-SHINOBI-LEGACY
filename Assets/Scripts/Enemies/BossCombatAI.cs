@@ -30,6 +30,11 @@ namespace ShinobiLegacy.Enemies
         private int bossProfile;
         private float nextSpecialTime;
         private Color baseColor;
+        private MaterialPropertyBlock bodyColorBlock;
+        private int bodyColorPropertyId;
+        private bool supportsBodyColor;
+        private static readonly int BaseColorProperty = Shader.PropertyToID("_BaseColor");
+        private static readonly int LegacyColorProperty = Shader.PropertyToID("_Color");
         private LineRenderer attackTelegraph;
         private Material telegraphMaterial;
         private const int TelegraphSegments = 48;
@@ -47,7 +52,29 @@ namespace ShinobiLegacy.Enemies
             controller = GetComponent<CharacterController>();
             health = GetComponent<CombatantHealth>();
             if (bodyRenderer == null) bodyRenderer = GetComponentInChildren<Renderer>();
-            if (bodyRenderer != null) baseColor = bodyRenderer.material.color;
+            if (bodyRenderer != null)
+            {
+                Material shared = bodyRenderer.sharedMaterial;
+                if (shared != null)
+                {
+                    if (shared.HasProperty(BaseColorProperty))
+                    {
+                        bodyColorPropertyId = BaseColorProperty;
+                        supportsBodyColor = true;
+                    }
+                    else if (shared.HasProperty(LegacyColorProperty))
+                    {
+                        bodyColorPropertyId = LegacyColorProperty;
+                        supportsBodyColor = true;
+                    }
+                    if (supportsBodyColor)
+                    {
+                        baseColor = shared.GetColor(bodyColorPropertyId);
+                        bodyColorBlock = new MaterialPropertyBlock();
+                        bodyRenderer.GetPropertyBlock(bodyColorBlock);
+                    }
+                }
+            }
             CreateAttackTelegraph();
             health.Died += OnDied;
         }
@@ -70,7 +97,7 @@ namespace ShinobiLegacy.Enemies
                 windingUp = false;
                 windupRemaining = 0f;
                 SetTelegraphVisible(false);
-                if (bodyRenderer != null) bodyRenderer.material.color = phaseTwo ? ProfileColor() : baseColor;
+                if (bodyRenderer != null) SetBodyColor(phaseTwo ? ProfileColor() : baseColor);
                 return;
             }
 
@@ -81,7 +108,7 @@ namespace ShinobiLegacy.Enemies
                 moveSpeed *= 1.35f;
                 slamDamage *= 1.3f;
                 slamCooldown = Mathf.Max(1.8f, slamCooldown * 0.72f);
-                if (bodyRenderer != null) bodyRenderer.material.color = ProfileColor();
+                if (bodyRenderer != null) SetBodyColor(ProfileColor());
                 Debug.Log("SHINOBI LEGACY: Boss entered phase two: " + gameObject.name);
             }
 
@@ -97,7 +124,7 @@ namespace ShinobiLegacy.Enemies
                     specialWindup = false;
                     windupRemaining = 0f;
                     SetTelegraphVisible(false);
-                    if (bodyRenderer != null) bodyRenderer.material.color = phaseTwo ? ProfileColor() : baseColor;
+                    if (bodyRenderer != null) SetBodyColor(phaseTwo ? ProfileColor() : baseColor);
                 }
                 return;
             }
@@ -122,7 +149,7 @@ namespace ShinobiLegacy.Enemies
                 specialWindup = true;
                 windupRemaining = windupDuration * 1.25f;
                 nextSpecialTime = Time.time + specialCooldown;
-                if (bodyRenderer != null) bodyRenderer.material.color = ProfileColor();
+                if (bodyRenderer != null) SetBodyColor(ProfileColor());
                 SetTelegraphVisible(true);
                 UpdateAttackTelegraph();
                 return;
@@ -139,7 +166,7 @@ namespace ShinobiLegacy.Enemies
                 specialWindup = false;
                 windupRemaining = windupDuration;
                 nextSlamTime = Time.time + slamCooldown;
-                if (bodyRenderer != null) bodyRenderer.material.color = new Color(1f, 0.55f, 0.08f);
+                if (bodyRenderer != null) SetBodyColor(new Color(1f, 0.55f, 0.08f));
                 SetTelegraphVisible(true);
                 UpdateAttackTelegraph();
             }
@@ -150,7 +177,7 @@ namespace ShinobiLegacy.Enemies
             windingUp = false;
             specialWindup = false;
             SetTelegraphVisible(false);
-            if (bodyRenderer != null) bodyRenderer.material.color = phaseTwo ? ProfileColor() : baseColor;
+            if (bodyRenderer != null) SetBodyColor(phaseTwo ? ProfileColor() : baseColor);
             if (target == null) return;
 
             Vector3 flatTarget = target.position;
@@ -167,7 +194,7 @@ namespace ShinobiLegacy.Enemies
             windingUp = false;
             specialWindup = false;
             SetTelegraphVisible(false);
-            if (bodyRenderer != null) bodyRenderer.material.color = ProfileColor();
+            if (bodyRenderer != null) SetBodyColor(ProfileColor());
             if (target == null) return;
 
             float distance = Vector3.Distance(transform.position, target.position);
@@ -186,6 +213,14 @@ namespace ShinobiLegacy.Enemies
             targetHealth.TakeDamage(damage);
             if (bossProfile == 2) targetHealth.ApplyStun(1.15f);
             else if (bossProfile == 3) targetHealth.ApplyStun(0.55f);
+        }
+
+        private void SetBodyColor(Color color)
+        {
+            if (bodyRenderer == null || !supportsBodyColor || bodyColorBlock == null) return;
+            bodyRenderer.GetPropertyBlock(bodyColorBlock);
+            bodyColorBlock.SetColor(bodyColorPropertyId, color);
+            bodyRenderer.SetPropertyBlock(bodyColorBlock);
         }
 
         private void CreateAttackTelegraph()
@@ -255,7 +290,7 @@ namespace ShinobiLegacy.Enemies
         {
             windingUp = false;
             SetTelegraphVisible(false);
-            if (bodyRenderer != null) bodyRenderer.material.color = phaseTwo ? ProfileColor() : baseColor;
+            if (bodyRenderer != null) SetBodyColor(phaseTwo ? ProfileColor() : baseColor);
             enabled = false;
             controller.enabled = false;
             Destroy(gameObject, 2f);
