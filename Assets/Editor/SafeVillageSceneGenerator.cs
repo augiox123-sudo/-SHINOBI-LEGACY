@@ -139,6 +139,7 @@ namespace ShinobiLegacy.Editor
             player.AddComponent<CombatantHealth>();
             player.AddComponent<PlayerCombat>();
             player.AddComponent<ShinobiLegacy.Combat.EnemyTargetLockSystem>();
+            player.AddComponent<ShinobiLegacy.Combat.PlayerDodge>();
             player.AddComponent<ShinobiLegacy.UI.MobileAbilityControls>();
             player.AddComponent<ShinobiLegacy.UI.InventoryEquipmentUI>();
             player.AddComponent<PlayerSaveSystem>();
