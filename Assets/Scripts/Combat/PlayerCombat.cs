@@ -37,6 +37,8 @@ namespace ShinobiLegacy.Combat
         private float nextWaterTime;
         private float nextWindTime;
         private float chakra;
+        private float nextResourceRegenEventTime;
+        private const float ResourceRegenEventInterval = 0.15f;
         private readonly Collider[] hitBuffer = new Collider[24];
         private readonly HashSet<CombatantHealth> damagedThisCast = new HashSet<CombatantHealth>();
         private readonly Collider[] chainBuffer = new Collider[24];
