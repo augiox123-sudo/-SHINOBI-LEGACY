@@ -70,7 +70,7 @@ namespace ShinobiLegacy.UI
         }
 
         private void CreateButton(string label, int index, UnityEngine.Events.UnityAction action, Color color,
-            Func<float> remaining, Func<float> duration, Func<bool> hasResource)
+            Func<float> remaining = null, Func<float> duration = null, Func<bool> hasResource = null)
         {
             GameObject buttonObject = new GameObject("Ability_" + label,
                 typeof(RectTransform), typeof(Image), typeof(Button));
