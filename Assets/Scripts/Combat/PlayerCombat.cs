@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 using ShinobiLegacy.Items;
 
 namespace ShinobiLegacy.Combat
@@ -34,6 +35,7 @@ namespace ShinobiLegacy.Combat
         private float nextFireTime;
         private float chakra;
         private readonly Collider[] hitBuffer = new Collider[24];
+        private readonly HashSet<CombatantHealth> damagedThisCast = new HashSet<CombatantHealth>();
         private EquipmentManager equipment;
         private CombatantHealth ownHealth;
         [SerializeField, Range(1, 5)] private int burstRank = 1;
@@ -79,6 +81,7 @@ namespace ShinobiLegacy.Combat
         {
             if (Time.time < nextAttackTime) return;
             nextAttackTime = Time.time + attackCooldown;
+            damagedThisCast.Clear();
             HitTargets(attackRange, attackRadius, GetScaledDamage(attackDamage));
         }
 
@@ -87,6 +90,7 @@ namespace ShinobiLegacy.Combat
             if (Time.time < nextBurstTime || chakra < burstCost) return;
             chakra -= burstCost;
             nextBurstTime = Time.time + burstCooldown;
+            damagedThisCast.Clear();
             float damage = GetScaledDamage(burstDamage) * (1f + (burstRank - 1) * 0.05f);
             string modifier = equipment != null ? equipment.GetAbilityModifier("burst") : string.Empty;
             if (modifier == "burst_storm")
@@ -109,6 +113,7 @@ namespace ShinobiLegacy.Combat
             if (Time.time < nextFireTime || chakra < fireCost) return;
             chakra -= fireCost;
             nextFireTime = Time.time + fireCooldown;
+            damagedThisCast.Clear();
             Vector3 origin = transform.position + Vector3.up * 1.1f + transform.forward * 0.6f;
             Vector3 direction = transform.forward;
             float damage = GetScaledDamage(fireDamage) * (1f + (fireRank - 1) * 0.05f);
@@ -116,36 +121,36 @@ namespace ShinobiLegacy.Combat
             if (modifier == "fire_wave")
             {
                 for (int step = 1; step <= 3; step++)
-                    DamageArea(origin + direction * (step * fireRange / 3f), 2.1f, damage * 0.62f);
+                    DamageArea(origin + direction * (step * fireRange / 3f), 2.1f, damage * 0.62f, true);
             }
             else if (modifier == "fire_dragon")
             {
-                FireRay(origin - transform.right * 0.8f, direction, damage * 0.82f, 0.8f);
-                FireRay(origin + transform.right * 0.8f, direction, damage * 0.82f, 0.8f);
+                FireRay(origin - transform.right * 0.8f, direction, damage * 0.82f, 0.8f, true);
+                FireRay(origin + transform.right * 0.8f, direction, damage * 0.82f, 0.8f, true);
             }
             else if (modifier == "fire_burst")
             {
                 if (Physics.SphereCast(origin, 0.55f, direction, out RaycastHit hit, fireRange,
                     Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
-                    DamageArea(hit.point, 3.2f, damage * 1.15f);
+                    DamageArea(hit.point, 3.2f, damage * 1.15f, true);
             }
-            else FireRay(origin, direction, damage, 0.55f);
+            else FireRay(origin, direction, damage, 0.55f, false);
             RecordAbilityUse(false);
             ResourcesChanged?.Invoke();
         }
 
 
-        private void FireRay(Vector3 origin, Vector3 direction, float damage, float radius)
+        private void FireRay(Vector3 origin, Vector3 direction, float damage, float radius, bool applyBurn)
         {
             if (Physics.SphereCast(origin, radius, direction, out RaycastHit hit, fireRange,
                 Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
             {
                 CombatantHealth health = hit.collider.GetComponentInParent<CombatantHealth>();
-                if (health != null && health.transform != transform) health.TakeDamage(damage);
+                if (health != null && health.transform != transform) ApplyDamageOnce(health, damage, applyBurn);
             }
         }
 
-        private void DamageArea(Vector3 center, float radius, float damage)
+        private void DamageArea(Vector3 center, float radius, float damage, bool applyBurn)
         {
             int count = Physics.OverlapSphereNonAlloc(center, radius, hitBuffer,
                 Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
@@ -154,9 +159,16 @@ namespace ShinobiLegacy.Combat
                 Collider hit = hitBuffer[i];
                 if (hit == null) continue;
                 CombatantHealth health = hit.GetComponentInParent<CombatantHealth>();
-                if (health != null && !health.IsDead && health.transform != transform) health.TakeDamage(damage);
+                if (health != null && !health.IsDead && health.transform != transform) ApplyDamageOnce(health, damage, applyBurn);
                 hitBuffer[i] = null;
             }
+        }
+
+        private void ApplyDamageOnce(CombatantHealth target, float damage, bool applyBurn)
+        {
+            if (target == null || target.IsDead || !damagedThisCast.Add(target)) return;
+            target.TakeDamage(damage);
+            if (applyBurn && !target.IsDead) target.ApplyBurn(Mathf.Max(2f, damage * 0.08f), 3f, 1f);
         }
 
         private void RecordAbilityUse(bool burst)
