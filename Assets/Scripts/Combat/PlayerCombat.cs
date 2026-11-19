@@ -195,7 +195,7 @@ namespace ShinobiLegacy.Combat
                     else if (modifier == "lightning_storm")
                     {
                         DamageArea(target.transform.position, 3.4f, damage * 0.62f, false);
-                        StunTargetsInFront(5f, 3.4f, 0.55f);
+                        StunTargetsAt(target.transform.position, 3.4f, 0.55f);
                         if (abilityVfx != null) abilityVfx.PlayLightningStorm(target.transform.position);
                     }
                 }
@@ -381,6 +381,23 @@ namespace ShinobiLegacy.Combat
                 searchCenter = previous.transform.position + Vector3.up;
             }
             for (int i = 0; i < chainBuffer.Length; i++) chainBuffer[i] = null;
+        }
+
+        private void StunTargetsAt(Vector3 center, float radius, float duration)
+        {
+            int count = Physics.OverlapSphereNonAlloc(center, radius, hitBuffer,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < count; i++)
+            {
+                Collider hit = hitBuffer[i];
+                if (hit != null)
+                {
+                    CombatantHealth target = hit.GetComponentInParent<CombatantHealth>();
+                    if (target != null && target.transform != transform && !target.IsDead)
+                        target.ApplyStun(duration);
+                }
+                hitBuffer[i] = null;
+            }
         }
 
         private void StunTargetsInFront(float range, float radius, float duration)
