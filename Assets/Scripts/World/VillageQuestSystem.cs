@@ -28,6 +28,20 @@ namespace ShinobiLegacy.World
             "Defeat the elite champion in the Drowned Temple."
         };
         private static readonly int[] RequiredKills = { 6, 6, 8, 1 };
+        private static readonly string[] OfficerBriefings =
+        {
+            "The old road is burning again. Clear the patrols and recover the first seal. The village needs proof that the Ashen Warden has returned.",
+            "The forest paths have gone silent. Something is twisting the roots and driving the guardians mad. Push back the patrols and secure the heartwood charm.",
+            "Lightning strikes the shrine even beneath a clear sky. Defeat the shrine patrols and bring back the storm conduit.",
+            "The temple's champion guards the last oath. Defeat it and claim the relic that binds the four regional seals."
+        };
+        private static readonly string[] RelicNames =
+        {
+            "Ashen Warden's Ember Seal",
+            "Rootbound Heartwood Charm",
+            "Raijin's Storm Conduit",
+            "Abyssal Oath — Tidebound Relic"
+        };
 
         private int questIndex;
         private int progress;
@@ -93,17 +107,10 @@ namespace ShinobiLegacy.World
 
         private void GrantStoryRelic(int completedQuest, int level)
         {
-            string[] names =
-            {
-                "Ashen Warden's Ember Seal",
-                "Rootbound Heartwood Charm",
-                "Raijin's Storm Conduit",
-                "Abyssal Oath — Tidebound Relic"
-            };
             string[] modifiers = { "fire_meteor", "wind_vortex", "lightning_storm", "water_prison" };
             string[] slots = { "Accessory", "Chest", "Weapon", "Accessory" };
             int power = 18 + completedQuest * 12 + level * 2;
-            InventoryItem relic = new InventoryItem(names[completedQuest], LootRarity.Legendary, power, slots[completedQuest])
+            InventoryItem relic = new InventoryItem(RelicNames[completedQuest], LootRarity.Legendary, power, slots[completedQuest])
             {
                 abilityModifier = modifiers[completedQuest],
                 bonusDamagePercent = 0.035f + completedQuest * 0.005f,
@@ -116,7 +123,7 @@ namespace ShinobiLegacy.World
 
             // Full inventory fallback: drop the guaranteed relic beside the player.
             GameObject orb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            orb.name = "QuestReward_" + names[completedQuest].Replace(" ", "_");
+            orb.name = "QuestReward_" + RelicNames[completedQuest].Replace(" ", "_");
             orb.transform.position = transform.position + Vector3.up * 0.65f;
             orb.transform.localScale = Vector3.one * 0.8f;
             Collider pickupCollider = orb.GetComponent<Collider>();
@@ -151,6 +158,8 @@ namespace ShinobiLegacy.World
             {
                 GUILayout.Label("CONTRACT " + (questIndex + 1) + " / " + QuestRegions.Length + "  |  " + QuestNames[questIndex]);
                 GUILayout.Label(QuestDescriptions[questIndex]);
+                GUILayout.Label(OfficerBriefings[questIndex]);
+                GUILayout.Label("GUARANTEED REWARD: " + RelicNames[questIndex] + " [LEGENDARY]");
                 int requiredLevel = WorldRegionProgression.Regions[questIndex + 1].requiredLevel;
                 bool unlocked = regions != null && regions.IsUnlocked(QuestRegions[questIndex]);
                 if (active)
