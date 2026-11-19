@@ -73,6 +73,7 @@ namespace ShinobiLegacy.Editor
                 scenes = scenes,
                 locationPathName = OutputPath,
                 target = BuildTarget.Android,
+                targetGroup = BuildTargetGroup.Android,
                 options = BuildOptions.Development
             };
 
@@ -88,6 +89,9 @@ namespace ShinobiLegacy.Editor
         private static bool ValidateFirstTestProject()
         {
             List<string> errors = new List<string>();
+
+            if (!BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.Android, BuildTarget.Android))
+                errors.Add("Android Build Support is not installed in this Unity Editor. Install Android Build Support, Android SDK & NDK Tools and OpenJDK through Unity Hub.");
 
             if (!File.Exists(VillageScene))
                 errors.Add("Missing scene: " + VillageScene + ". Run Prepare Android First Test.");
@@ -222,7 +226,11 @@ namespace ShinobiLegacy.Editor
             PlayerSettings.SetScriptingBackend(BuildTargetGroup.Android, ScriptingImplementation.IL2CPP);
             PlayerSettings.SetManagedStrippingLevel(BuildTargetGroup.Android, ManagedStrippingLevel.Low);
             PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
+            PlayerSettings.Android.targetSdkVersion = AndroidSdkVersions.AndroidApiLevelAuto;
+            PlayerSettings.Android.bundleVersionCode = 1;
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
+            PlayerSettings.Android.optimizedFramePacing = true;
+            PlayerSettings.gcIncremental = true;
             EditorUserBuildSettings.buildAppBundle = false;
         }
     }
