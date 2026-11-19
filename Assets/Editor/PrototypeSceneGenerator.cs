@@ -144,6 +144,8 @@ namespace ShinobiLegacy.Editor
 
             // Mobile touch joystick (visible in Game view and on Android).
             GameObject canvasObject = new GameObject("Mobile HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            ShinobiLegacy.UI.TestSceneTravelButton sceneTravel = canvasObject.AddComponent<ShinobiLegacy.UI.TestSceneTravelButton>();
+            sceneTravel.Configure("SafeVillage", "VILLAGE HUB");
             Canvas canvas = canvasObject.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
