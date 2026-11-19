@@ -492,3 +492,10 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Enemy AI now signals a visible procedural windup when a melee attack begins. Hunter and Skirmisher use a shorter arm preparation; Brute uses a longer, heavier two-arm preparation and torso lean.
 - The windup is cancelled when the enemy is stunned, loses its target, or the target leaves detection range. The attack still rechecks target life and distance at resolution, so the animation does not guarantee a hit.
 - This is a lightweight transform-based fallback for the current blockout rigs. Authored skeletal animation clips and in-game timing validation remain future work.
+
+
+## Light and heavy hit reactions
+
+- The procedural character motion now distinguishes ordinary hits from heavier impacts. Light hits use a short, restrained torso recoil; knockbacks with strength 2.3 or higher trigger a stronger body lean and arm recoil.
+- The reaction is routed through the existing animation bridge and reuses the current knockback strength, with no additional rigidbody simulation or per-frame allocations.
+- These are placeholder transform motions. Final hit-stun timing, animation clips and impact feel still require Unity Play Mode and Android device testing.
