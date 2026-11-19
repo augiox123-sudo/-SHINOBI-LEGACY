@@ -32,6 +32,7 @@ namespace ShinobiLegacy.Combat
         public void TakeDamage(float amount)
         {
             if (IsDead || amount <= 0f) return;
+            if (equipment == null) equipment = GetComponent<EquipmentManager>();
             float incomingDamage = amount;
             if (equipment != null) incomingDamage = Mathf.Max(1f, amount - equipment.Defense);
             currentHealth = Mathf.Max(0f, currentHealth - incomingDamage);
