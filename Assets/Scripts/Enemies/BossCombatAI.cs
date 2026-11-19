@@ -43,6 +43,13 @@ namespace ShinobiLegacy.Enemies
         private void Update()
         {
             if (health == null || health.IsDead || target == null) return;
+            if (health.IsStunned)
+            {
+                windingUp = false;
+                windupRemaining = 0f;
+                if (bodyRenderer != null) bodyRenderer.material.color = baseColor;
+                return;
+            }
 
             Vector3 offset = target.position - transform.position;
             offset.y = 0f;
