@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using ShinobiLegacy.Combat;
+using ShinobiLegacy.Player;
 
 namespace ShinobiLegacy.Items
 {
@@ -24,12 +25,15 @@ namespace ShinobiLegacy.Items
             public int fireRank = 1;
             public int burstUses;
             public int fireUses;
+            public int playerLevel = 1;
+            public int playerExperience;
         }
 
         private PlayerWallet wallet;
         private PlayerInventory inventory;
         private EquipmentManager equipment;
         private PlayerCombat playerCombat;
+        private PlayerProgression progression;
         private bool ready;
         [SerializeField] private float autosaveInterval = 30f;
         private float autosaveTimer;
@@ -40,6 +44,7 @@ namespace ShinobiLegacy.Items
             inventory = GetComponent<PlayerInventory>();
             equipment = GetComponent<EquipmentManager>();
             playerCombat = GetComponent<PlayerCombat>();
+            progression = GetComponent<PlayerProgression>();
 
             Load();
             if (wallet != null) wallet.CoinsChanged += Save;
@@ -82,7 +87,9 @@ namespace ShinobiLegacy.Items
                 burstRank = playerCombat != null ? playerCombat.BurstRank : 1,
                 fireRank = playerCombat != null ? playerCombat.FireRank : 1,
                 burstUses = playerCombat != null ? playerCombat.BurstUses : 0,
-                fireUses = playerCombat != null ? playerCombat.FireUses : 0
+                fireUses = playerCombat != null ? playerCombat.FireUses : 0,
+                playerLevel = progression != null ? progression.Level : 1,
+                playerExperience = progression != null ? progression.Experience : 0
             };
             PlayerPrefs.SetString(SaveKey, JsonUtility.ToJson(data));
             PlayerPrefs.Save();
@@ -99,6 +106,7 @@ namespace ShinobiLegacy.Items
                 if (inventory != null) inventory.RestoreItems(data.inventory);
                 if (equipment != null) equipment.RestoreEquipment(data.equipped);
                 if (playerCombat != null) playerCombat.RestoreAbilityProgress(data.burstRank, data.fireRank, data.burstUses, data.fireUses);
+                if (progression != null) progression.RestoreProgress(data.playerLevel, data.playerExperience);
             }
             catch (Exception exception)
             {
