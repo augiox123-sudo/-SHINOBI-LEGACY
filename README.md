@@ -239,3 +239,7 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - Added a dedicated **TARGET** touch button to the shared mobile combat controls. It cycles through nearby valid enemies using the existing target-lock system, so Android players do not need to rely on a desktop-style GUI button.
 - The mission officer board now has a persistent **TALK TO MISSION OFFICER** prompt while the player remains in the interaction area. Closing the board no longer traps the player in a state where they must leave and re-enter the area to reopen it.
 - These UI changes are static-code checked; device layout and touch behavior still need Unity playtesting.
+
+## Boss attack telegraphs
+
+Boss wind-up attacks now display a pulsing ground ring before impact. The ring radius distinguishes the normal slam from the phase-two special attack, and its color reflects the boss profile. The indicator is hidden when the attack resolves, the boss is stunned, or the boss dies. This is a runtime-generated LineRenderer effect with no external asset dependency.
