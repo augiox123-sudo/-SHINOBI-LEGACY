@@ -10,6 +10,7 @@ namespace ShinobiLegacy.Player
         [SerializeField] private Transform cameraTransform;
         private CharacterController controller;
         private Vector2 externalMoveInput;
+        private bool movementEnabled = true;
 
         public Vector2 MoveInput
         {
@@ -24,8 +25,11 @@ namespace ShinobiLegacy.Player
                 cameraTransform = Camera.main.transform;
         }
 
+        public void SetMovementEnabled(bool enabled) { movementEnabled = enabled; }
+
         private void Update()
         {
+            if (!movementEnabled) return;
             Vector2 input = externalMoveInput;
 #if UNITY_EDITOR || UNITY_STANDALONE
             Vector2 keyboard = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
