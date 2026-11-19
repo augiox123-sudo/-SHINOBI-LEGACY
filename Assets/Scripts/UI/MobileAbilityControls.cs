@@ -13,7 +13,7 @@ namespace ShinobiLegacy.UI
     public sealed class MobileAbilityControls : MonoBehaviour
     {
         [SerializeField] private PlayerCombat combat;
-        [SerializeField] private Vector2 buttonSize = new Vector2(112f, 112f);
+        [SerializeField] private Vector2 buttonSize = new Vector2(148f, 148f);
         [SerializeField] private float spacing = 14f;
         private Canvas controlsCanvas;
 
@@ -55,7 +55,7 @@ namespace ShinobiLegacy.UI
             rect.anchorMax = new Vector2(1f, 0f);
             rect.pivot = new Vector2(1f, 0f);
             rect.sizeDelta = buttonSize;
-            rect.anchoredPosition = new Vector2(28f + (index % 3) * (buttonSize.x + spacing),
+            rect.anchoredPosition = new Vector2(-28f - (index % 3) * (buttonSize.x + spacing),
                 28f + (index / 3) * (buttonSize.y + spacing));
             Image image = buttonObject.GetComponent<Image>();
             image.color = color;
@@ -74,7 +74,7 @@ namespace ShinobiLegacy.UI
             text.text = label;
             text.alignment = TextAnchor.MiddleCenter;
             text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            text.fontSize = 22;
+            text.fontSize = 26;
             text.fontStyle = FontStyle.Bold;
             text.color = Color.white;
             text.raycastTarget = false;
