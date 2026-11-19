@@ -25,6 +25,8 @@ namespace ShinobiLegacy.Items
         private PlayerInventory inventory;
         private EquipmentManager equipment;
         private bool ready;
+        [SerializeField] private float autosaveInterval = 30f;
+        private float autosaveTimer;
 
         private void Start()
         {
@@ -48,6 +50,17 @@ namespace ShinobiLegacy.Items
         private void OnItemEquipped(InventoryItem item)
         {
             if (ready) Save();
+        }
+
+        private void Update()
+        {
+            if (!ready) return;
+            autosaveTimer += Time.unscaledDeltaTime;
+            if (autosaveTimer >= Mathf.Max(5f, autosaveInterval))
+            {
+                autosaveTimer = 0f;
+                Save();
+            }
         }
 
         public void Save()
