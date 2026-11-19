@@ -125,6 +125,7 @@ namespace ShinobiLegacy.Editor
                 EnemyRewardDrop enemyRewards = enemy.AddComponent<EnemyRewardDrop>();
                 enemyRewards.Configure(progression, 35, 0.72f, false);
                 EnemyCombatAI ai = enemy.AddComponent<EnemyCombatAI>();
+                ai.ConfigureBehavior(i);
                 ai.SetTarget(player.transform);
             }
 
