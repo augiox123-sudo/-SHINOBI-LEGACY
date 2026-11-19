@@ -102,7 +102,7 @@ namespace ShinobiLegacy.Enemies
             else if (Time.time >= nextAttackTime)
             {
                 nextAttackTime = Time.time + attackCooldown;
-                if (animationBridge != null) animationBridge.TriggerAttack();
+                if (animationBridge != null) animationBridge.PlayAttack();
                 targetHealth.TakeDamage(attackDamage);
             }
         }
