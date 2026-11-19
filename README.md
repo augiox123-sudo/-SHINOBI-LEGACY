@@ -552,3 +552,10 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - The evade applies a short CharacterController dash after the normal motor update, has a 1.25-second cooldown, and grants 0.18 seconds of temporary damage immunity through the existing health damage gate.
 - The mobile HUD creates a DODGE button with a cooldown overlay when the player has the dodge component. The button is placed beside the target-cycle control.
 - Dodge is intended to escape committed enemy melee arcs and guardian impact zones through movement and timing. Cooldown, dash distance, immunity window, collision behavior and touch layout still require Unity Play Mode and Android device testing.
+
+## Three-stage basic melee combo
+
+- Basic melee now chains through three accepted attacks while the player keeps attacking within a 1.2-second combo window.
+- The second strike deals 1.12x basic attack damage; the third strike is a heavier finisher dealing 1.35x damage and uses a slightly longer 0.72-second recovery.
+- Waiting longer than the combo window resets the sequence to the first strike. The same combo damage is used for both focused target-lock hits and the forward melee sweep.
+- This is a gameplay timing/damage pass using the current procedural attack motion. Distinct authored combo animations, hit-stop, sound, balance and Unity/Android testing remain outstanding.
