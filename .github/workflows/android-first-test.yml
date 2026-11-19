@@ -1,0 +1,81 @@
+name: Android first-test APK
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "Assets/**"
+      - "Packages/**"
+      - "ProjectSettings/**"
+      - ".github/workflows/android-first-test.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-android-apk:
+    name: Build SHINOBI LEGACY Android test APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Check for Unity license secret
+        id: unity-license
+        shell: bash
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        run: |
+          if [[ -n "$UNITY_LICENSE" ]]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Explain missing Unity license
+        if: steps.unity-license.outputs.available != 'true'
+        run: |
+          echo "::notice title=Unity license required::Add a Unity Personal license file as the UNITY_LICENSE repository secret, then run this workflow again from the Actions tab."
+
+      - name: Restore Unity Library cache
+        if: steps.unity-license.outputs.available == 'true'
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-Android-2022.3.62f1-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-Android-2022.3.62f1-
+
+      - name: Build Android APK with Unity
+        if: steps.unity-license.outputs.available == 'true'
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          unityVersion: 2022.3.62f1
+          targetPlatform: Android
+          buildMethod: ShinobiLegacy.Editor.AndroidFirstTestBuild.BuildAndroidFirstTestFromCleanCheckout
+          androidExportType: androidPackage
+          allowDirtyBuild: true
+          versioning: None
+
+      - name: Verify APK output
+        if: steps.unity-license.outputs.available == 'true'
+        shell: bash
+        run: |
+          test -s Builds/Android/SHINOBI_LEGACY_FirstTest.apk
+
+      - name: Upload Android test APK
+        if: steps.unity-license.outputs.available == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: SHINOBI-LEGACY-Android-FirstTest
+          path: Builds/Android/SHINOBI_LEGACY_FirstTest.apk
+          if-no-files-found: error
+          retention-days: 14
