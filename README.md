@@ -457,7 +457,7 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 
 ## Boss phase-two summoned raiders
 
-- When the Stone Guardian enters phase two (55% health), it begins summoning up to two raiders after a short 2.5-second delay. If a raider is defeated, a later wave can refill the empty slot; waves are spaced by 19 seconds.
+- When the Stone Guardian enters phase two (55% health), it begins summoning up to two raiders after a short 2.5-second delay. Each spawn location displays a pulsing violet warning ring for 0.9 seconds before the raider appears. If a raider is defeated, a later wave can refill the empty slot; waves are spaced by 19 seconds.
 - Raiders use the existing Hunter/Skirmisher enemy AI, target the player, have 85 health, and grant 45 XP with an 85% loot-drop chance. Their inactive scene template remains available even after the original training enemies are defeated.
 - Summoning is bounded to two active raiders to limit mobile CPU and memory load. The summon logic only runs while the boss has a live target and is within its encounter range.
 - This is source-level implementation. Spawn placement, enemy navigation, reward behavior, scene generation and performance still require Unity compilation and Play Mode/device testing.
