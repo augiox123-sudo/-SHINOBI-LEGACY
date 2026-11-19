@@ -120,7 +120,12 @@ namespace ShinobiLegacy.Editor
 
             if (!AssetDatabase.IsValidFolder("Assets/Scenes")) AssetDatabase.CreateFolder("Assets", "Scenes");
             EditorSceneManager.MarkSceneDirty(scene);
-            EditorSceneManager.SaveScene(scene, "Assets/Scenes/PrototypeArena.unity");
+            const string scenePath = "Assets/Scenes/PrototypeArena.unity";
+            EditorSceneManager.SaveScene(scene, scenePath);
+            EditorBuildSettings.scenes = new[]
+            {
+                new EditorBuildSettingsScene(scenePath, true)
+            };
             AssetDatabase.SaveAssets();
             Selection.activeGameObject = player;
             Debug.Log("SHINOBI LEGACY: 3D prototype scene created.");
