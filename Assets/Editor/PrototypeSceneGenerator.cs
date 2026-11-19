@@ -45,6 +45,7 @@ namespace ShinobiLegacy.Editor
             PlayerInventory inventory = player.AddComponent<PlayerInventory>();
             EquipmentManager equipment = player.AddComponent<EquipmentManager>();
             player.AddComponent<PlayerWallet>();
+            player.AddComponent<PlayerForgeSystem>();
             player.AddComponent<PlayerSaveSystem>();
             PlayerRespawnController respawn = player.AddComponent<PlayerRespawnController>();
             player.AddComponent<FastTravelMapUI>();
