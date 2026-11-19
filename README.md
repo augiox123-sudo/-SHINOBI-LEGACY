@@ -61,3 +61,12 @@ The generated scene uses primitive geometry as a functional blockout, not final 
 - The HUD displays player level, current XP and inventory item count.
 
 This is still a Unity source prototype. It has not yet been compiled or tested in the Unity Editor, and no APK has been produced.
+
+
+## Equipment and item stats
+
+- Inventory items can be equipped from their matching gear slots: Weapon, Chest, Accessory and Hands.
+- The prototype HUD includes an **EQUIP BEST** action to equip the highest-power item currently in the inventory.
+- Weapon power increases basic and chakra skill damage.
+- Non-weapon equipment adds defense and reduces incoming damage.
+- Current equipment power is displayed in the HUD.
