@@ -142,7 +142,7 @@ namespace ShinobiLegacy.Combat
             lastBasicAttackTime = Time.time;
             nextAttackTime = Time.time + (currentStep == 2 ? comboFinisherCooldown : attackCooldown);
 
-            if (animationBridge != null) animationBridge.PlayAttack();
+            if (animationBridge != null) animationBridge.PlayComboAttack(currentStep + 1);
             damagedThisCast.Clear();
             bool isFinisher = currentStep == 2;
             float comboMultiplier = currentStep == 1 ? comboSecondDamageMultiplier :
