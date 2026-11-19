@@ -56,9 +56,22 @@ namespace ShinobiLegacy.UI
                 string burstMod = gear != null ? gear.GetAbilityModifier("burst") : string.Empty;
                 string fireMod = gear != null ? gear.GetAbilityModifier("fire") : string.Empty;
                 statusText.text = "BURST R" + combat.BurstRank + ": " + burst +
-                    (string.IsNullOrEmpty(burstMod) ? "" : " [" + burstMod + "]") +
+                    (string.IsNullOrEmpty(burstMod) ? "" : " [" + ModifierLabel(burstMod) + "]") +
                     "    FIRE R" + combat.FireRank + ": " + fire +
-                    (string.IsNullOrEmpty(fireMod) ? "" : " [" + fireMod + "]");
+                    (string.IsNullOrEmpty(fireMod) ? "" : " [" + ModifierLabel(fireMod) + "]");
+            }
+        }
+
+        private static string ModifierLabel(string id)
+        {
+            switch (id)
+            {
+                case "fire_wave": return "Flame Wave";
+                case "fire_dragon": return "Twin Dragons";
+                case "fire_burst": return "Inferno Impact";
+                case "burst_storm": return "Chakra Tempest";
+                case "burst_guard": return "Guardian Pulse";
+                default: return id;
             }
         }
 
