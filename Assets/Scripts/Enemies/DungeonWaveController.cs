@@ -181,6 +181,7 @@ namespace ShinobiLegacy.Enemies
             float legendaryChance = selectedDifficulty == DungeonDifficulty.Nightmare ? 0.40f :
                 selectedDifficulty == DungeonDifficulty.Hard ? 0.28f : 0.18f;
             rewards.SetLegendaryChance(legendaryChance);
+            rewards.SetBossLootProfile((int)selectedTheme);
             health.Died += OnEnemyDied;
             SetStatus("BOSS: " + BossName().ToUpper() + "  |  LEGENDARY CHANCE " +
                 Mathf.RoundToInt(legendaryChance * 100f) + "%");
