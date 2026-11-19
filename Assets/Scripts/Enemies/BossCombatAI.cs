@@ -52,6 +52,7 @@ namespace ShinobiLegacy.Enemies
         private GameObject summonTemplate;
         private PlayerProgression summonProgression;
         private readonly List<GameObject> activeSummons = new List<GameObject>(MaxActiveSummons);
+        private readonly RaycastHit[] impactHitBuffer = new RaycastHit[16];
         private float nextSummonTime;
         private int summonWave;
 
@@ -363,9 +364,7 @@ namespace ShinobiLegacy.Enemies
             if (bodyRenderer != null) SetBodyColor(phaseTwo ? ProfileColor() : baseColor);
             if (target == null) return;
 
-            Vector3 flatTarget = target.position;
-            flatTarget.y = transform.position.y;
-            bool targetHit = Vector3.Distance(transform.position, flatTarget) <= slamRange + 0.8f;
+            bool targetHit = IsTargetInsideImpactRadius(slamRange + 0.8f);
             if (animationBridge != null) animationBridge.PlayHeavyAttack();
             PlayImpactFeedback(transform.position + Vector3.up * 0.12f, slamRange + 0.8f,
                 new Color(1f, 0.42f, 0.12f), targetHit ? 0.2f : 0f);
@@ -396,9 +395,7 @@ namespace ShinobiLegacy.Enemies
             // The special is a dodgeable close-range area attack. The warning ring
             // uses the same profile radius that is checked when the attack resolves.
             float impactRadius = SpecialImpactRadius();
-            Vector3 flatOffset = target.position - transform.position;
-            flatOffset.y = 0f;
-            bool targetInsideImpact = flatOffset.sqrMagnitude <= impactRadius * impactRadius;
+            bool targetInsideImpact = IsTargetInsideImpactRadius(impactRadius);
             float shakeStrength = targetInsideImpact && bossProfile != 1 ? 0.24f : 0f;
             PlayImpactFeedback(transform.position + Vector3.up * 0.12f, impactRadius, ProfileColor(), shakeStrength);
 
@@ -435,6 +432,50 @@ namespace ShinobiLegacy.Enemies
                     }
                     break;
             }
+        }
+
+        private bool IsTargetInsideImpactRadius(float radius)
+        {
+            if (target == null || radius <= 0f) return false;
+
+            Collider targetCollider = target.GetComponent<Collider>();
+            if (targetCollider == null) targetCollider = target.GetComponentInChildren<Collider>();
+
+            Vector3 origin = transform.position + Vector3.up * 1.05f;
+            Vector3 targetPoint = targetCollider != null
+                ? targetCollider.ClosestPoint(origin)
+                : target.position + Vector3.up * 0.85f;
+
+            Vector3 flatOffset = targetPoint - origin;
+            float verticalGap = Mathf.Abs(flatOffset.y);
+            flatOffset.y = 0f;
+            if (verticalGap > 1.8f || flatOffset.sqrMagnitude > radius * radius)
+                return false;
+
+            float distance = Vector3.Distance(origin, targetPoint);
+            if (distance <= 0.05f) return true;
+
+            int hitCount = Physics.RaycastNonAlloc(origin, (targetPoint - origin) / distance,
+                impactHitBuffer, distance, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+
+            float nearestBlockingDistance = float.MaxValue;
+            bool targetWasFirstHit = false;
+            for (int i = 0; i < hitCount; i++)
+            {
+                Collider hitCollider = impactHitBuffer[i].collider;
+                if (hitCollider == null || hitCollider.transform == transform ||
+                    hitCollider.transform.IsChildOf(transform))
+                    continue;
+
+                if (impactHitBuffer[i].distance >= nearestBlockingDistance) continue;
+                nearestBlockingDistance = impactHitBuffer[i].distance;
+                targetWasFirstHit = hitCollider.transform == target ||
+                    hitCollider.transform.IsChildOf(target);
+            }
+
+            // If no collider was hit (for example, a target without a collider),
+            // retain the radius/height result instead of making the attack impossible.
+            return nearestBlockingDistance == float.MaxValue || targetWasFirstHit;
         }
 
         private void PlayImpactFeedback(Vector3 position, float radius, Color color, float shakeStrength)
