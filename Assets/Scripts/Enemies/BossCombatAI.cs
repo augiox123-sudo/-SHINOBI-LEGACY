@@ -27,6 +27,8 @@ namespace ShinobiLegacy.Enemies
         private CharacterController controller;
         private CombatAnimationBridge animationBridge;
         private CombatantHealth health;
+        private AbilityVfxController impactVfx;
+        private ImpactCameraShake impactCameraShake;
         private float nextSlamTime;
         private float windupRemaining;
         private float windupTotal;
@@ -72,6 +74,14 @@ namespace ShinobiLegacy.Enemies
             animationBridge = GetComponent<CombatAnimationBridge>();
             if (animationBridge == null) animationBridge = gameObject.AddComponent<CombatAnimationBridge>();
             health = GetComponent<CombatantHealth>();
+            impactVfx = GetComponent<AbilityVfxController>();
+            if (impactVfx == null) impactVfx = gameObject.AddComponent<AbilityVfxController>();
+            Camera mainCamera = Camera.main;
+            if (mainCamera != null)
+            {
+                impactCameraShake = mainCamera.GetComponent<ImpactCameraShake>();
+                if (impactCameraShake == null) impactCameraShake = mainCamera.gameObject.AddComponent<ImpactCameraShake>();
+            }
             if (bodyRenderer == null) bodyRenderer = GetComponentInChildren<Renderer>();
             if (bodyRenderer != null)
             {
@@ -354,9 +364,13 @@ namespace ShinobiLegacy.Enemies
 
             Vector3 flatTarget = target.position;
             flatTarget.y = transform.position.y;
-            if (Vector3.Distance(transform.position, flatTarget) <= slamRange + 0.8f)
+            bool targetHit = Vector3.Distance(transform.position, flatTarget) <= slamRange + 0.8f;
+            if (animationBridge != null) animationBridge.PlayHeavyAttack();
+            PlayImpactFeedback(transform.position + Vector3.up * 0.12f, slamRange + 0.8f,
+                new Color(1f, 0.42f, 0.12f), targetHit ? 0.2f : 0f);
+
+            if (targetHit)
             {
-                if (animationBridge != null) animationBridge.PlayHeavyAttack();
                 CombatantHealth playerHealth = target.GetComponent<CombatantHealth>();
                 if (playerHealth != null && !playerHealth.IsDead) playerHealth.TakeDamage(slamDamage);
             }
@@ -380,6 +394,8 @@ namespace ShinobiLegacy.Enemies
             Vector3 flatOffset = target.position - transform.position;
             flatOffset.y = 0f;
             bool targetInsideImpact = flatOffset.sqrMagnitude <= impactRadius * impactRadius;
+            float shakeStrength = targetInsideImpact && bossProfile != 1 ? 0.24f : 0f;
+            PlayImpactFeedback(transform.position + Vector3.up * 0.12f, impactRadius, ProfileColor(), shakeStrength);
 
             switch (bossProfile)
             {
@@ -411,6 +427,13 @@ namespace ShinobiLegacy.Enemies
                     }
                     break;
             }
+        }
+
+        private void PlayImpactFeedback(Vector3 position, float radius, Color color, float shakeStrength)
+        {
+            if (impactVfx != null) impactVfx.PlayBossImpact(position, radius, color);
+            if (shakeStrength > 0f && impactCameraShake != null)
+                impactCameraShake.Shake(shakeStrength, 0.22f);
         }
 
         private float SpecialImpactRadius()
