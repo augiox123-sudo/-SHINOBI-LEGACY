@@ -30,10 +30,19 @@ The generated scene uses primitive geometry as a functional blockout, not final 
 - `Assets/Editor` — test-scene generator
 - `Packages` — Unity package manifest
 
+## Implemented in source
+- Player health and damage handling.
+- Basic melee attack (Space in Editor/PC, on-screen button on mobile).
+- Chakra technique (Q in Editor/PC, on-screen button on mobile).
+- Chakra regeneration and technique cost.
+- Three training enemies that detect, approach and attack the player.
+- Enemy health and death handling.
+- Prototype arena is registered as the first build scene.
+
 ## Next milestones
-1. Mobile joystick and skill buttons.
-2. Combat, hit detection and enemy AI.
-3. 3D environment, character assets and animations.
+1. Improve combat feel with attack animations, hit reactions, effects and targeting.
+2. Mobile skill layout, cooldown feedback and health/chakra HUD.
+3. Real 3D environment, character assets and animations.
 4. Loot, inventory, equipment and progression.
-5. Quests, dungeons and bosses.
+5. Quests, dungeons and boss encounters.
 6. Android profiling, optimization and APK testing.
