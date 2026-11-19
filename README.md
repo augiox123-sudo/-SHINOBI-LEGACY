@@ -405,3 +405,9 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Player movement and combat, combatant hit/death events, and enemy/boss movement and attacks now feed the bridge. This is an integration layer only: animation clips, rigged 3D character models, and Animator Controller assets still need to be authored and assigned.
 
 - Animator attack state is now driven through a timed `IsAttacking` boolean (when that parameter exists) alongside the `Attack` trigger. The state automatically resets after the attack window and is cleared if the bridge is disabled or the character dies.
+
+## Procedural shinobi character visual pass
+
+- Added an Editor-side `ShinobiCharacterVisualBuilder` that assembles an original stylized shinobi from lightweight mesh parts: cloth torso, chest and shoulder armor, headband, face mask, forearm and shin guards, sandals and a sheathed katana. Rogue enemies and the Stone Guardian receive a distinct silhouette and material treatment.
+- Both generated test scenes now hide the single-capsule placeholder renderer and build the multi-part visual rig under the existing gameplay root. Gameplay colliders and movement/combat components remain on the root, while decorative mesh-part colliders are removed.
+- This is a procedural visual prototype made from Unity primitive meshes, not a final rigged character asset. It has no authored skinning, animation clips, textures or production-quality facial detail. The Animator bridge is ready for a later rigged model integration. Unity scene generation, compilation and Android performance still need Editor/device validation.
