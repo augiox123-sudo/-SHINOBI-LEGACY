@@ -118,7 +118,7 @@ namespace ShinobiLegacy.Enemies
 
         private void RestoreVisualColors()
         {
-            if (visuals == null || originalVisualColors == null) return;
+            if (visuals == null || originalBaseColors == null || originalLegacyColors == null) return;
             for (int i = 0; i < visuals.Length; i++)
             {
                 if (visuals[i] == null) continue;
