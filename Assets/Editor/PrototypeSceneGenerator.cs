@@ -83,6 +83,22 @@ namespace ShinobiLegacy.Editor
                 ai.SetTarget(player.transform);
             }
 
+            // First boss encounter: a slower heavy enemy with a telegraphed area slam.
+            GameObject boss = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            boss.name = "Boss_StoneGuardian";
+            boss.transform.position = new Vector3(0f, 1.6f, 14f);
+            boss.transform.localScale = new Vector3(1.65f, 1.6f, 1.65f);
+            boss.GetComponent<Renderer>().sharedMaterial = MakeMaterial("Boss Material", new Color(0.32f, 0.19f, 0.12f));
+            Object.DestroyImmediate(boss.GetComponent<CapsuleCollider>());
+            CharacterController bossController = boss.AddComponent<CharacterController>();
+            bossController.height = 2f;
+            bossController.radius = 0.55f;
+            bossController.center = Vector3.zero;
+            CombatantHealth bossHealth = boss.AddComponent<CombatantHealth>();
+            bossHealth.SetMaxHealth(550f);
+            BossCombatAI bossAI = boss.AddComponent<BossCombatAI>();
+            bossAI.SetTarget(player.transform);
+
             // Mobile touch joystick (visible in Game view and on Android).
             GameObject canvasObject = new GameObject("Mobile HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             Canvas canvas = canvasObject.GetComponent<Canvas>();
@@ -138,6 +154,56 @@ namespace ShinobiLegacy.Editor
             statusText.color = Color.white;
             statusText.text = "SKILLS READY";
             statusText.raycastTarget = false;
+            GameObject bossUi = new GameObject("Boss Health UI", typeof(RectTransform));
+            bossUi.transform.SetParent(canvasObject.transform, false);
+            RectTransform bossUiRect = bossUi.GetComponent<RectTransform>();
+            bossUiRect.anchorMin = new Vector2(0.5f, 1f);
+            bossUiRect.anchorMax = new Vector2(0.5f, 1f);
+            bossUiRect.pivot = new Vector2(0.5f, 1f);
+            bossUiRect.anchoredPosition = new Vector2(0f, -35f);
+            bossUiRect.sizeDelta = new Vector2(560f, 70f);
+
+            GameObject bossNameObject = new GameObject("Boss Name", typeof(RectTransform), typeof(Text));
+            bossNameObject.transform.SetParent(bossUi.transform, false);
+            RectTransform bossNameRect = bossNameObject.GetComponent<RectTransform>();
+            bossNameRect.anchorMin = new Vector2(0f, 1f);
+            bossNameRect.anchorMax = new Vector2(1f, 1f);
+            bossNameRect.pivot = new Vector2(0.5f, 1f);
+            bossNameRect.anchoredPosition = Vector2.zero;
+            bossNameRect.sizeDelta = new Vector2(560f, 28f);
+            Text bossName = bossNameObject.GetComponent<Text>();
+            bossName.text = "STONE GUARDIAN";
+            bossName.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            bossName.fontSize = 20;
+            bossName.alignment = TextAnchor.MiddleCenter;
+            bossName.color = new Color(1f, 0.82f, 0.55f);
+            bossName.raycastTarget = false;
+
+            GameObject bossBarBackground = new GameObject("Boss Health Background", typeof(RectTransform), typeof(Image));
+            bossBarBackground.transform.SetParent(bossUi.transform, false);
+            RectTransform bossBackgroundRect = bossBarBackground.GetComponent<RectTransform>();
+            bossBackgroundRect.anchorMin = new Vector2(0f, 0f);
+            bossBackgroundRect.anchorMax = new Vector2(1f, 0f);
+            bossBackgroundRect.pivot = new Vector2(0.5f, 0f);
+            bossBackgroundRect.anchoredPosition = Vector2.zero;
+            bossBackgroundRect.sizeDelta = new Vector2(0f, 26f);
+            bossBarBackground.GetComponent<Image>().color = new Color(0.025f, 0.02f, 0.02f, 0.9f);
+
+            GameObject bossFillObject = new GameObject("Boss Health Fill", typeof(RectTransform), typeof(Image));
+            bossFillObject.transform.SetParent(bossBarBackground.transform, false);
+            RectTransform bossFillRect = bossFillObject.GetComponent<RectTransform>();
+            bossFillRect.anchorMin = Vector2.zero;
+            bossFillRect.anchorMax = Vector2.one;
+            bossFillRect.offsetMin = new Vector2(3f, 3f);
+            bossFillRect.offsetMax = new Vector2(-3f, -3f);
+            Image bossFill = bossFillObject.GetComponent<Image>();
+            bossFill.color = new Color(0.72f, 0.12f, 0.08f);
+            bossFill.type = Image.Type.Filled;
+            bossFill.fillMethod = Image.FillMethod.Horizontal;
+            bossFill.fillAmount = 1f;
+            BossHealthBar bossBar = canvasObject.AddComponent<BossHealthBar>();
+            bossBar.Configure(bossHealth, bossFill, bossUi);
+
             CombatHud hud = canvasObject.AddComponent<CombatHud>();
             hud.Configure(player.GetComponent<CombatantHealth>(), playerCombat, healthFill, chakraFill, statusText);
 
