@@ -521,6 +521,7 @@ namespace ShinobiLegacy.Combat
             bool critical = equipment != null && UnityEngine.Random.value < equipment.CriticalChance;
             if (critical) damage *= equipment.CriticalDamageMultiplier;
             target.TakeDamage(damage);
+            if (!target.IsDead) target.ApplyKnockbackFrom(transform.position, 2.5f, 0.11f);
             if (applyBurn && !target.IsDead) target.ApplyBurn(Mathf.Max(2f, damage * 0.08f), 3f, 1f);
         }
 
