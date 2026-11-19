@@ -25,11 +25,25 @@ namespace ShinobiLegacy.Player
                 cameraTransform = Camera.main.transform;
         }
 
-        public void SetMovementEnabled(bool enabled) { movementEnabled = enabled; }
+        public void SetMovementEnabled(bool enabled)
+        {
+            if (movementEnabled == enabled) return;
+            movementEnabled = enabled;
+            if (!movementEnabled) externalMoveInput = Vector2.zero;
+        }
+
+        private void OnDisable()
+        {
+            externalMoveInput = Vector2.zero;
+        }
 
         private void Update()
         {
-            if (!movementEnabled) return;
+            if (!movementEnabled)
+            {
+                externalMoveInput = Vector2.zero;
+                return;
+            }
             Vector2 input = externalMoveInput;
 #if UNITY_EDITOR || UNITY_STANDALONE
             Vector2 keyboard = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
