@@ -566,3 +566,9 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - The second basic strike now applies a slightly stronger push, while the third-hit finisher applies a stronger 4.5-strength knockback with a longer 0.19-second impulse window. The existing enemy stagger system therefore gives the finisher a more noticeable interruption.
 - The finisher has its own heavier forward-swing and impact feedback: a denser particle burst and two compact impact rings. Normal attacks retain their lighter effects.
 - Damage multipliers and combo timing are unchanged. These are lightweight procedural effects and controller impulses; impact feel, stagger balance, collision behavior and mobile performance still require Unity Play Mode and Android testing.
+
+## Distinct three-strike combo motion
+
+- The three basic melee combo steps now send their strike index through the animation bridge to the procedural character rig.
+- Strike one uses a compact right-arm diagonal cut; strike two adds a counter-swing with the left arm and opposite torso twist; strike three uses a wider two-arm finisher pose with stronger torso rotation.
+- The combo still uses the same damage, cooldown and hit logic. These are transform-driven placeholder poses, not authored skeletal clips; their readability and timing must be checked in Unity Play Mode and on Android.
