@@ -417,3 +417,10 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - The prototype arena's three training enemies now use three distinct original visual profiles: a crimson hooded rogue, a moss-toned forest raider and a violet storm fighter. Their head crests, shoulder details, sash colors and armor accents help distinguish silhouettes at the isometric camera distance.
 - The Stone Guardian boss now has a broader torso, chest core, crown-like stone crests and a reinforced shoulder plate to make its boss silhouette easier to read.
 - These profiles remain lightweight procedural blockout visuals built from Unity primitive meshes. They are not final character art, do not include rigged animation or authored textures, and require Unity Editor plus device validation.
+
+## Procedural locomotion and combat motion fallback
+
+- Added `ShinobiProceduralMotion` to the generated player, enemy and boss visual rigs. It drives a lightweight run cycle, alternating arm/leg swings, subtle idle/run body bob, attack/ability arm sweeps, hit recoil and a simple death pose.
+- `CombatAnimationBridge` now forwards movement speed, attacks, hit reactions, abilities and death state to this procedural layer while continuing to support a future authored Animator Controller.
+- Enemy and boss rigs now include arm transforms so their movement and attack motions are visible. Reviving a combatant clears the procedural death state.
+- This is a code-driven fallback, not skeletal animation: the current meshes are not skinned, motion is intentionally simple, and Unity Editor compilation, scene playback, animation feel and Android performance remain unverified.
