@@ -329,3 +329,12 @@ Record device model, Android version, build date, test duration, observed FPS (i
 - The virtual joystick now locks to the pointer that began the touch, so a second finger cannot unexpectedly take over movement.
 - Movement input and the joystick handle reset on pointer release, application focus loss, app pause and component disable. This prevents a held movement direction from persisting after common mobile interruption events.
 - This is a source-level input safeguard. Touch behavior still needs verification on a physical Android device.
+
+
+## Mobile ability cooldown feedback
+
+- The six combat buttons now show a radial cooldown mask and a live whole-second countdown while an ability recharges.
+- Chakra abilities change their label tint when the player does not have enough chakra to cast them.
+- Cooldown values are read from the combat system; the HUD refreshes ten times per second rather than every frame.
+- The target-cycle button remains separate and does not display an ability cooldown.
+- This is source-level UI work. The overlay sprite, readability, safe-area placement and touch behavior still require Unity Editor and physical-device validation.
