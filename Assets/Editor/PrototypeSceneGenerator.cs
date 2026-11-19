@@ -115,7 +115,7 @@ namespace ShinobiLegacy.Editor
                 enemy.transform.position = new Vector3((i - 1) * 3.2f, 1f, 6f + (i % 2) * 1.5f);
                 enemy.GetComponent<Renderer>().sharedMaterial = MakeMaterial("Enemy Material", new Color(0.55f, 0.12f, 0.12f));
                 enemy.GetComponent<Renderer>().enabled = false;
-                ShinobiCharacterVisualBuilder.BuildEnemy(enemy.transform);
+                ShinobiCharacterVisualBuilder.BuildEnemy(enemy.transform, false, i);
                 Object.DestroyImmediate(enemy.GetComponent<CapsuleCollider>());
                 CharacterController enemyController = enemy.AddComponent<CharacterController>();
                 enemyController.height = 2f;
