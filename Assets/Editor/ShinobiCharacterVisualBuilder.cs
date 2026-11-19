@@ -12,6 +12,9 @@ namespace ShinobiLegacy.Editor
         private static Material skin;
         private static Material metal;
         private static Material accent;
+        private static Material crimson;
+        private static Material moss;
+        private static Material violet;
 
         private static Material MakeMaterial(string name, Color color, float metallic = 0f)
         {
@@ -33,6 +36,9 @@ namespace ShinobiLegacy.Editor
             skin = MakeMaterial("SL Shinobi - Skin", new Color(0.68f, 0.48f, 0.34f));
             metal = MakeMaterial("SL Shinobi - Blade", new Color(0.62f, 0.72f, 0.79f), 0.8f);
             accent = MakeMaterial("SL Shinobi - Azure Accent", new Color(0.12f, 0.65f, 0.88f), 0.25f);
+            crimson = MakeMaterial("SL Enemy - Crimson", new Color(0.42f, 0.055f, 0.075f), 0.08f);
+            moss = MakeMaterial("SL Enemy - Moss", new Color(0.12f, 0.27f, 0.16f), 0.05f);
+            violet = MakeMaterial("SL Enemy - Storm Violet", new Color(0.24f, 0.12f, 0.42f), 0.18f);
         }
 
         public static void BuildPlayer(Transform parent)
@@ -65,22 +71,49 @@ namespace ShinobiLegacy.Editor
             handle.localRotation = Quaternion.Euler(0f, 0f, -28f);
         }
 
-        public static void BuildEnemy(Transform parent, bool boss = false)
+        public static void BuildEnemy(Transform parent, bool boss = false, int variant = 0)
         {
             EnsureMaterials();
-            Transform rig = CreateRoot(parent, boss ? "VisualRig_StoneGuardian" : "VisualRig_Rogue");
+            int style = Mathf.Abs(variant) % 3;
+            string rigName = boss ? "VisualRig_StoneGuardian" : "VisualRig_Rogue_" + style;
+            Transform rig = CreateRoot(parent, rigName);
             float scale = boss ? 1.35f : 1f;
-            Material body = boss ? armor : darkCloth;
-            Part(rig, "Torso", PrimitiveType.Capsule, new Vector3(0f, 0.05f * scale, 0f), new Vector3(0.66f, 0.82f, 0.43f) * scale, body);
+            Material body = boss ? armor : (style == 0 ? darkCloth : style == 1 ? moss : violet);
+            Material trim = boss ? metal : (style == 0 ? crimson : style == 1 ? accent : violet);
+            Part(rig, "Torso", PrimitiveType.Capsule, new Vector3(0f, 0.05f * scale, 0f), new Vector3(boss ? 0.78f : 0.66f, boss ? 0.96f : 0.82f, boss ? 0.55f : 0.43f) * scale, body);
             Part(rig, "Head", PrimitiveType.Sphere, new Vector3(0f, 0.82f * scale, 0f), new Vector3(0.4f, 0.42f, 0.38f) * scale, boss ? metal : skin);
             Part(rig, "Mask", PrimitiveType.Cube, new Vector3(0f, 0.7f * scale, 0.23f * scale), new Vector3(0.34f, 0.17f, 0.1f) * scale, darkCloth);
-            Part(rig, "ShoulderLeft", PrimitiveType.Sphere, new Vector3(-0.43f * scale, 0.38f * scale, 0f), new Vector3(0.32f, 0.28f, 0.34f) * scale, armor);
-            Part(rig, "ShoulderRight", PrimitiveType.Sphere, new Vector3(0.43f * scale, 0.38f * scale, 0f), new Vector3(0.32f, 0.28f, 0.34f) * scale, armor);
+            Part(rig, "ShoulderLeft", PrimitiveType.Sphere, new Vector3(-0.43f * scale, 0.38f * scale, 0f), new Vector3(0.32f, 0.28f, 0.34f) * scale, trim);
+            Part(rig, "ShoulderRight", PrimitiveType.Sphere, new Vector3(0.43f * scale, 0.38f * scale, 0f), new Vector3(0.32f, 0.28f, 0.34f) * scale, trim);
             Part(rig, "LegLeft", PrimitiveType.Capsule, new Vector3(-0.2f * scale, -0.68f * scale, 0f), new Vector3(0.23f, 0.5f, 0.24f) * scale, body);
             Part(rig, "LegRight", PrimitiveType.Capsule, new Vector3(0.2f * scale, -0.68f * scale, 0f), new Vector3(0.23f, 0.5f, 0.24f) * scale, body);
+            Part(rig, "BeltSash", PrimitiveType.Cube, new Vector3(0f, -0.31f * scale, 0.2f * scale), new Vector3(0.52f, 0.09f, 0.045f) * scale, trim);
             Part(rig, "Weapon", PrimitiveType.Cube, new Vector3(0.55f * scale, -0.05f * scale, 0.08f), new Vector3(0.08f, 0.95f, 0.08f) * scale, metal).localRotation = Quaternion.Euler(0f, 0f, -25f);
+            if (boss)
+            {
+                Part(rig, "GuardianChestCore", PrimitiveType.Sphere, new Vector3(0f, 0.14f * scale, 0.27f * scale), new Vector3(0.25f, 0.25f, 0.12f) * scale, accent);
+                Part(rig, "CrownLeft", PrimitiveType.Cube, new Vector3(-0.2f * scale, 1.18f * scale, 0f), new Vector3(0.12f, 0.38f, 0.14f) * scale, metal).localRotation = Quaternion.Euler(0f, 0f, -22f);
+                Part(rig, "CrownRight", PrimitiveType.Cube, new Vector3(0.2f * scale, 1.18f * scale, 0f), new Vector3(0.12f, 0.38f, 0.14f) * scale, metal).localRotation = Quaternion.Euler(0f, 0f, 22f);
+                Part(rig, "GuardianShoulderPlate", PrimitiveType.Cube, new Vector3(0f, 0.45f * scale, -0.2f * scale), new Vector3(0.95f, 0.24f, 0.18f) * scale, metal);
+            }
+            else if (style == 0)
+            {
+                Part(rig, "CrimsonHood", PrimitiveType.Sphere, new Vector3(0f, 1.02f, -0.06f), new Vector3(0.48f, 0.22f, 0.42f), crimson);
+                Part(rig, "ShoulderSpikes", PrimitiveType.Cube, new Vector3(0f, 0.52f, -0.03f), new Vector3(0.78f, 0.12f, 0.18f), crimson);
+            }
+            else if (style == 1)
+            {
+                Part(rig, "ForestCrest", PrimitiveType.Cube, new Vector3(0f, 1.08f, -0.02f), new Vector3(0.12f, 0.42f, 0.12f), moss);
+                Part(rig, "LeafShoulderLeft", PrimitiveType.Cube, new Vector3(-0.48f, 0.48f, 0.03f), new Vector3(0.28f, 0.16f, 0.32f), accent).localRotation = Quaternion.Euler(0f, 0f, -18f);
+                Part(rig, "LeafShoulderRight", PrimitiveType.Cube, new Vector3(0.48f, 0.48f, 0.03f), new Vector3(0.28f, 0.16f, 0.32f), accent).localRotation = Quaternion.Euler(0f, 0f, 18f);
+            }
+            else
+            {
+                Part(rig, "StormCrest", PrimitiveType.Cube, new Vector3(0f, 1.08f, -0.02f), new Vector3(0.1f, 0.42f, 0.1f), violet);
+                Part(rig, "StormShoulderLeft", PrimitiveType.Sphere, new Vector3(-0.5f, 0.45f, 0f), new Vector3(0.22f, 0.34f, 0.24f), accent);
+                Part(rig, "StormShoulderRight", PrimitiveType.Sphere, new Vector3(0.5f, 0.45f, 0f), new Vector3(0.22f, 0.34f, 0.24f), accent);
+            }
         }
-
         private static Transform CreateRoot(Transform parent, string name)
         {
             Transform existing = parent.Find(name);
