@@ -19,7 +19,17 @@ namespace ShinobiLegacy.Editor
         [MenuItem("Tools/Shinobi Legacy/Create 3D Test Scene")]
         public static void CreateScene()
         {
-            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            CreateSceneInternal(true);
+        }
+
+        public static void CreateSceneForBuild()
+        {
+            CreateSceneInternal(false);
+        }
+
+        private static void CreateSceneInternal(bool askBeforeReplacingScene)
+        {
+            if (askBeforeReplacingScene && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             GameObject ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
