@@ -35,6 +35,15 @@ namespace ShinobiLegacy.Combat
         private float chakra;
         private readonly Collider[] hitBuffer = new Collider[24];
         private EquipmentManager equipment;
+        private CombatantHealth ownHealth;
+        [SerializeField, Range(1, 5)] private int burstRank = 1;
+        [SerializeField, Range(1, 5)] private int fireRank = 1;
+        [SerializeField] private int burstUses;
+        [SerializeField] private int fireUses;
+        public int BurstRank => burstRank;
+        public int FireRank => fireRank;
+        public int BurstUses => burstUses;
+        public int FireUses => fireUses;
 
         public float Chakra => chakra;
         public float MaxChakra => chakraMaximum;
@@ -48,6 +57,7 @@ namespace ShinobiLegacy.Combat
         {
             chakra = chakraMaximum;
             equipment = GetComponent<EquipmentManager>();
+            ownHealth = GetComponent<CombatantHealth>();
             ResourcesChanged?.Invoke();
         }
 
@@ -76,7 +86,20 @@ namespace ShinobiLegacy.Combat
             if (Time.time < nextBurstTime || chakra < burstCost) return;
             chakra -= burstCost;
             nextBurstTime = Time.time + burstCooldown;
-            HitTargets(burstRange, burstRadius, GetScaledDamage(burstDamage));
+            float damage = GetScaledDamage(burstDamage) * (1f + (burstRank - 1) * 0.05f);
+            string modifier = equipment != null ? equipment.GetAbilityModifier("burst") : string.Empty;
+            if (modifier == "burst_storm")
+            {
+                HitTargets(burstRange, burstRadius * 1.45f, damage * 0.72f);
+                HitTargets(burstRange * 0.82f, burstRadius * 1.2f, damage * 0.42f);
+            }
+            else
+            {
+                HitTargets(burstRange, burstRadius, damage);
+                if (modifier == "burst_guard" && ownHealth != null)
+                    ownHealth.Restore(ownHealth.MaxHealth * 0.18f);
+            }
+            RecordAbilityUse(true);
             ResourcesChanged?.Invoke();
         }
 
@@ -87,14 +110,74 @@ namespace ShinobiLegacy.Combat
             nextFireTime = Time.time + fireCooldown;
             Vector3 origin = transform.position + Vector3.up * 1.1f + transform.forward * 0.6f;
             Vector3 direction = transform.forward;
-            if (Physics.SphereCast(origin, 0.55f, direction, out RaycastHit hit, fireRange,
+            float damage = GetScaledDamage(fireDamage) * (1f + (fireRank - 1) * 0.05f);
+            string modifier = equipment != null ? equipment.GetAbilityModifier("fire") : string.Empty;
+            if (modifier == "fire_wave")
+            {
+                for (int step = 1; step <= 3; step++)
+                    DamageArea(origin + direction * (step * fireRange / 3f), 2.1f, damage * 0.62f);
+            }
+            else if (modifier == "fire_dragon")
+            {
+                FireRay(origin - transform.right * 0.8f, direction, damage * 0.82f, 0.8f);
+                FireRay(origin + transform.right * 0.8f, direction, damage * 0.82f, 0.8f);
+            }
+            else if (modifier == "fire_burst")
+            {
+                if (Physics.SphereCast(origin, 0.55f, direction, out RaycastHit hit, fireRange,
+                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                    DamageArea(hit.point, 3.2f, damage * 1.15f);
+            }
+            else FireRay(origin, direction, damage, 0.55f);
+            RecordAbilityUse(false);
+            ResourcesChanged?.Invoke();
+        }
+
+
+        private void FireRay(Vector3 origin, Vector3 direction, float damage, float radius)
+        {
+            if (Physics.SphereCast(origin, radius, direction, out RaycastHit hit, fireRange,
                 Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
             {
                 CombatantHealth health = hit.collider.GetComponentInParent<CombatantHealth>();
-                if (health != null && health.transform != transform)
-                    health.TakeDamage(GetScaledDamage(fireDamage));
+                if (health != null && health.transform != transform) health.TakeDamage(damage);
             }
-            ResourcesChanged?.Invoke();
+        }
+
+        private void DamageArea(Vector3 center, float radius, float damage)
+        {
+            int count = Physics.OverlapSphereNonAlloc(center, radius, hitBuffer,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < count; i++)
+            {
+                Collider hit = hitBuffer[i];
+                if (hit == null) continue;
+                CombatantHealth health = hit.GetComponentInParent<CombatantHealth>();
+                if (health != null && !health.IsDead && health.transform != transform) health.TakeDamage(damage);
+                hitBuffer[i] = null;
+            }
+        }
+
+        private void RecordAbilityUse(bool burst)
+        {
+            if (burst)
+            {
+                burstUses++;
+                if (burstRank < 5 && burstUses >= burstRank * 20) burstRank++;
+            }
+            else
+            {
+                fireUses++;
+                if (fireRank < 5 && fireUses >= fireRank * 20) fireRank++;
+            }
+        }
+
+        public void RestoreAbilityProgress(int savedBurstRank, int savedFireRank, int savedBurstUses, int savedFireUses)
+        {
+            burstRank = Mathf.Clamp(savedBurstRank, 1, 5);
+            fireRank = Mathf.Clamp(savedFireRank, 1, 5);
+            burstUses = Mathf.Max(0, savedBurstUses);
+            fireUses = Mathf.Max(0, savedFireUses);
         }
 
         private float GetScaledDamage(float baseDamage)
