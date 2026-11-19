@@ -10,6 +10,7 @@ namespace ShinobiLegacy.Items
         [SerializeField] private int experienceReward = 35;
         [SerializeField] private float dropChance = 0.75f;
         [SerializeField] private bool guaranteedRareChance;
+        [SerializeField, Range(0f, 1f)] private float legendaryChanceOverride = -1f;
         private PlayerProgression target;
         private CombatantHealth health;
         private bool rewarded;
@@ -22,7 +23,7 @@ namespace ShinobiLegacy.Items
             guaranteedRareChance = boss;
         }
 
-        private void Awake()
+        public void SetLegendaryChance(float chance)\n        {\n            legendaryChanceOverride = Mathf.Clamp01(chance);\n        }\n\n        private void Awake()
         {
             health = GetComponent<CombatantHealth>();
             health.Died += OnDied;
