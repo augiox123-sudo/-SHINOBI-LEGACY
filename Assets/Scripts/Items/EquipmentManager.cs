@@ -52,6 +52,24 @@ namespace ShinobiLegacy.Items
             return true;
         }
 
+        public string GetAbilityModifier(string abilityId)
+        {
+            foreach (InventoryItem item in equipped.Values)
+                if (item != null && item.rarity == LootRarity.Legendary &&
+                    !string.IsNullOrEmpty(item.abilityModifier) &&
+                    item.abilityModifier.StartsWith(abilityId + "_"))
+                    return item.abilityModifier;
+            return string.Empty;
+        }
+
+        public bool HasAbilityModifier(string modifierId)
+        {
+            foreach (InventoryItem item in equipped.Values)
+                if (item != null && item.rarity == LootRarity.Legendary &&
+                    item.abilityModifier == modifierId) return true;
+            return false;
+        }
+
         public float DamageMultiplier
         {
             get
