@@ -88,7 +88,19 @@ namespace ShinobiLegacy.Enemies
             Vector3 offset = target.position - transform.position;
             offset.y = 0f;
             float distance = offset.magnitude;
-            if (distance > detectionRange) return;
+            if (distance > detectionRange)
+            {
+                // Cancel a pending attack if the player escapes the boss encounter range.
+                if (windingUp)
+                {
+                    windingUp = false;
+                    specialWindup = false;
+                    windupRemaining = 0f;
+                    SetTelegraphVisible(false);
+                    if (bodyRenderer != null) bodyRenderer.material.color = phaseTwo ? ProfileColor() : baseColor;
+                }
+                return;
+            }
 
             Face(offset.normalized);
 
