@@ -13,6 +13,8 @@ namespace ShinobiLegacy.Combat
         private EquipmentManager equipment;
         private float invulnerableUntil;
         private Coroutine burnRoutine;
+        private float stunnedUntil;
+        public bool IsStunned => Time.time < stunnedUntil;
 
         public float CurrentHealth => currentHealth;
         public float MaxHealth => maxHealth;
@@ -49,6 +51,11 @@ namespace ShinobiLegacy.Combat
             currentHealth = maxHealth;
             invulnerableUntil = Time.time + Mathf.Max(0f, invulnerabilitySeconds);
             HealthChanged?.Invoke(currentHealth, maxHealth);
+        }
+
+        public void ApplyStun(float duration)
+        {
+            if (!IsDead) stunnedUntil = Mathf.Max(stunnedUntil, Time.time + Mathf.Max(0f, duration));
         }
 
         public void ApplyBurn(float damagePerTick, float duration, float tickInterval = 1f)
