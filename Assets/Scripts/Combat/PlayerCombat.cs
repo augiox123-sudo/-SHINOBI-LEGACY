@@ -215,7 +215,7 @@ namespace ShinobiLegacy.Combat
         {
             if (equipment == null) equipment = GetComponent<EquipmentManager>();
             if (equipment == null) return baseDamage;
-            return baseDamage * equipment.DamageMultiplier;
+            return baseDamage * equipment.DamageMultiplier * equipment.LegendarySynergyDamageMultiplier;
         }
 
         private void HitTargets(float range, float radius, float damage)
