@@ -16,11 +16,13 @@ namespace ShinobiLegacy.UI
         [SerializeField] private Vector2 buttonSize = new Vector2(148f, 148f);
         [SerializeField] private float spacing = 14f;
         private Canvas controlsCanvas;
+        private EnemyTargetLockSystem targetLock;
 
         private void Start()
         {
             if (combat == null) combat = GetComponent<PlayerCombat>();
             if (combat == null) return;
+            targetLock = GetComponent<EnemyTargetLockSystem>();
             EnsureEventSystem();
             BuildControls();
         }
@@ -43,6 +45,8 @@ namespace ShinobiLegacy.UI
             CreateButton("LIGHT", 3, () => combat.CastLightningStyle(), new Color(0.48f, 0.35f, 0.9f, 0.92f));
             CreateButton("WATER", 4, () => combat.CastWaterStyle(), new Color(0.08f, 0.48f, 0.78f, 0.92f));
             CreateButton("WIND", 5, () => combat.CastWindStyle(), new Color(0.25f, 0.62f, 0.52f, 0.92f));
+            if (targetLock != null)
+                CreateButton("TARGET", 6, () => targetLock.CycleTarget(), new Color(0.72f, 0.42f, 0.12f, 0.94f));
         }
 
         private void CreateButton(string label, int index, UnityEngine.Events.UnityAction action, Color color)
