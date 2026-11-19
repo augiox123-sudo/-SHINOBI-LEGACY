@@ -439,3 +439,9 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Enemy melee attacks now have a short windup and re-check target life and distance before applying damage, giving the player a reaction window to move away.
 - AI cancels pending attacks and stops its movement animation when stunned, when its target dies or disappears, or when the target leaves detection range.
 - These behaviors are an initial tuning pass. Actual difficulty, dodge readability, hit timing and mobile performance need validation in Unity Play Mode and on Android.
+
+## Boss phase-two signature attacks
+
+- The four guardian profiles now resolve their phase-two special differently: Ashen deals a heavy burst followed by a short burn, Verdant restores 10% of its own maximum health, Thunder deals moderate damage and applies a longer stun, and Drowned deals a heavier controlled hit with a shorter stun.
+- Each effect is checked against the player's alive state before it is applied. The existing windup telegraph and encounter-range checks remain in place.
+- These are distinct gameplay effects built on the current health/status system; profile tuning, readability, balance and actual combat timing still require Unity Play Mode and Android testing.
