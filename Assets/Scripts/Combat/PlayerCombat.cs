@@ -99,6 +99,7 @@ namespace ShinobiLegacy.Combat
 
         private float GetScaledDamage(float baseDamage)
         {
+            if (equipment == null) equipment = GetComponent<EquipmentManager>();
             if (equipment == null) return baseDamage;
             return baseDamage * equipment.DamageMultiplier;
         }
