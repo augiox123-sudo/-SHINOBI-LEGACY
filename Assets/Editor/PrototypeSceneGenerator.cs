@@ -39,6 +39,7 @@ namespace ShinobiLegacy.Editor
             player.AddComponent<PlayerMotor>();
             player.AddComponent<CombatantHealth>();
             PlayerCombat playerCombat = player.AddComponent<PlayerCombat>();
+            player.AddComponent<ShinobiLegacy.UI.MobileAbilityControls>();
             PlayerProgression progression = player.AddComponent<PlayerProgression>();
             PlayerInventory inventory = player.AddComponent<PlayerInventory>();
             EquipmentManager equipment = player.AddComponent<EquipmentManager>();
