@@ -180,24 +180,47 @@ namespace ShinobiLegacy.Combat
             Vector3 origin = transform.position + Vector3.up * 1.1f + transform.forward * 0.5f;
             float damage = GetScaledDamage(76f) * (1f + (lightningRank - 1) * 0.05f);
             string modifier = equipment != null ? equipment.GetAbilityModifier("lightning") : string.Empty;
-            if (Physics.SphereCast(origin, modifier == "lightning_storm" ? 1.25f : 0.85f,
-                transform.forward, out RaycastHit hit, 10f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            // Search the actual combat area for enemies instead of stopping at the first
+            // collider; terrain and scenery must not consume the lightning cast.
+            Vector3 searchCenter = origin + transform.forward * 5.5f;
+            int targetCount = Physics.OverlapSphereNonAlloc(searchCenter,
+                modifier == "lightning_storm" ? 3.8f : 3.1f, hitBuffer,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            CombatantHealth primaryTarget = null;
+            float nearestDistance = float.MaxValue;
+            for (int i = 0; i < targetCount; i++)
             {
-                CombatantHealth target = hit.collider.GetComponentInParent<CombatantHealth>();
-                if (target != null && target.transform != transform && !target.IsDead)
+                Collider candidateCollider = hitBuffer[i];
+                if (candidateCollider != null)
                 {
-                    ApplyDamageOnce(target, damage * (modifier == "lightning_storm" ? 1.18f : 1f), false);
-                    target.ApplyStun(modifier == "lightning_storm" ? 1.65f : 1.1f);
-                    Vector3 impact = target.transform.position + Vector3.up;
-                    if (abilityVfx != null) abilityVfx.PlayLightning(origin, impact);
-                    if (modifier == "lightning_chain")
-                        ChainLightningFrom(target, damage * 0.82f, 3, 5f);
-                    else if (modifier == "lightning_storm")
+                    CombatantHealth candidate = candidateCollider.GetComponentInParent<CombatantHealth>();
+                    if (candidate != null && candidate.transform != transform && !candidate.IsDead)
                     {
-                        DamageArea(target.transform.position, 3.4f, damage * 0.62f, false);
-                        StunTargetsAt(target.transform.position, 3.4f, 0.55f);
-                        if (abilityVfx != null) abilityVfx.PlayLightningStorm(target.transform.position);
+                        float distance = (candidate.transform.position - searchCenter).sqrMagnitude;
+                        if (distance < nearestDistance)
+                        {
+                            nearestDistance = distance;
+                            primaryTarget = candidate;
+                        }
                     }
+                }
+                hitBuffer[i] = null;
+            }
+
+            if (primaryTarget != null)
+            {
+                float primaryDamage = damage * (modifier == "lightning_storm" ? 1.18f : 1f);
+                ApplyDamageOnce(primaryTarget, primaryDamage, false);
+                primaryTarget.ApplyStun(modifier == "lightning_storm" ? 1.65f : 1.1f);
+                Vector3 impact = primaryTarget.transform.position + Vector3.up;
+                if (abilityVfx != null) abilityVfx.PlayLightning(origin, impact);
+                if (modifier == "lightning_chain")
+                    ChainLightningFrom(primaryTarget, damage * 0.82f, 3, 5f);
+                else if (modifier == "lightning_storm")
+                {
+                    DamageArea(primaryTarget.transform.position, 3.4f, damage * 0.62f, false);
+                    StunTargetsAt(primaryTarget.transform.position, 3.4f, 0.55f);
+                    if (abilityVfx != null) abilityVfx.PlayLightningStorm(primaryTarget.transform.position);
                 }
             }
             RecordElementUse(0);
