@@ -356,3 +356,7 @@ Focused melee attacks also rotate the player toward the currently locked enemy b
 ## Enemy hit-flash restoration fix
 
 Fixed the enemy hit-flash color restoration guard to validate the two color arrays actually initialized by the AI component. This removes a stale field reference that could otherwise prevent the enemy visual restoration method from compiling.
+
+## Boss encounter range handling
+
+Boss windups are now cancelled if the player leaves the configured encounter detection range before the attack resolves. The warning telegraph is hidden and the boss returns to its normal or phase-two color, preventing a stale attack warning or delayed strike after the player disengages.
