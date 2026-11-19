@@ -37,7 +37,7 @@ namespace ShinobiLegacy.World
                 mapOpen = false;
 
             Rect mapRect = new Rect(panel.x + 18f, panel.y + 52f, panel.width - 36f, Mathf.Min(390f, panel.height * 0.55f));
-            GUI.Box(mapRect, "VILLAGE DISTRICT MAP");
+            GUI.Box(mapRect, "WORLD REGIONS  |  VILLAGE + 4 EXPEDITION ZONES");
 
             // Stylized village streets and central market square.
             GUI.color = new Color(0.62f, 0.54f, 0.38f, 0.9f);
@@ -50,8 +50,8 @@ namespace ShinobiLegacy.World
             {
                 if (point == null || !point.IsUnlocked) continue;
                 Vector3 position = point.transform.position;
-                float mapX = mapRect.x + 16f + Mathf.InverseLerp(-75f, 75f, position.x) * (mapRect.width - 32f);
-                float mapY = mapRect.y + 34f + (1f - Mathf.InverseLerp(-75f, 75f, position.z)) * (mapRect.height - 68f);
+                float mapX = mapRect.x + 16f + Mathf.InverseLerp(-250f, 250f, position.x) * (mapRect.width - 32f);
+                float mapY = mapRect.y + 34f + (1f - Mathf.InverseLerp(-250f, 250f, position.z)) * (mapRect.height - 68f);
                 Rect marker = new Rect(mapX - 12f, mapY - 12f, 24f, 24f);
                 if (GUI.Button(marker, "◆"))
                 {
