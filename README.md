@@ -301,3 +301,9 @@ Use this checklist after installing `SHINOBI_LEGACY_FirstTest.apk`. The current 
 Record device model, Android version, build date, test duration, observed FPS (if available), temperature/overheating symptoms, crashes and the exact reproduction steps for each issue. A failed checklist item should be fixed before treating the build as a usable test milestone.
 
 **Current limitation:** this checklist is a test plan, not a passed test report. No physical-device results are claimed until the APK has been built, installed and exercised on hardware.
+
+## Mobile joystick input safety
+
+- The virtual joystick now locks to the pointer that began the touch, so a second finger cannot unexpectedly take over movement.
+- Movement input and the joystick handle reset on pointer release, application focus loss, app pause and component disable. This prevents a held movement direction from persisting after common mobile interruption events.
+- This is a source-level input safeguard. Touch behavior still needs verification on a physical Android device.
