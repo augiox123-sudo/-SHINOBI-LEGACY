@@ -28,6 +28,7 @@ namespace ShinobiLegacy.Enemies
         private Text selectionLabel;
         private Button difficultyButton;
         private Button[] themeButtons = new Button[4];
+        private int lastLevelForSelectionRefresh = -1;
 
         public bool IsRunning => running;
         public int CurrentWave => currentWave;
@@ -60,6 +61,11 @@ namespace ShinobiLegacy.Enemies
         public void StartDungeon()
         {
             if (running || player == null) return;
+            if (!IsThemeUnlocked(selectedTheme))
+            {
+                SetStatus("DUNGEON LOCKED  |  REQUIRED LEVEL " + RequiredLevelForTheme(selectedTheme));
+                return;
+            }
             running = true;
             completed = false;
             waitingForNextWave = false;
@@ -70,6 +76,13 @@ namespace ShinobiLegacy.Enemies
 
         private void Update()
         {
+            int level = GetPlayerLevel();
+            if (level != lastLevelForSelectionRefresh)
+            {
+                lastLevelForSelectionRefresh = level;
+                RefreshSelectionLabel();
+            }
+
             if (!running || !waitingForNextWave || Time.time < nextWaveTime) return;
             waitingForNextWave = false;
             SpawnNextWave();
