@@ -26,6 +26,7 @@ namespace ShinobiLegacy.Combat
         private float moveSpeed;
         private float attackTimer;
         private float hitTimer;
+        private bool heavyHit;
         private float abilityTimer;
         private float heavyAttackTimer;
         private float windupTimer;
@@ -71,9 +72,11 @@ namespace ShinobiLegacy.Combat
             if (!dead) attackTimer = 0.32f;
         }
 
-        public void PlayHit()
+        public void PlayHit(bool heavy = false)
         {
-            if (!dead) hitTimer = 0.18f;
+            if (dead) return;
+            heavyHit = heavy;
+            hitTimer = heavy ? 0.26f : 0.18f;
         }
 
         public void PlayAbility()
@@ -109,6 +112,8 @@ namespace ShinobiLegacy.Combat
             float stride = Mathf.Sin(cycle) * runSwingAngle * moveSpeed;
             float armCounter = -stride;
             float attackWeight = attackTimer > 0f ? Mathf.Sin((1f - attackTimer / 0.42f) * Mathf.PI) : 0f;
+            float hitWeight = hitTimer > 0f ? Mathf.Sin((1f - hitTimer / (heavyHit ? 0.26f : 0.18f)) * Mathf.PI) : 0f;
+            float hitArmAngle = heavyHit ? 28f : 12f;
             float abilityWeight = abilityTimer > 0f ? Mathf.Sin((1f - abilityTimer / 0.42f) * Mathf.PI) : 0f;
             float heavyWeight = heavyAttackTimer > 0f ? Mathf.Sin((1f - heavyAttackTimer / 0.62f) * Mathf.PI) : 0f;
             float windupProgress = windupTimer > 0f ? 1f - windupTimer / (heavyWindup ? 0.56f : 0.32f) : 0f;
@@ -117,15 +122,15 @@ namespace ShinobiLegacy.Combat
 
             if (leftLeg != null) leftLeg.localRotation = leftLegBase * Quaternion.Euler(stride, 0f, 0f);
             if (rightLeg != null) rightLeg.localRotation = rightLegBase * Quaternion.Euler(-stride, 0f, 0f);
-            if (leftArm != null) leftArm.localRotation = leftArmBase * Quaternion.Euler(armCounter + heavyWeight * -72f + windupWeight * windupArmAngle, 0f, 0f);
-            float rightArmAngle = stride + attackWeight * -105f + abilityWeight * -55f + heavyWeight * -48f + windupWeight * windupArmAngle * 0.75f;
+            if (leftArm != null) leftArm.localRotation = leftArmBase * Quaternion.Euler(armCounter + heavyWeight * -72f + windupWeight * windupArmAngle + hitWeight * hitArmAngle, 0f, 0f);
+            float rightArmAngle = stride + attackWeight * -105f + abilityWeight * -55f + heavyWeight * -48f + windupWeight * windupArmAngle * 0.75f + hitWeight * hitArmAngle * 0.8f;
             if (rightArm != null) rightArm.localRotation = rightArmBase * Quaternion.Euler(rightArmAngle, 0f, 0f);
 
             float bob = dead ? -0.12f : Mathf.Abs(Mathf.Sin(cycle * 2f)) * idleBobAmount * (0.35f + moveSpeed);
             transform.localPosition = basePosition + Vector3.up * bob;
             if (torso != null)
             {
-                float recoil = hitTimer > 0f ? Mathf.Sin((1f - hitTimer / 0.18f) * Mathf.PI) * 12f : 0f;
+                float recoil = hitWeight * (heavyHit ? 24f : 12f);
                 float windupLean = windupWeight * (heavyWindup ? 14f : 6f);
                 torso.localRotation = torsoBase * Quaternion.Euler(recoil + abilityWeight * -8f + heavyWeight * 18f + windupLean, 0f, 0f);
             }
