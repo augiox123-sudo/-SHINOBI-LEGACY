@@ -424,3 +424,10 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - `CombatAnimationBridge` now forwards movement speed, attacks, hit reactions, abilities and death state to this procedural layer while continuing to support a future authored Animator Controller.
 - Enemy and boss rigs now include arm transforms so their movement and attack motions are visible. Reviving a combatant clears the procedural death state.
 - This is a code-driven fallback, not skeletal animation: the current meshes are not skinned, motion is intentionally simple, and Unity Editor compilation, scene playback, animation feel and Android performance remain unverified.
+
+## Melee combat feedback and boss telegraph polish
+
+- Basic attacks now show a compact forward swing effect when no target is locked, and a small impact burst/ring at a focused locked target when the strike connects.
+- Melee effects use the existing lightweight runtime particle/line helpers and short lifetimes; they are prototype feedback, not final authored combat VFX.
+- Boss slam and phase-two special telegraphs now intensify as the windup approaches: pulse frequency, line width and opacity increase. The actual attack radius and damage checks are unchanged.
+- Unity compilation, in-editor combat validation and Android GPU/performance profiling are still required.
