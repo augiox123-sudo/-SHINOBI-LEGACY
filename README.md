@@ -270,3 +270,33 @@ The repository now includes an automated first-test scene and APK workflow for U
 The first-test player is configured for landscape, ARM64, Android API 26+, Gamma color space, IL2CPP and a conservative mobile 30 FPS profile with shadows disabled. This is a development test build, not a store release.
 
 **Build limitation:** the repository changes can be prepared here, but an actual APK cannot be claimed until Unity's Android toolchain compiles the project successfully. Check the Unity Console and Editor.log for any compile or build errors. The APK must then be installed and tested on a physical Android device; stable 30 FPS is a target, not yet a measured result.
+
+## First Android test: device QA checklist
+
+Use this checklist after installing `SHINOBI_LEGACY_FirstTest.apk`. The current test scenes are generated from editor scripts, so run the preparation menu before every clean build.
+
+### Installation and launch
+- [ ] Install the APK on an ARM64 Android device running Android 8.0 (API 26) or newer.
+- [ ] Confirm the app opens in landscape and starts in Safe Village.
+- [ ] Confirm there is no immediate crash, black screen, missing UI or stuck loading state.
+- [ ] Walk around the village with the left virtual joystick; check that the isometric camera follows the player smoothly.
+- [ ] Check the village interaction areas: vendor stalls and Mission Officer.
+
+### Combat scene
+- [ ] Tap **COMBAT TEST** and confirm Prototype Arena loads.
+- [ ] Move with the left joystick; test **ATTACK**, **CHAKRA BURST** and **FIRE STYLE**.
+- [ ] Test **LIGHT**, **WATER** and **WIND** when those controls are visible in the mobile ability panel.
+- [ ] Check enemy damage, hit reactions, enemy attacks, player health and death/respawn.
+- [ ] Approach the boss and verify its ground telegraph appears before the slam.
+- [ ] Tap **VILLAGE HUB** and confirm return travel works.
+
+### Stability and performance
+- [ ] Play continuously for at least 20 minutes; then repeat for 30 minutes.
+- [ ] Watch for overheating, frame drops, input delay, memory-related exits and visual corruption.
+- [ ] Confirm the target is stable 30 FPS; record actual performance rather than assuming the target was achieved.
+- [ ] Test Android Back behavior, app pause/resume and relaunch; confirm saved character progress and inventory persist.
+
+### Report results
+Record device model, Android version, build date, test duration, observed FPS (if available), temperature/overheating symptoms, crashes and the exact reproduction steps for each issue. A failed checklist item should be fixed before treating the build as a usable test milestone.
+
+**Current limitation:** this checklist is a test plan, not a passed test report. No physical-device results are claimed until the APK has been built, installed and exercised on hardware.
