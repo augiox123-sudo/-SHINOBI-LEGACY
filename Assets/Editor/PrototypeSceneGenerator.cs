@@ -47,6 +47,7 @@ namespace ShinobiLegacy.Editor
             motorCollider.radius = 0.42f;
             motorCollider.center = Vector3.zero;
             player.AddComponent<PlayerMotor>();
+            player.AddComponent<ShinobiLegacy.Performance.MobilePerformanceBootstrap>();
             player.AddComponent<CombatantHealth>();
             PlayerCombat playerCombat = player.AddComponent<PlayerCombat>();
             player.AddComponent<ShinobiLegacy.Combat.EnemyTargetLockSystem>();
