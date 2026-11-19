@@ -28,6 +28,11 @@ namespace ShinobiLegacy.World
             progression = GetComponent<PlayerProgression>();
             activeRegion = PlayerPrefs.GetString(RegionKey, "");
             kills = Mathf.Clamp(PlayerPrefs.GetInt(KillsKey, 0), 0, RequiredKills);
+        }
+
+        private void Start()
+        {
+            // Wait until every component has completed Awake before awarding a saved completion.
             if (kills >= RequiredKills && HasContract) CompleteContract();
         }
 
