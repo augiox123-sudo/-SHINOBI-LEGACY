@@ -87,3 +87,13 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - The prototype shop supports buying stock into the 60-slot inventory and selling carried inventory items for coins.
 - New players start with 500 prototype coins. Wallet and inventory are runtime-only at this stage; persistence, equipped-item selling restrictions, consumable effects and a polished mobile shop UI remain future work.
 - Generate the scene with **Tools → Shinobi Legacy → Create Safe Village Hub**. The scene is source-generated and still requires Unity Editor compilation and device testing.
+
+
+## Runtime graphics settings
+
+- Added an in-game **GRAPHICS** menu that is created automatically when a scene loads.
+- Players can switch the frame-rate target between **30 FPS** and **60 FPS**.
+- Players can switch real-time shadows **ON/OFF**. Turning shadows off disables Unity's shadow rendering and sets shadow distance to zero to reduce GPU load.
+- Choices are saved locally with PlayerPrefs and restored on the next launch.
+- The default is 30 FPS with shadows disabled for a more conservative mobile performance baseline. Selecting 60 FPS requests a 60 FPS target; actual performance depends on device capability, scene load and thermal limits.
+- The settings script is source-added but has not yet been compiled in Unity Editor or tested on a physical Android device.
