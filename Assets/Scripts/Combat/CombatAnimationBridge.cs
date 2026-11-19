@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,6 +22,7 @@ namespace ShinobiLegacy.Combat
         private static readonly int HitHash = Animator.StringToHash("Hit");
         private static readonly int AbilityHash = Animator.StringToHash("Ability");
         private bool parametersCached;
+        private Coroutine attackStateRoutine;
 
         private Animator ResolveAnimator()
         {
@@ -59,14 +61,41 @@ namespace ShinobiLegacy.Combat
 
         public void SetDead(bool value)
         {
+            if (value && attackStateRoutine != null)
+            {
+                StopCoroutine(attackStateRoutine);
+                attackStateRoutine = null;
+            }
             Animator current = ResolveAnimator();
             if (current != null && boolParameters.Contains(IsDeadHash))
                 current.SetBool(IsDeadHash, value);
         }
 
-        public void TriggerAttack()
+        public void PlayAttack(float activeDuration = 0.28f)
         {
             Trigger(AttackHash);
+            if (attackStateRoutine != null) StopCoroutine(attackStateRoutine);
+            if (ResolveAnimator() != null && boolParameters.Contains(IsAttackingHash))
+                attackStateRoutine = StartCoroutine(AttackState(activeDuration));
+        }
+
+        private IEnumerator AttackState(float duration)
+        {
+            SetAttacking(true);
+            yield return new WaitForSeconds(Mathf.Max(0.05f, duration));
+            SetAttacking(false);
+            attackStateRoutine = null;
+        }
+
+        private void OnDisable()
+        {
+            if (attackStateRoutine != null)
+            {
+                StopCoroutine(attackStateRoutine);
+                attackStateRoutine = null;
+            }
+            if (animator != null && parametersCached && boolParameters.Contains(IsAttackingHash))
+                animator.SetBool(IsAttackingHash, false);
         }
 
         public void TriggerHit()
