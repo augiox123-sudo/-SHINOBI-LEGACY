@@ -39,11 +39,37 @@ namespace ShinobiLegacy.Editor
         [MenuItem("Tools/Shinobi Legacy/Build Android First Test APK")]
         public static void BuildFirstTestApk()
         {
+            TryBuildFirstTestApk();
+        }
+
+        /// <summary>
+        /// GameCI entry point. Regenerates runtime-created scenes in a clean checkout,
+        /// then exits with a non-zero code if validation or the APK build fails.
+        /// </summary>
+        public static void BuildAndroidFirstTestFromCleanCheckout()
+        {
+            try
+            {
+                PrototypeSceneGenerator.CreateSceneForBuild();
+                SafeVillageSceneGenerator.CreateVillageForBuild();
+
+                if (!TryBuildFirstTestApk())
+                    EditorApplication.Exit(1);
+            }
+            catch (System.Exception exception)
+            {
+                Debug.LogException(exception);
+                EditorApplication.Exit(1);
+            }
+        }
+
+        private static bool TryBuildFirstTestApk()
+        {
             ConfigureAndroidPlayer();
             if (!ValidateFirstTestProject())
             {
                 Debug.LogError("SHINOBI LEGACY: APK build cancelled because project validation failed. Fix the errors above and run validation again.");
-                return;
+                return false;
             }
 
             if (EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android)
@@ -52,7 +78,7 @@ namespace ShinobiLegacy.Editor
                 if (!switched || EditorUserBuildSettings.activeBuildTarget != BuildTarget.Android)
                 {
                     Debug.LogError("SHINOBI LEGACY: Switch the active build platform to Android, wait for Unity to finish reimporting, then run the APK build again.");
-                    return;
+                    return false;
                 }
             }
 
@@ -64,7 +90,7 @@ namespace ShinobiLegacy.Editor
             if (scenes.Length < 2 || scenes[0] != VillageScene || scenes[1] != ArenaScene)
             {
                 Debug.LogError("SHINOBI LEGACY: Build Settings must contain SafeVillage first and PrototypeArena second. Run Prepare Android First Test again.");
-                return;
+                return false;
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(OutputPath));
@@ -79,11 +105,15 @@ namespace ShinobiLegacy.Editor
 
             BuildReport report = BuildPipeline.BuildPlayer(options);
             if (report.summary.result == BuildResult.Succeeded)
+            {
                 Debug.Log("SHINOBI LEGACY: Android APK ready: " + Path.GetFullPath(OutputPath) +
                     " | Size: " + (report.summary.totalSize / (1024f * 1024f)).ToString("0.0") + " MB");
-            else
-                Debug.LogError("SHINOBI LEGACY: Android build failed. Result: " + report.summary.result +
-                    ". Check the Unity Console and Editor.log for the first compiler or Android toolchain error.");
+                return true;
+            }
+
+            Debug.LogError("SHINOBI LEGACY: Android build failed. Result: " + report.summary.result +
+                ". Check the Unity Console and Editor.log for the first compiler or Android toolchain error.");
+            return false;
         }
 
         private static bool ValidateFirstTestProject()
