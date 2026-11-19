@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using ShinobiLegacy.Combat;
 
 namespace ShinobiLegacy.Enemies
@@ -18,6 +19,10 @@ namespace ShinobiLegacy.Enemies
         private CharacterController controller;
         private CombatantHealth health;
         private float nextAttackTime;
+        private Renderer[] visuals;
+        private MaterialPropertyBlock hitBlock;
+        private Coroutine hitFlashRoutine;
+        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
 
         public void SetTarget(Transform value) => target = value;
 
@@ -33,12 +38,19 @@ namespace ShinobiLegacy.Enemies
         {
             controller = GetComponent<CharacterController>();
             health = GetComponent<CombatantHealth>();
+            visuals = GetComponentsInChildren<Renderer>();
+            hitBlock = new MaterialPropertyBlock();
             health.Died += OnDied;
+            health.HealthChanged += OnHealthChanged;
         }
 
         private void OnDestroy()
         {
-            if (health != null) health.Died -= OnDied;
+            if (health != null)
+            {
+                health.Died -= OnDied;
+                health.HealthChanged -= OnHealthChanged;
+            }
         }
 
         private void Update()
@@ -65,6 +77,37 @@ namespace ShinobiLegacy.Enemies
                 nextAttackTime = Time.time + attackCooldown;
                 CombatantHealth targetHealth = target.GetComponent<CombatantHealth>();
                 if (targetHealth != null) targetHealth.TakeDamage(attackDamage);
+            }
+        }
+
+        private void OnHealthChanged(float current, float maximum)
+        {
+            if (health == null || health.IsDead || visuals == null) return;
+            if (hitFlashRoutine != null) StopCoroutine(hitFlashRoutine);
+            hitFlashRoutine = StartCoroutine(HitFlash());
+        }
+
+        private IEnumerator HitFlash()
+        {
+            SetHitFlash(new Color(1f, 0.22f, 0.16f, 1f));
+            yield return new WaitForSeconds(0.09f);
+            SetHitFlash(Color.white);
+            yield return new WaitForSeconds(0.045f);
+            SetHitFlash(new Color(1f, 0.55f, 0.35f, 1f));
+            yield return new WaitForSeconds(0.07f);
+            SetHitFlash(Color.white);
+            hitFlashRoutine = null;
+        }
+
+        private void SetHitFlash(Color color)
+        {
+            if (visuals == null) return;
+            foreach (Renderer visual in visuals)
+            {
+                if (visual == null) continue;
+                visual.GetPropertyBlock(hitBlock);
+                hitBlock.SetColor(ColorProperty, color);
+                visual.SetPropertyBlock(hitBlock);
             }
         }
 
