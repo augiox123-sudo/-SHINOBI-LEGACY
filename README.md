@@ -521,3 +521,11 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - The melee check also rejects targets with an excessive vertical separation and keeps the forward-arc and obstruction checks, so solid walls and arena props can still block a strike.
 - Focused target-lock attacks retain their turn-to-target behavior, but validate range and line of sight against the collider shape before applying damage.
 - This is a source-level collision improvement. Collider setup, actual hit feel, Unity compilation and Android device testing still need validation.
+
+## Dodgeable enemy melee strikes
+
+- Standard enemy melee attacks now validate the player's closest collider point at the end of the windup, rather than checking only the player transform pivot.
+- A strike is rejected when the player has moved beyond melee reach, has excessive vertical separation, or has stepped outside the enemy's forward attack arc.
+- The enemy commits to its facing direction when the windup begins instead of continuously turning to track the player. This gives lateral movement a real chance to evade the committed strike.
+- A non-allocating raycast check ignores the attacking enemy's own colliders while allowing walls and other solid objects to obstruct the hit.
+- This is source-level combat logic. Collision layers, actual dodge timing, Unity compilation, Play Mode and Android device behavior still require testing.
