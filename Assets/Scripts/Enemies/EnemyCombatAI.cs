@@ -131,13 +131,13 @@ namespace ShinobiLegacy.Enemies
         private void SetHitFlash(Color color)
         {
             if (visuals == null) return;
-            foreach (Renderer visual in visuals)
+            for (int i = 0; i < visuals.Length; i++)
             {
+                Renderer visual = visuals[i];
                 if (visual == null) continue;
                 visual.GetPropertyBlock(hitBlock);
-                int index = System.Array.IndexOf(visuals, visual);
-                if (index >= 0 && supportsBaseColor[index]) hitBlock.SetColor(BaseColorProperty, color);
-                if (index >= 0 && supportsLegacyColor[index]) hitBlock.SetColor(ColorProperty, color);
+                if (supportsBaseColor[i]) hitBlock.SetColor(BaseColorProperty, color);
+                if (supportsLegacyColor[i]) hitBlock.SetColor(ColorProperty, color);
                 visual.SetPropertyBlock(hitBlock);
             }
         }
