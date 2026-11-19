@@ -251,3 +251,7 @@ Standard enemies now react visibly when damaged. Their renderers briefly flash u
 ## Target-lock combat integration
 
 The mobile target-lock system can cycle nearby enemies and display the selected target with its health bar. Lightning Style now prioritizes that manually selected enemy when it is inside the skill's valid search area and forward-facing arc; otherwise it falls back to the nearest eligible enemy. This keeps the lock useful without allowing attacks through the full map or behind the player.
+
+## Mobile rendering and effect cleanup
+
+Enemy hit flashes now write both URP Lit (`_BaseColor`) and legacy (`_Color`) shader properties through `MaterialPropertyBlock`, preserving each renderer's original supported colors. Boss attack telegraphs keep ownership of their generated material and release it when the boss object is destroyed; telegraphs also fail safely if the expected shader is unavailable.
