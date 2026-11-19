@@ -13,6 +13,22 @@ namespace ShinobiLegacy.Items
         public event Action<InventoryItem> ItemAdded;
         public event Action<InventoryItem> ItemEquipped;
 
+        public bool EquipBest(EquipmentManager equipment)
+        {
+            if (equipment == null || items.Count == 0) return false;
+            int bestIndex = -1;
+            int bestPower = -1;
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (items[i] != null && items[i].power > bestPower)
+                {
+                    bestPower = items[i].power;
+                    bestIndex = i;
+                }
+            }
+            return EquipAt(bestIndex, equipment);
+        }
+
         public bool EquipAt(int index, EquipmentManager equipment)
         {
             if (equipment == null || index < 0 || index >= items.Count) return false;
