@@ -360,3 +360,7 @@ Fixed the enemy hit-flash color restoration guard to validate the two color arra
 ## Boss encounter range handling
 
 Boss windups are now cancelled if the player leaves the configured encounter detection range before the attack resolves. The warning telegraph is hidden and the boss returns to its normal or phase-two color, preventing a stale attack warning or delayed strike after the player disengages.
+
+## Mobile HUD update throttling
+
+Chakra regeneration notifications are throttled to a 0.15-second interval instead of firing every rendered frame. Ability casts still emit an immediate resource-change notification, so the HUD responds immediately when chakra is spent while avoiding unnecessary per-frame UI callbacks during passive regeneration.
