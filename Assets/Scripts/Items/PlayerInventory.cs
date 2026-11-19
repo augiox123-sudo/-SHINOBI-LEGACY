@@ -47,6 +47,17 @@ namespace ShinobiLegacy.Items
             return true;
         }
 
+        public void RestoreItems(IEnumerable<InventoryItem> restoredItems)
+        {
+            items.Clear();
+            if (restoredItems == null) return;
+            foreach (InventoryItem item in restoredItems)
+            {
+                if (item != null && items.Count < capacity) items.Add(item);
+            }
+            ItemAdded?.Invoke(null);
+        }
+
         public bool Add(InventoryItem item)
         {
             if (item == null || items.Count >= capacity) return false;
