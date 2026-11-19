@@ -68,6 +68,7 @@ namespace ShinobiLegacy.Combat
             direction.y = 0f;
             if (direction.sqrMagnitude < 0.0001f) direction = -transform.forward;
             hitReaction.ApplyImpulse(direction, strength, duration);
+            if (strength >= 2.3f && animationBridge != null) animationBridge.TriggerHeavyHit();
         }
 
         public void ApplyStun(float duration)
