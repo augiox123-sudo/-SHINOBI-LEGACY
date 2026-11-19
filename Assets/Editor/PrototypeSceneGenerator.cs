@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using UnityEngine.SceneManagement;\nusing UnityEngine.UI;\nusing UnityEngine.EventSystems;
 using ShinobiLegacy.Player;
 using ShinobiLegacy.CameraSystem;
 
@@ -58,6 +58,39 @@ namespace ShinobiLegacy.Editor
                 rock.transform.localScale = new Vector3(1.4f, 1f, 1.4f);
                 rock.GetComponent<Renderer>().sharedMaterial = MakeMaterial("Stone", new Color(0.28f, 0.31f, 0.30f));
             }
+
+            // Mobile touch joystick (visible in Game view and on Android).
+            GameObject canvasObject = new GameObject("Mobile HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            Canvas canvas = canvasObject.GetComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            CanvasScaler scaler = canvasObject.GetComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
+
+            GameObject eventSystem = new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+            eventSystem.transform.SetParent(null);
+
+            GameObject joystickBase = new GameObject("Movement Joystick", typeof(RectTransform), typeof(Image), typeof(VirtualJoystick));
+            joystickBase.transform.SetParent(canvasObject.transform, false);
+            RectTransform baseRect = joystickBase.GetComponent<RectTransform>();
+            baseRect.anchorMin = new Vector2(0f, 0f);
+            baseRect.anchorMax = new Vector2(0f, 0f);
+            baseRect.pivot = new Vector2(0.5f, 0.5f);
+            baseRect.anchoredPosition = new Vector2(190f, 190f);
+            baseRect.sizeDelta = new Vector2(250f, 250f);
+            Image baseImage = joystickBase.GetComponent<Image>();
+            baseImage.color = new Color(0.08f, 0.14f, 0.2f, 0.48f);
+
+            GameObject joystickHandle = new GameObject("Handle", typeof(RectTransform), typeof(Image));
+            joystickHandle.transform.SetParent(joystickBase.transform, false);
+            RectTransform handleRect = joystickHandle.GetComponent<RectTransform>();
+            handleRect.anchorMin = new Vector2(0.5f, 0.5f);
+            handleRect.anchorMax = new Vector2(0.5f, 0.5f);
+            handleRect.pivot = new Vector2(0.5f, 0.5f);
+            handleRect.sizeDelta = new Vector2(105f, 105f);
+            joystickHandle.GetComponent<Image>().color = new Color(0.35f, 0.72f, 0.9f, 0.8f);
+            joystickBase.GetComponent<VirtualJoystick>().Configure(baseRect, handleRect, player.GetComponent<PlayerMotor>());
 
             if (!AssetDatabase.IsValidFolder("Assets/Scenes")) AssetDatabase.CreateFolder("Assets", "Scenes");
             EditorSceneManager.MarkSceneDirty(scene);
