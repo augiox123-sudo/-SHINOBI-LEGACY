@@ -384,3 +384,8 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 ## Player movement input safety
 
 `PlayerMotor.SetMovementEnabled(false)` now clears the last virtual-joystick input immediately. The motor also clears external movement input when disabled and on component shutdown. This prevents a stale touch direction from being applied when movement is re-enabled after a dialogue, UI lock, pause, or other control transition.
+
+### Mobile graphics preference consistency
+- Mobile startup now reads the same saved 30/60 FPS and shadow preferences as the in-game Graphics Settings menu.
+- Scene changes no longer force the mobile bootstrap back to 30 FPS and shadows OFF after the player has selected different settings.
+- Default remains 30 FPS with shadows OFF for entry-level Android devices; user selections are retained through PlayerPrefs.
