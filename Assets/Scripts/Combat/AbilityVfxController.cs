@@ -12,6 +12,18 @@ namespace ShinobiLegacy.Combat
         private static Material particleMaterial;
         private static Material lineMaterial;
 
+        public void PlayMeleeSwing(Vector3 origin, Vector3 direction)
+        {
+            EmitCone(origin, direction, new Color(0.82f, 0.9f, 1f, 0.9f), 22, 2.6f, 32f, 0.18f, 5.5f);
+        }
+
+        public void PlayMeleeImpact(Vector3 position, Vector3 direction)
+        {
+            Color impact = new Color(0.95f, 0.98f, 1f, 1f);
+            EmitBurst(position, impact, 20, 0.55f, 3.2f, 0.22f);
+            EmitRing(position + Vector3.down * 0.72f, 0.72f, new Color(0.55f, 0.82f, 1f, 0.85f));
+        }
+
         public void PlayFire(Vector3 origin, Vector3 direction, float range, string modifier)
         {
             Color fire = modifier == "fire_meteor"
