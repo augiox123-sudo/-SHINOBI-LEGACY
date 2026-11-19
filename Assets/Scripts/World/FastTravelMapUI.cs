@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ShinobiLegacy.Combat;
 using ShinobiLegacy.Items;
+using ShinobiLegacy.Player;
 
 namespace ShinobiLegacy.World
 {
@@ -61,7 +62,22 @@ namespace ShinobiLegacy.World
             }
 
             GUILayout.BeginArea(new Rect(panel.x + 18f, mapRect.yMax + 12f, panel.width - 36f, panel.yMax - mapRect.yMax - 24f));
-            GUILayout.Label("DISCOVERED DESTINATIONS");
+            GUILayout.Label("REGIONAL ACCESS");
+            WorldRegionProgression regionProgression = GetComponent<WorldRegionProgression>();
+            PlayerProgression playerProgression = GetComponent<PlayerProgression>();
+            int playerLevel = playerProgression != null ? playerProgression.Level : 1;
+            foreach (WorldRegionProgression.Region region in WorldRegionProgression.Regions)
+            {
+                bool unlocked = regionProgression != null && regionProgression.IsUnlocked(region.id);
+                GUILayout.BeginHorizontal("box");
+                GUILayout.Label((unlocked ? "[UNLOCKED] " : "[LOCKED] ") + region.displayName +
+                    "\n" + region.description + "  |  Required level: " + region.requiredLevel,
+                    GUILayout.ExpandWidth(true), GUILayout.Height(54f));
+                GUILayout.EndHorizontal();
+            }
+
+            GUILayout.Space(8f);
+            GUILayout.Label("DISCOVERED DESTINATIONS  |  CHARACTER LEVEL " + playerLevel);
             scroll = GUILayout.BeginScrollView(scroll);
             bool found = false;
             foreach (FastTravelPoint point in points)
