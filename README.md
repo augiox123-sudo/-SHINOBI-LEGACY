@@ -182,3 +182,5 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
   - **Drowned Temple:** a water-force strike that briefly interrupts the player.
 - Bosses visibly change color during their second phase and telegraph special attacks with a longer wind-up, giving the player a reaction window.
 - This is a first gameplay implementation using placeholder models and color cues. Dedicated attack animations, arena telegraphs, elemental VFX and balance testing remain outstanding.
+
+- Regional patrols now mix distinct combat roles: durable **Vanguards**, mobile **Hunters**, fast-attacking **Assassins**, plus additional Raider/Sentinel variants when patrol size is increased. Roles have different health, movement, damage, attack cadence and visual tint.
