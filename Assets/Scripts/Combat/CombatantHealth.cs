@@ -14,6 +14,7 @@ namespace ShinobiLegacy.Combat
         private CombatAnimationBridge animationBridge;
         private float invulnerableUntil;
         private Coroutine burnRoutine;
+        private CombatantHitReaction hitReaction;
         private float stunnedUntil;
         public bool IsStunned => Time.time < stunnedUntil;
 
@@ -56,6 +57,17 @@ namespace ShinobiLegacy.Combat
             currentHealth = maxHealth;
             invulnerableUntil = Time.time + Mathf.Max(0f, invulnerabilitySeconds);
             HealthChanged?.Invoke(currentHealth, maxHealth);
+        }
+
+        public void ApplyKnockbackFrom(Vector3 sourcePosition, float strength = 3.2f, float duration = 0.14f)
+        {
+            if (IsDead) return;
+            if (hitReaction == null) hitReaction = GetComponent<CombatantHitReaction>();
+            if (hitReaction == null) hitReaction = gameObject.AddComponent<CombatantHitReaction>();
+            Vector3 direction = transform.position - sourcePosition;
+            direction.y = 0f;
+            if (direction.sqrMagnitude < 0.0001f) direction = -transform.forward;
+            hitReaction.ApplyImpulse(direction, strength, duration);
         }
 
         public void ApplyStun(float duration)
