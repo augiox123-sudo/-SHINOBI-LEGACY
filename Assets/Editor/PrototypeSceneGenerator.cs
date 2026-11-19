@@ -1,9 +1,13 @@
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;\nusing UnityEngine.UI;\nusing UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using ShinobiLegacy.Player;
-using ShinobiLegacy.CameraSystem;\nusing ShinobiLegacy.Combat;\nusing ShinobiLegacy.Enemies;
+using ShinobiLegacy.CameraSystem;
+using ShinobiLegacy.Combat;
+using ShinobiLegacy.Enemies;
 
 namespace ShinobiLegacy.Editor
 {
@@ -29,7 +33,9 @@ namespace ShinobiLegacy.Editor
             motorCollider.height = 2f;
             motorCollider.radius = 0.42f;
             motorCollider.center = Vector3.zero;
-            player.AddComponent<PlayerMotor>();\n            player.AddComponent<CombatantHealth>();\n            PlayerCombat playerCombat = player.AddComponent<PlayerCombat>();
+            player.AddComponent<PlayerMotor>();
+            player.AddComponent<CombatantHealth>();
+            PlayerCombat playerCombat = player.AddComponent<PlayerCombat>();
 
             GameObject cameraObject = new GameObject("Main Camera");
             cameraObject.tag = "MainCamera";
