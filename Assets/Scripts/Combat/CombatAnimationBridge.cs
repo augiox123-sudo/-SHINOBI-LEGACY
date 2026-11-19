@@ -102,8 +102,13 @@ namespace ShinobiLegacy.Combat
 
         public void PlayAttack(float activeDuration = 0.28f)
         {
+            PlayComboAttack(1, activeDuration);
+        }
+
+        public void PlayComboAttack(int strike, float activeDuration = 0.28f)
+        {
             ShinobiProceduralMotion motion = ResolveProceduralMotion();
-            if (motion != null) motion.PlayAttack();
+            if (motion != null) motion.PlayComboAttack(strike);
             Trigger(AttackHash);
             if (attackStateRoutine != null) StopCoroutine(attackStateRoutine);
             if (ResolveAnimator() != null && boolParameters.Contains(IsAttackingHash))
