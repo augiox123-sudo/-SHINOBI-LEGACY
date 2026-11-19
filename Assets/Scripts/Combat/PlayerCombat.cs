@@ -1,4 +1,5 @@
 using UnityEngine;
+using System;
 
 namespace ShinobiLegacy.Combat
 {
@@ -9,30 +10,54 @@ namespace ShinobiLegacy.Combat
         [SerializeField] private float attackRange = 2.2f;
         [SerializeField] private float attackRadius = 1.15f;
         [SerializeField] private float attackCooldown = 0.55f;
-        [SerializeField] private LayerMask targetLayers = ~0;
 
-        [Header("Chakra technique")]
-        [SerializeField] private float techniqueDamage = 65f;
-        [SerializeField] private float techniqueRange = 5.5f;
+        [Header("Chakra burst")]
+        [SerializeField] private float burstDamage = 65f;
+        [SerializeField] private float burstRange = 5.5f;
+        [SerializeField] private float burstRadius = 1.8f;
+        [SerializeField] private float burstCost = 35f;
+        [SerializeField] private float burstCooldown = 4.5f;
+
+        [Header("Fire style")]
+        [SerializeField] private float fireDamage = 48f;
+        [SerializeField] private float fireRange = 9f;
+        [SerializeField] private float fireCost = 25f;
+        [SerializeField] private float fireCooldown = 3f;
+
+        [Header("Chakra")]
         [SerializeField] private float chakraMaximum = 100f;
-        [SerializeField] private float chakraCost = 35f;
         [SerializeField] private float chakraRegeneration = 7f;
 
         private float nextAttackTime;
+        private float nextBurstTime;
+        private float nextFireTime;
         private float chakra;
         private readonly Collider[] hitBuffer = new Collider[24];
 
         public float Chakra => chakra;
         public float MaxChakra => chakraMaximum;
+        public float BurstCooldownRemaining => Mathf.Max(0f, nextBurstTime - Time.time);
+        public float FireCooldownRemaining => Mathf.Max(0f, nextFireTime - Time.time);
+        public float BurstCooldownDuration => burstCooldown;
+        public float FireCooldownDuration => fireCooldown;
+        public event Action ResourcesChanged;
 
-        private void Awake() => chakra = chakraMaximum;
+        private void Awake()
+        {
+            chakra = chakraMaximum;
+            ResourcesChanged?.Invoke();
+        }
 
         private void Update()
         {
+            float previous = chakra;
             chakra = Mathf.Min(chakraMaximum, chakra + chakraRegeneration * Time.deltaTime);
+            if (!Mathf.Approximately(previous, chakra)) ResourcesChanged?.Invoke();
+
 #if UNITY_EDITOR || UNITY_STANDALONE
             if (Input.GetKeyDown(KeyCode.Space)) BasicAttack();
-            if (Input.GetKeyDown(KeyCode.Q)) CastTechnique();
+            if (Input.GetKeyDown(KeyCode.Q)) CastChakraBurst();
+            if (Input.GetKeyDown(KeyCode.E)) CastFireStyle();
 #endif
         }
 
@@ -43,24 +68,44 @@ namespace ShinobiLegacy.Combat
             HitTargets(attackRange, attackRadius, attackDamage);
         }
 
-        public void CastTechnique()
+        public void CastChakraBurst()
         {
-            if (chakra < chakraCost) return;
-            chakra -= chakraCost;
-            HitTargets(techniqueRange, 1.8f, techniqueDamage);
+            if (Time.time < nextBurstTime || chakra < burstCost) return;
+            chakra -= burstCost;
+            nextBurstTime = Time.time + burstCooldown;
+            HitTargets(burstRange, burstRadius, burstDamage);
+            ResourcesChanged?.Invoke();
+        }
+
+        public void CastFireStyle()
+        {
+            if (Time.time < nextFireTime || chakra < fireCost) return;
+            chakra -= fireCost;
+            nextFireTime = Time.time + fireCooldown;
+            Vector3 origin = transform.position + Vector3.up * 1.1f + transform.forward * 0.6f;
+            Vector3 direction = transform.forward;
+            if (Physics.SphereCast(origin, 0.55f, direction, out RaycastHit hit, fireRange,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
+                CombatantHealth health = hit.collider.GetComponentInParent<CombatantHealth>();
+                if (health != null && health.transform != transform)
+                    health.TakeDamage(fireDamage);
+            }
+            ResourcesChanged?.Invoke();
         }
 
         private void HitTargets(float range, float radius, float damage)
         {
             Vector3 center = transform.position + Vector3.up * 1f + transform.forward * range * 0.55f;
-            int count = Physics.OverlapSphereNonAlloc(center, radius, hitBuffer, targetLayers, QueryTriggerInteraction.Ignore);
+            int count = Physics.OverlapSphereNonAlloc(center, radius, hitBuffer,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
             for (int i = 0; i < count; i++)
             {
                 Collider hit = hitBuffer[i];
-                if (hit == null || hit.transform.IsChildOf(transform)) continue;
+                if (hit == null) continue;
                 CombatantHealth health = hit.GetComponentInParent<CombatantHealth>();
-                if (health == null || health.IsDead || health.transform == transform) continue;
-                health.TakeDamage(damage);
+                if (health != null && !health.IsDead && health.transform != transform)
+                    health.TakeDamage(damage);
                 hitBuffer[i] = null;
             }
         }
