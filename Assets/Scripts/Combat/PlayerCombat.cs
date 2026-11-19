@@ -132,6 +132,10 @@ namespace ShinobiLegacy.Combat
             float reach = attackRange + attackRadius;
             if (offset.sqrMagnitude > reach * reach) return false;
 
+            // Face the selected enemy before delivering the focused melee strike.
+            if (offset.sqrMagnitude > 0.001f)
+                transform.rotation = Quaternion.LookRotation(offset.normalized, Vector3.up);
+
             // A locked target takes the focused basic strike instead of the wide fallback sweep.
             ApplyDamageOnce(target, damage, false);
             return true;
