@@ -233,3 +233,9 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - The mission board shows a short story briefing and previews the guaranteed legendary reward for each chapter.
 - Regional patrol and champion defeats now advance both the optional bounty contract and the active story quest when their region and enemy type match.
 - The quest board currently uses Unity's immediate-mode GUI as a functional prototype. It still needs a polished mobile UI, authored NPC model/animation, voiced dialogue and narrative cutscenes.
+
+## Mobile target cycling and mission officer interaction
+
+- Added a dedicated **TARGET** touch button to the shared mobile combat controls. It cycles through nearby valid enemies using the existing target-lock system, so Android players do not need to rely on a desktop-style GUI button.
+- The mission officer board now has a persistent **TALK TO MISSION OFFICER** prompt while the player remains in the interaction area. Closing the board no longer traps the player in a state where they must leave and re-enter the area to reopen it.
+- These UI changes are static-code checked; device layout and touch behavior still need Unity playtesting.
