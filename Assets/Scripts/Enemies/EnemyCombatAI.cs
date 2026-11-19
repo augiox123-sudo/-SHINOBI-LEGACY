@@ -378,7 +378,7 @@ namespace ShinobiLegacy.Enemies
             float radius = attackRange + 0.18f;
             float pulse = 1f + Mathf.Sin(Time.time * Mathf.Lerp(6f, 18f, progress)) *
                 Mathf.Lerp(0.015f, 0.055f, progress);
-            const float halfAngle = 65f;
+            const float halfAngle = 70f;
             for (int i = 0; i < TelegraphSegments; i++)
             {
                 float t = i / (float)(TelegraphSegments - 1);
