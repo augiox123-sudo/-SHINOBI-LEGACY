@@ -27,6 +27,7 @@ namespace ShinobiLegacy.Combat
         private float attackTimer;
         private float hitTimer;
         private bool heavyHit;
+        private bool staggered;
         private float abilityTimer;
         private float heavyAttackTimer;
         private float windupTimer;
@@ -79,6 +80,12 @@ namespace ShinobiLegacy.Combat
             hitTimer = heavy ? 0.26f : 0.18f;
         }
 
+        public void SetStaggered(bool value)
+        {
+            staggered = value && !dead;
+            if (staggered) moveSpeed = 0f;
+        }
+
         public void PlayAbility()
         {
             if (!dead) abilityTimer = 0.42f;
@@ -119,11 +126,12 @@ namespace ShinobiLegacy.Combat
             float windupProgress = windupTimer > 0f ? 1f - windupTimer / (heavyWindup ? 0.56f : 0.32f) : 0f;
             float windupWeight = windupTimer > 0f ? Mathf.Sin(windupProgress * Mathf.PI * 0.5f) : 0f;
             float windupArmAngle = heavyWindup ? -62f : -38f;
+            float staggerWeight = staggered ? 1f : 0f;
 
             if (leftLeg != null) leftLeg.localRotation = leftLegBase * Quaternion.Euler(stride, 0f, 0f);
             if (rightLeg != null) rightLeg.localRotation = rightLegBase * Quaternion.Euler(-stride, 0f, 0f);
-            if (leftArm != null) leftArm.localRotation = leftArmBase * Quaternion.Euler(armCounter + heavyWeight * -72f + windupWeight * windupArmAngle + hitWeight * hitArmAngle, 0f, 0f);
-            float rightArmAngle = stride + attackWeight * -105f + abilityWeight * -55f + heavyWeight * -48f + windupWeight * windupArmAngle * 0.75f + hitWeight * hitArmAngle * 0.8f;
+            if (leftArm != null) leftArm.localRotation = leftArmBase * Quaternion.Euler(armCounter + heavyWeight * -72f + windupWeight * windupArmAngle + hitWeight * hitArmAngle + staggerWeight * 34f, 0f, 0f);
+            float rightArmAngle = stride + attackWeight * -105f + abilityWeight * -55f + heavyWeight * -48f + windupWeight * windupArmAngle * 0.75f + hitWeight * hitArmAngle * 0.8f + staggerWeight * 27f;
             if (rightArm != null) rightArm.localRotation = rightArmBase * Quaternion.Euler(rightArmAngle, 0f, 0f);
 
             float bob = dead ? -0.12f : Mathf.Abs(Mathf.Sin(cycle * 2f)) * idleBobAmount * (0.35f + moveSpeed);
@@ -132,7 +140,7 @@ namespace ShinobiLegacy.Combat
             {
                 float recoil = hitWeight * (heavyHit ? 24f : 12f);
                 float windupLean = windupWeight * (heavyWindup ? 14f : 6f);
-                torso.localRotation = torsoBase * Quaternion.Euler(recoil + abilityWeight * -8f + heavyWeight * 18f + windupLean, 0f, 0f);
+                torso.localRotation = torsoBase * Quaternion.Euler(recoil + abilityWeight * -8f + heavyWeight * 18f + windupLean + staggerWeight * 18f, 0f, 0f);
             }
         }
     }
