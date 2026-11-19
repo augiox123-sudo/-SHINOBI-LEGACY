@@ -56,7 +56,12 @@ namespace ShinobiLegacy.Items
             ready = true;
         }
 
-        private void OnProgressChanged(int level, int experience, int required)\n        {\n            if (ready) Save();\n        }\n\n        private void OnInventoryChanged(InventoryItem item)
+        private void OnProgressChanged(int level, int experience, int required)
+        {
+            if (ready) Save();
+        }
+
+        private void OnInventoryChanged(InventoryItem item)
         {
             if (ready) Save();
         }
