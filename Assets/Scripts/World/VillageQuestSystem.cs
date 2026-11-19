@@ -36,6 +36,7 @@ namespace ShinobiLegacy.World
         private PlayerWallet wallet;
         private PlayerProgression progression;
         private WorldRegionProgression regions;
+        private PlayerInventory inventory;
 
         public bool BoardVisible => boardVisible;
         public int QuestIndex => questIndex;
@@ -47,6 +48,7 @@ namespace ShinobiLegacy.World
             wallet = GetComponent<PlayerWallet>();
             progression = GetComponent<PlayerProgression>();
             regions = GetComponent<WorldRegionProgression>();
+            inventory = GetComponent<PlayerInventory>();
             questIndex = Mathf.Clamp(PlayerPrefs.GetInt(QuestIndexKey, 0), 0, QuestRegions.Length);
             active = PlayerPrefs.GetInt(ActiveKey, 0) == 1;
             progress = Mathf.Clamp(PlayerPrefs.GetInt(ProgressKey, 0), 0, questIndex < RequiredKills.Length ? RequiredKills[questIndex] : 0);
@@ -79,13 +81,50 @@ namespace ShinobiLegacy.World
             int xp = 140 + questIndex * 90 + level * 22;
             if (wallet != null) wallet.Add(coins);
             if (progression != null) progression.AddExperience(xp);
+            GrantStoryRelic(questIndex, level);
 
             Debug.Log("SHINOBI LEGACY: Story quest complete: " + QuestNames[questIndex] +
-                " | +" + coins + " coins | +" + xp + " XP");
+                " | +" + coins + " coins | +" + xp + " XP | story relic granted");
             questIndex++;
             progress = 0;
             active = false;
             Save();
+        }
+
+        private void GrantStoryRelic(int completedQuest, int level)
+        {
+            string[] names =
+            {
+                "Ashen Warden's Ember Seal",
+                "Rootbound Heartwood Charm",
+                "Raijin's Storm Conduit",
+                "Abyssal Oath — Tidebound Relic"
+            };
+            string[] modifiers = { "fire_meteor", "wind_vortex", "lightning_storm", "water_prison" };
+            string[] slots = { "Accessory", "Chest", "Weapon", "Accessory" };
+            int power = 18 + completedQuest * 12 + level * 2;
+            InventoryItem relic = new InventoryItem(names[completedQuest], LootRarity.Legendary, power, slots[completedQuest])
+            {
+                abilityModifier = modifiers[completedQuest],
+                bonusDamagePercent = 0.035f + completedQuest * 0.005f,
+                bonusDefense = 1.5f + completedQuest,
+                bonusCriticalChance = 0.018f,
+                bonusCriticalDamage = 0.06f
+            };
+
+            if (inventory != null && inventory.Add(relic)) return;
+
+            // Full inventory fallback: drop the guaranteed relic beside the player.
+            GameObject orb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            orb.name = "QuestReward_" + names[completedQuest].Replace(" ", "_");
+            orb.transform.position = transform.position + Vector3.up * 0.65f;
+            orb.transform.localScale = Vector3.one * 0.8f;
+            Collider pickupCollider = orb.GetComponent<Collider>();
+            pickupCollider.isTrigger = true;
+            Rigidbody body = orb.AddComponent<Rigidbody>();
+            body.isKinematic = true;
+            body.useGravity = false;
+            orb.AddComponent<LootPickup>().Configure(relic);
         }
 
         private void Save()
