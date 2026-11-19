@@ -17,6 +17,7 @@ namespace ShinobiLegacy.Enemies
         [SerializeField] private float turnSpeed = 540f;
 
         private CharacterController controller;
+        private CombatAnimationBridge animationBridge;
         private CombatantHealth health;
         private float nextAttackTime;
         private Renderer[] visuals;
@@ -42,6 +43,8 @@ namespace ShinobiLegacy.Enemies
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
+            animationBridge = GetComponent<CombatAnimationBridge>();
+            if (animationBridge == null) animationBridge = gameObject.AddComponent<CombatAnimationBridge>();
             health = GetComponent<CombatantHealth>();
             visuals = GetComponentsInChildren<Renderer>();
             originalBaseColors = new Color[visuals.Length];
@@ -90,6 +93,7 @@ namespace ShinobiLegacy.Enemies
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, desired, turnSpeed * Time.deltaTime);
             }
 
+            if (animationBridge != null) animationBridge.SetMoveSpeed(distance > attackRange ? moveSpeed : 0f);
             if (distance > attackRange)
             {
                 Vector3 direction = offset.normalized;
@@ -98,6 +102,7 @@ namespace ShinobiLegacy.Enemies
             else if (Time.time >= nextAttackTime)
             {
                 nextAttackTime = Time.time + attackCooldown;
+                if (animationBridge != null) animationBridge.TriggerAttack();
                 targetHealth.TakeDamage(attackDamage);
             }
         }
