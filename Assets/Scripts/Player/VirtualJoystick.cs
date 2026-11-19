@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace ShinobiLegacy.Player
 {
@@ -18,6 +19,10 @@ namespace ShinobiLegacy.Player
             background = baseRect;
             handle = handleRect;
             player = motor;
+
+            // Keep the handle visual from intercepting touch events intended for the joystick base.
+            Image handleImage = handle != null ? handle.GetComponent<Image>() : null;
+            if (handleImage != null) handleImage.raycastTarget = false;
         }
 
         public void OnPointerDown(PointerEventData eventData)
