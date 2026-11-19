@@ -2,6 +2,9 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using ShinobiLegacy.Player;
+using ShinobiLegacy.CameraSystem;
+using ShinobiLegacy.Items;
 
 namespace ShinobiLegacy.Editor
 {
@@ -77,6 +80,38 @@ namespace ShinobiLegacy.Editor
             CreateTrainingGround();
             CreateForestLine();
 
+            // Playable village arrival point, wallet, inventory and isometric camera.
+            GameObject player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            player.name = "Player_Village_Hub";
+            player.transform.position = new Vector3(0f, 1f, -58f);
+            player.GetComponent<Renderer>().sharedMaterial = accentMat;
+            Object.DestroyImmediate(player.GetComponent<CapsuleCollider>());
+            CharacterController playerController = player.AddComponent<CharacterController>();
+            playerController.height = 2f;
+            playerController.radius = 0.42f;
+            player.AddComponent<PlayerMotor>();
+            player.AddComponent<PlayerInventory>();
+            player.AddComponent<PlayerWallet>();
+            player.AddComponent<VillageShopUI>();
+
+            GameObject cameraObject = new GameObject("Main Camera");
+            cameraObject.tag = "MainCamera";
+            Camera camera = cameraObject.AddComponent<Camera>();
+            camera.orthographic = true;
+            camera.orthographicSize = 12f;
+            camera.nearClipPlane = 0.1f;
+            camera.farClipPlane = 250f;
+            cameraObject.AddComponent<AudioListener>();
+            IsometricCameraFollow cameraFollow = cameraObject.AddComponent<IsometricCameraFollow>();
+            cameraFollow.Target = player.transform;
+            cameraObject.transform.position = player.transform.position + new Vector3(0f, 15f, -11f);
+
+            GameObject lightObject = new GameObject("Village Sun");
+            Light sun = lightObject.AddComponent<Light>();
+            sun.type = LightType.Directional;
+            sun.intensity = 1.2f;
+            lightObject.transform.rotation = Quaternion.Euler(48f, -32f, 0f);
+
             // Arrival point and navigation labels.
             CreateMarker("VILLAGE GATE", new Vector3(0f, 0.2f, -62f));
             CreateMarker("CENTRAL MARKET", new Vector3(0f, 0.2f, 0f));
@@ -92,7 +127,7 @@ namespace ShinobiLegacy.Editor
                 new EditorBuildSettingsScene(scenePath, true)
             };
             AssetDatabase.SaveAssets();
-            Debug.Log("SHINOBI LEGACY: Safe Village hub blockout created. Add the player spawn, vendor interaction and scene travel systems in the next gameplay pass.");
+            Debug.Log("SHINOBI LEGACY: Safe Village hub created with player spawn, isometric camera, wallet and vendor buy/sell interaction.");
         }
 
         private static void CreateMaterials()
@@ -173,6 +208,12 @@ namespace ShinobiLegacy.Editor
             vendor.transform.position = position + new Vector3(0f, 2f, 1.8f);
             vendor.transform.localScale = new Vector3(0.75f, 1f, 0.75f);
             vendor.GetComponent<Renderer>().sharedMaterial = accentMat;
+            SphereCollider interaction = vendor.AddComponent<SphereCollider>();
+            interaction.isTrigger = true;
+            interaction.radius = 4.5f;
+            VillageVendor shop = vendor.AddComponent<VillageVendor>();
+            shop.shopName = shopName;
+            shop.category = shopName;
             CreateLabel(shopName.ToUpper(), position + new Vector3(0f, 5.4f, -2.8f), 1.35f);
         }
 
