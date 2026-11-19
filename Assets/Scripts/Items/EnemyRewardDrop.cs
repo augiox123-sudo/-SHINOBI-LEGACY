@@ -14,6 +14,7 @@ namespace ShinobiLegacy.Items
         private PlayerProgression target;
         private CombatantHealth health;
         private bool rewarded;
+        private int bossLootProfile = -1;
 
         public void Configure(PlayerProgression player, int xp, float chance, bool boss)
         {
@@ -26,6 +27,11 @@ namespace ShinobiLegacy.Items
         public void SetLegendaryChance(float chance)
         {
             legendaryChanceOverride = Mathf.Clamp01(chance);
+        }
+
+        public void SetBossLootProfile(int profile)
+        {
+            bossLootProfile = Mathf.Clamp(profile, 0, 3);
         }
 
         private void Awake()
@@ -62,8 +68,13 @@ namespace ShinobiLegacy.Items
                     "water_prison", "water_torrent",
                     "wind_vortex", "wind_blade"
                 };
-                item.abilityModifier = legendaryEffects[Random.Range(0, legendaryEffects.Length)];
-                item.itemName += " [" + GetModifierName(item.abilityModifier) + "]";
+                if (bossLootProfile >= 0)
+                    ApplyBossLegendary(item, bossLootProfile);
+                else
+                {
+                    item.abilityModifier = legendaryEffects[Random.Range(0, legendaryEffects.Length)];
+                    item.itemName += " [" + GetModifierName(item.abilityModifier) + "]";
+                }
             }
 
             GameObject orb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -113,15 +124,39 @@ namespace ShinobiLegacy.Items
             }
         }
 
+        private static void ApplyBossLegendary(InventoryItem item, int profile)
+        {
+            string[] names =
+            {
+                "Ashen Warden's Cinderfang",
+                "Rootbound Colossus Heart",
+                "Raijin's Tempest Core",
+                "Abyssal Guardian's Deepwater Seal"
+            };
+            string[] modifiers = { "fire_meteor", "wind_vortex", "lightning_storm", "water_prison" };
+            string[] slots = { "Weapon", "Chest", "Accessory", "Accessory" };
+            item.itemName = names[profile];
+            item.abilityModifier = modifiers[profile];
+            item.slot = slots[profile];
+            item.bonusDamagePercent += 0.035f;
+            item.bonusCriticalChance += 0.012f;
+            item.bonusCriticalDamage += 0.08f;
+            item.bonusDefense += 2f + profile;
+        }
+
         private LootRarity RollRarity()
         {
             float roll = Random.value;
             float legendaryChance = legendaryChanceOverride >= 0f ? legendaryChanceOverride :
                 (guaranteedRareChance ? 0.08f : 0.015f);
+            // Keep the normal rarity-band widths when a boss-specific legendary rate is configured.
+            float epicThreshold = legendaryChance + 0.055f;
+            float rareThreshold = legendaryChance + 0.205f;
+            float uncommonThreshold = legendaryChance + 0.505f;
             if (roll < legendaryChance) return LootRarity.Legendary;
-            if (roll < 0.07f) return LootRarity.Epic;
-            if (roll < 0.22f) return LootRarity.Rare;
-            if (roll < 0.52f) return LootRarity.Uncommon;
+            if (roll < epicThreshold) return LootRarity.Epic;
+            if (roll < rareThreshold) return LootRarity.Rare;
+            if (roll < uncommonThreshold) return LootRarity.Uncommon;
             return LootRarity.Common;
         }
     }
