@@ -338,3 +338,11 @@ Record device model, Android version, build date, test duration, observed FPS (i
 - Cooldown values are read from the combat system; the HUD refreshes ten times per second rather than every frame.
 - The target-cycle button remains separate and does not display an ability cooldown.
 - This is source-level UI work. The overlay sprite, readability, safe-area placement and touch behavior still require Unity Editor and physical-device validation.
+
+
+## Combat HUD event and refresh safety
+
+- The combat HUD now manages health/resource event subscriptions idempotently. Reconfiguring the HUD no longer attaches duplicate listeners, and listeners are detached when the component is disabled.
+- The equipment component is cached instead of repeatedly looked up while composing status text.
+- Health/chakra bars retain a responsive 0.15-second refresh interval, while the longer skill/status line refreshes at 0.5 seconds by default to reduce repeated string/UI work on mobile.
+- These are source-level safeguards; Unity compilation, profiler measurements and device testing are still required.
