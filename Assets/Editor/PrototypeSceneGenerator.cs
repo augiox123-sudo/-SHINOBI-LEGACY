@@ -8,6 +8,7 @@ using ShinobiLegacy.Player;
 using ShinobiLegacy.CameraSystem;
 using ShinobiLegacy.Combat;
 using ShinobiLegacy.Enemies;
+using ShinobiLegacy.UI;
 
 namespace ShinobiLegacy.Editor
 {
@@ -115,8 +116,30 @@ namespace ShinobiLegacy.Editor
             joystickHandle.GetComponent<Image>().color = new Color(0.35f, 0.72f, 0.9f, 0.8f);
             joystickBase.GetComponent<VirtualJoystick>().Configure(baseRect, handleRect, player.GetComponent<PlayerMotor>());
 
-            CreateActionButton(canvasObject.transform, "Basic Attack", new Vector2(-190f, 150f), new Vector2(145f, 100f), () => playerCombat.BasicAttack());
-            CreateActionButton(canvasObject.transform, "Chakra", new Vector2(-350f, 265f), new Vector2(120f, 85f), () => playerCombat.CastTechnique());
+            CreateActionButton(canvasObject.transform, "ATTACK", new Vector2(-180f, 125f), new Vector2(150f, 110f), () => playerCombat.BasicAttack());
+            CreateActionButton(canvasObject.transform, "CHAKRA BURST", new Vector2(-350f, 245f), new Vector2(155f, 100f), () => playerCombat.CastChakraBurst());
+            CreateActionButton(canvasObject.transform, "FIRE STYLE", new Vector2(-180f, 265f), new Vector2(135f, 90f), () => playerCombat.CastFireStyle());
+
+            Image healthFill = CreateBar(canvasObject.transform, "Health Bar", new Vector2(35f, -35f),
+                new Vector2(420f, 30f), new Color(0.78f, 0.12f, 0.12f, 1f));
+            Image chakraFill = CreateBar(canvasObject.transform, "Chakra Bar", new Vector2(35f, -78f),
+                new Vector2(420f, 22f), new Color(0.12f, 0.52f, 0.9f, 1f));
+            GameObject statusObject = new GameObject("Skill Cooldown Status", typeof(RectTransform), typeof(Text));
+            statusObject.transform.SetParent(canvasObject.transform, false);
+            RectTransform statusRect = statusObject.GetComponent<RectTransform>();
+            statusRect.anchorMin = new Vector2(0f, 1f);
+            statusRect.anchorMax = new Vector2(0f, 1f);
+            statusRect.pivot = new Vector2(0f, 1f);
+            statusRect.anchoredPosition = new Vector2(35f, -112f);
+            statusRect.sizeDelta = new Vector2(650f, 36f);
+            Text statusText = statusObject.GetComponent<Text>();
+            statusText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            statusText.fontSize = 20;
+            statusText.color = Color.white;
+            statusText.text = "SKILLS READY";
+            statusText.raycastTarget = false;
+            CombatHud hud = canvasObject.AddComponent<CombatHud>();
+            hud.Configure(player.GetComponent<CombatantHealth>(), playerCombat, healthFill, chakraFill, statusText);
 
             if (!AssetDatabase.IsValidFolder("Assets/Scenes")) AssetDatabase.CreateFolder("Assets", "Scenes");
             EditorSceneManager.MarkSceneDirty(scene);
@@ -129,6 +152,34 @@ namespace ShinobiLegacy.Editor
             AssetDatabase.SaveAssets();
             Selection.activeGameObject = player;
             Debug.Log("SHINOBI LEGACY: 3D prototype scene created.");
+        }
+
+        private static Image CreateBar(Transform parent, string name, Vector2 position, Vector2 size, Color fillColor)
+        {
+            GameObject backgroundObject = new GameObject(name + " Background", typeof(RectTransform), typeof(Image));
+            backgroundObject.transform.SetParent(parent, false);
+            RectTransform backgroundRect = backgroundObject.GetComponent<RectTransform>();
+            backgroundRect.anchorMin = new Vector2(0f, 1f);
+            backgroundRect.anchorMax = new Vector2(0f, 1f);
+            backgroundRect.pivot = new Vector2(0f, 1f);
+            backgroundRect.anchoredPosition = position;
+            backgroundRect.sizeDelta = size;
+            backgroundObject.GetComponent<Image>().color = new Color(0.025f, 0.035f, 0.05f, 0.82f);
+
+            GameObject fillObject = new GameObject(name + " Fill", typeof(RectTransform), typeof(Image));
+            fillObject.transform.SetParent(backgroundObject.transform, false);
+            RectTransform fillRect = fillObject.GetComponent<RectTransform>();
+            fillRect.anchorMin = Vector2.zero;
+            fillRect.anchorMax = Vector2.one;
+            fillRect.offsetMin = new Vector2(3f, 3f);
+            fillRect.offsetMax = new Vector2(-3f, -3f);
+            Image fill = fillObject.GetComponent<Image>();
+            fill.color = fillColor;
+            fill.type = Image.Type.Filled;
+            fill.fillMethod = Image.FillMethod.Horizontal;
+            fill.fillOrigin = (int)Image.OriginHorizontal.Left;
+            fill.fillAmount = 1f;
+            return fill;
         }
 
         private static void CreateActionButton(Transform parent, string label, Vector2 position, Vector2 size, UnityEngine.Events.UnityAction action)
