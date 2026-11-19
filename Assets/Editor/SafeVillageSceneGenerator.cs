@@ -94,6 +94,8 @@ namespace ShinobiLegacy.Editor
             player.AddComponent<PlayerMotor>();
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerWallet>();
+            player.AddComponent<EquipmentManager>();
+            player.AddComponent<PlayerSaveSystem>();
             player.AddComponent<VillageShopUI>();
 
             GameObject hud = new GameObject("Village Mobile HUD", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
