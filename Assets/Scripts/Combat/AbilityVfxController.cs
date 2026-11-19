@@ -32,6 +32,21 @@ namespace ShinobiLegacy.Combat
             EmitRing(position + Vector3.down * 0.72f, 0.72f, new Color(0.55f, 0.82f, 1f, 0.85f));
         }
 
+        public void PlayMeleeFinisherSwing(Vector3 origin, Vector3 direction)
+        {
+            Color impact = new Color(0.72f, 0.88f, 1f, 1f);
+            EmitCone(origin, direction, impact, 42, 3.1f, 42f, 0.24f, 8f);
+            EmitBurst(origin + direction.normalized * 1.35f, impact, 16, 0.9f, 4.5f, 0.2f);
+        }
+
+        public void PlayMeleeFinisherImpact(Vector3 position, Vector3 direction)
+        {
+            Color impact = new Color(0.72f, 0.9f, 1f, 1f);
+            EmitBurst(position, impact, 38, 0.9f, 5.2f, 0.28f);
+            EmitRing(position + Vector3.down * 0.68f, 1.05f, new Color(0.35f, 0.72f, 1f, 0.95f));
+            EmitRing(position + Vector3.down * 0.62f, 0.62f, new Color(0.88f, 0.96f, 1f, 0.9f));
+        }
+
         public void PlayFire(Vector3 origin, Vector3 direction, float range, string modifier)
         {
             Color fire = modifier == "fire_meteor"
