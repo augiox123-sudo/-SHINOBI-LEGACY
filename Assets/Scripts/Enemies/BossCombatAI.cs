@@ -30,6 +30,8 @@ namespace ShinobiLegacy.Enemies
         private int bossProfile;
         private float nextSpecialTime;
         private Color baseColor;
+        private LineRenderer attackTelegraph;
+        private const int TelegraphSegments = 48;
 
         public void SetTarget(Transform value) => target = value;
 
@@ -45,6 +47,7 @@ namespace ShinobiLegacy.Enemies
             health = GetComponent<CombatantHealth>();
             if (bodyRenderer == null) bodyRenderer = GetComponentInChildren<Renderer>();
             if (bodyRenderer != null) baseColor = bodyRenderer.material.color;
+            CreateAttackTelegraph();
             health.Died += OnDied;
         }
 
@@ -60,6 +63,7 @@ namespace ShinobiLegacy.Enemies
             {
                 windingUp = false;
                 windupRemaining = 0f;
+                SetTelegraphVisible(false);
                 if (bodyRenderer != null) bodyRenderer.material.color = phaseTwo ? ProfileColor() : baseColor;
                 return;
             }
@@ -84,6 +88,7 @@ namespace ShinobiLegacy.Enemies
 
             if (windingUp)
             {
+                UpdateAttackTelegraph();
                 windupRemaining -= Time.deltaTime;
                 if (windupRemaining <= 0f)
                 {
@@ -100,6 +105,8 @@ namespace ShinobiLegacy.Enemies
                 windupRemaining = windupDuration * 1.25f;
                 nextSpecialTime = Time.time + specialCooldown;
                 if (bodyRenderer != null) bodyRenderer.material.color = ProfileColor();
+                SetTelegraphVisible(true);
+                UpdateAttackTelegraph();
                 return;
             }
 
@@ -115,6 +122,8 @@ namespace ShinobiLegacy.Enemies
                 windupRemaining = windupDuration;
                 nextSlamTime = Time.time + slamCooldown;
                 if (bodyRenderer != null) bodyRenderer.material.color = new Color(1f, 0.55f, 0.08f);
+                SetTelegraphVisible(true);
+                UpdateAttackTelegraph();
             }
         }
 
@@ -122,6 +131,7 @@ namespace ShinobiLegacy.Enemies
         {
             windingUp = false;
             specialWindup = false;
+            SetTelegraphVisible(false);
             if (bodyRenderer != null) bodyRenderer.material.color = phaseTwo ? ProfileColor() : baseColor;
             if (target == null) return;
 
@@ -138,6 +148,7 @@ namespace ShinobiLegacy.Enemies
         {
             windingUp = false;
             specialWindup = false;
+            SetTelegraphVisible(false);
             if (bodyRenderer != null) bodyRenderer.material.color = ProfileColor();
             if (target == null) return;
 
@@ -157,6 +168,44 @@ namespace ShinobiLegacy.Enemies
             targetHealth.TakeDamage(damage);
             if (bossProfile == 2) targetHealth.ApplyStun(1.15f);
             else if (bossProfile == 3) targetHealth.ApplyStun(0.55f);
+        }
+
+        private void CreateAttackTelegraph()
+        {
+            GameObject ringObject = new GameObject("Boss_Attack_Telegraph");
+            ringObject.transform.SetParent(transform, false);
+            attackTelegraph = ringObject.AddComponent<LineRenderer>();
+            attackTelegraph.useWorldSpace = false;
+            attackTelegraph.loop = true;
+            attackTelegraph.positionCount = TelegraphSegments;
+            attackTelegraph.startWidth = 0.12f;
+            attackTelegraph.endWidth = 0.12f;
+            attackTelegraph.numCapVertices = 2;
+            attackTelegraph.material = new Material(Shader.Find("Sprites/Default"));
+            attackTelegraph.startColor = new Color(1f, 0.28f, 0.08f, 0.9f);
+            attackTelegraph.endColor = attackTelegraph.startColor;
+            attackTelegraph.enabled = false;
+        }
+
+        private void UpdateAttackTelegraph()
+        {
+            if (attackTelegraph == null) return;
+            float radius = specialWindup ? specialRange : slamRange + 0.8f;
+            float pulse = 1f + Mathf.Sin(Time.time * 9f) * 0.035f;
+            for (int i = 0; i < TelegraphSegments; i++)
+            {
+                float angle = i * Mathf.PI * 2f / TelegraphSegments;
+                attackTelegraph.SetPosition(i, new Vector3(Mathf.Cos(angle) * radius * pulse, 0.12f, Mathf.Sin(angle) * radius * pulse));
+            }
+            Color warning = specialWindup ? ProfileColor() : new Color(1f, 0.28f, 0.06f);
+            warning.a = 0.9f;
+            attackTelegraph.startColor = warning;
+            attackTelegraph.endColor = warning;
+        }
+
+        private void SetTelegraphVisible(bool visible)
+        {
+            if (attackTelegraph != null) attackTelegraph.enabled = visible;
         }
 
         private Color ProfileColor()
@@ -180,6 +229,7 @@ namespace ShinobiLegacy.Enemies
         private void OnDied()
         {
             windingUp = false;
+            SetTelegraphVisible(false);
             if (bodyRenderer != null) bodyRenderer.material.color = phaseTwo ? ProfileColor() : baseColor;
             enabled = false;
             controller.enabled = false;
