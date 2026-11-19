@@ -1,0 +1,116 @@
+using System.Collections.Generic;
+using UnityEngine;
+using ShinobiLegacy.Combat;
+using ShinobiLegacy.Enemies;
+using ShinobiLegacy.Player;
+
+namespace ShinobiLegacy.World
+{
+    /// <summary>
+    /// Lightweight regional patrol encounter. Spawns a small group when the player
+    /// enters an unlocked region and respawns after the area has been cleared.
+    /// </summary>
+    [RequireComponent(typeof(SphereCollider), typeof(Rigidbody))]
+    public sealed class RegionEncounterSpawner : MonoBehaviour
+    {
+        [SerializeField] private string regionId;
+        [SerializeField] private string enemyFaction = "Rogue Shinobi";
+        [SerializeField] private Color enemyColor = new Color(0.55f, 0.16f, 0.14f);
+        [SerializeField, Min(1)] private int requiredLevel = 1;
+        [SerializeField, Min(1)] private int patrolSize = 3;
+        [SerializeField, Min(10f)] private float respawnDelay = 30f;
+
+        private readonly List<GameObject> activeEnemies = new List<GameObject>();
+        private Transform player;
+        private bool encounterStarted;
+        private float respawnAt;
+
+        public void Configure(string id, string faction, Color color, int level, int count)
+        {
+            regionId = id;
+            enemyFaction = faction;
+            enemyColor = color;
+            requiredLevel = Mathf.Max(1, level);
+            patrolSize = Mathf.Clamp(count, 1, 5);
+
+            SphereCollider area = GetComponent<SphereCollider>();
+            area.isTrigger = true;
+            area.radius = 42f;
+            Rigidbody body = GetComponent<Rigidbody>();
+            body.isKinematic = true;
+            body.useGravity = false;
+        }
+
+        private void OnTriggerEnter(Collider other)
+        {
+            PlayerProgression progression = other.GetComponent<PlayerProgression>();
+            if (progression == null) progression = other.GetComponentInParent<PlayerProgression>();
+            if (progression == null || progression.Level < requiredLevel) return;
+
+            WorldRegionProgression regions = progression.GetComponent<WorldRegionProgression>();
+            if (regions != null && !regions.IsUnlocked(regionId)) return;
+
+            player = progression.transform;
+            if (!encounterStarted) SpawnPatrol();
+        }
+
+        private void Update()
+        {
+            activeEnemies.RemoveAll(enemy => enemy == null);
+            if (!encounterStarted || activeEnemies.Count > 0 || player == null) return;
+            if (Time.time < respawnAt) return;
+
+            float distance = Vector3.Distance(player.position, transform.position);
+            if (distance <= 48f) SpawnPatrol();
+            else encounterStarted = false;
+        }
+
+        private void SpawnPatrol()
+        {
+            if (player == null) return;
+            encounterStarted = true;
+            activeEnemies.Clear();
+
+            PlayerProgression progression = player.GetComponent<PlayerProgression>();
+            int level = progression != null ? progression.Level : requiredLevel;
+            for (int i = 0; i < patrolSize; i++)
+            {
+                float angle = i * Mathf.PI * 2f / patrolSize;
+                Vector3 offset = new Vector3(Mathf.Cos(angle) * 12f, 1f, Mathf.Sin(angle) * 12f);
+                GameObject enemy = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                enemy.name = regionId + "_" + enemyFaction.Replace(" ", "_") + "_" + (i + 1);
+                enemy.transform.position = transform.position + offset;
+                Renderer renderer = enemy.GetComponent<Renderer>();
+                Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+                if (shader == null) shader = Shader.Find("Standard");
+                Material material = new Material(shader) { color = enemyColor };
+                renderer.material = material;
+                Object.Destroy(enemy.GetComponent<CapsuleCollider>());
+
+                CharacterController controller = enemy.AddComponent<CharacterController>();
+                controller.height = 2f;
+                controller.radius = 0.42f;
+                CombatantHealth health = enemy.AddComponent<CombatantHealth>();
+                health.SetMaxHealth(100f + level * 22f);
+                EnemyCombatAI ai = enemy.AddComponent<EnemyCombatAI>();
+                ai.Configure(2.2f + level * 0.025f, 10f + level * 2.2f, 1.5f, 24f + level * 2f);
+                ai.SetTarget(player);
+
+                EnemyRewardDrop rewards = enemy.AddComponent<EnemyRewardDrop>();
+                rewards.Configure(progression, 28 + level * 8, 0.72f, false);
+                health.Died += OnPatrolEnemyDied;
+                activeEnemies.Add(enemy);
+            }
+            Debug.Log("SHINOBI LEGACY: " + enemyFaction + " patrol engaged in " + regionId);
+        }
+
+        private void OnPatrolEnemyDied()
+        {
+            activeEnemies.RemoveAll(enemy => enemy == null ||
+                enemy.GetComponent<CombatantHealth>() == null ||
+                enemy.GetComponent<CombatantHealth>().IsDead);
+            if (activeEnemies.Count == 0)
+                respawnAt = Time.time + respawnDelay;
+        }
+    }
+}
