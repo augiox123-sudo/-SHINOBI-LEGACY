@@ -200,7 +200,7 @@ namespace ShinobiLegacy.Enemies
             flatTarget.y = transform.position.y;
             if (Vector3.Distance(transform.position, flatTarget) <= slamRange + 0.8f)
             {
-                if (animationBridge != null) animationBridge.TriggerAttack();
+                if (animationBridge != null) animationBridge.PlayAttack();
                 CombatantHealth playerHealth = target.GetComponent<CombatantHealth>();
                 if (playerHealth != null && !playerHealth.IsDead) playerHealth.TakeDamage(slamDamage);
             }
