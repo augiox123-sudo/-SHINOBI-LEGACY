@@ -62,6 +62,20 @@ namespace ShinobiLegacy.Items
             return string.Empty;
         }
 
+        public bool LegendarySynergyActive
+        {
+            get
+            {
+                int legendaryAffixes = 0;
+                foreach (InventoryItem item in equipped.Values)
+                    if (item != null && item.rarity == LootRarity.Legendary &&
+                        !string.IsNullOrEmpty(item.abilityModifier)) legendaryAffixes++;
+                return legendaryAffixes >= 2;
+            }
+        }
+
+        public float LegendarySynergyDamageMultiplier => LegendarySynergyActive ? 1.10f : 1f;
+
         public bool HasAbilityModifier(string modifierId)
         {
             foreach (InventoryItem item in equipped.Values)
