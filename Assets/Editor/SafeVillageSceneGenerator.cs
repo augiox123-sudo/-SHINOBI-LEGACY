@@ -96,6 +96,7 @@ namespace ShinobiLegacy.Editor
             player.AddComponent<PlayerMotor>();
             player.AddComponent<PlayerInventory>();
             player.AddComponent<PlayerWallet>();
+            player.AddComponent<PlayerForgeSystem>();
             player.AddComponent<EquipmentManager>();
             player.AddComponent<CombatantHealth>();
             player.AddComponent<PlayerCombat>();
