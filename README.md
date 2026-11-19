@@ -529,3 +529,10 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - The enemy commits to its facing direction when the windup begins instead of continuously turning to track the player. This gives lateral movement a real chance to evade the committed strike.
 - A non-allocating raycast check ignores the attacking enemy's own colliders while allowing walls and other solid objects to obstruct the hit.
 - This is source-level combat logic. Collision layers, actual dodge timing, Unity compilation, Play Mode and Android device behavior still require testing.
+
+## Guardian impact collision validation
+
+- Stone Guardian slam and phase-two special attacks now measure the impact radius against the closest point on the player's collider, with a vertical-separation limit, instead of checking only the player transform pivot.
+- The final hit check performs a non-allocating raycast toward that collider point. The boss's own colliders are ignored, while a nearer solid obstruction can block the impact.
+- The slam and profile-specific special still use their existing visible warning radii; the final damage decision now uses the same radius with collider-aware validation.
+- This is source-level collision logic. Collider hierarchy, raycast layers, edge cases, Unity compilation, Play Mode and Android device behavior still require testing.
