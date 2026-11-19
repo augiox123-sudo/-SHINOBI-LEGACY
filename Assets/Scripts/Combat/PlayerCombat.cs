@@ -148,15 +148,18 @@ namespace ShinobiLegacy.Combat
             CombatantHealth target = targetLock != null ? targetLock.CurrentTarget : null;
             if (target == null || target.IsDead) return false;
 
-            Vector3 offset = target.transform.position - transform.position;
-            offset.y = 0f;
+            Vector3 attackOrigin = transform.position + Vector3.up * 1.05f;
+            Vector3 targetPoint = GetMeleeTargetPoint(target, attackOrigin);
+            Vector3 strikeOffset = targetPoint - attackOrigin;
             float reach = attackRange + attackRadius;
-            if (offset.sqrMagnitude > reach * reach) return false;
+            if (strikeOffset.magnitude > reach || Mathf.Abs(strikeOffset.y) > 1.5f) return false;
 
-            // Focused attacks may turn toward the selected target, then still require
-            // a clear strike path so walls and solid arena props can block the hit.
-            if (offset.sqrMagnitude > 0.001f)
-                transform.rotation = Quaternion.LookRotation(offset.normalized, Vector3.up);
+            // Focused attacks may turn toward the selected target, but range and
+            // obstruction checks use the target collider rather than its pivot.
+            Vector3 facingOffset = target.transform.position - transform.position;
+            facingOffset.y = 0f;
+            if (facingOffset.sqrMagnitude > 0.001f)
+                transform.rotation = Quaternion.LookRotation(facingOffset.normalized, Vector3.up);
             if (!HasClearMeleePath(target)) return false;
 
             // A locked target takes the focused basic strike instead of the wide fallback sweep.
@@ -565,13 +568,27 @@ namespace ShinobiLegacy.Combat
             return baseDamage * equipment.DamageMultiplier * equipment.LegendarySynergyDamageMultiplier;
         }
 
+        private Vector3 GetMeleeTargetPoint(CombatantHealth target, Vector3 from)
+        {
+            Collider targetCollider = target != null ? target.GetComponent<Collider>() : null;
+            if (targetCollider == null && target != null)
+                targetCollider = target.GetComponentInChildren<Collider>();
+            return targetCollider != null
+                ? targetCollider.ClosestPoint(from)
+                : target != null ? target.transform.position + Vector3.up * 0.85f : from;
+        }
+
         private bool IsInsideMeleeArc(CombatantHealth target)
         {
             if (target == null || target.IsDead) return false;
-            Vector3 offset = target.transform.position - transform.position;
-            offset.y = 0f;
+            Vector3 origin = transform.position + Vector3.up * 1.05f;
+            Vector3 point = GetMeleeTargetPoint(target, origin);
+            Vector3 offset = point - origin;
             float reach = attackRange + attackRadius;
-            if (offset.sqrMagnitude < 0.001f || offset.sqrMagnitude > reach * reach) return false;
+            if (offset.sqrMagnitude < 0.001f || offset.magnitude > reach ||
+                Mathf.Abs(offset.y) > 1.5f) return false;
+            offset.y = 0f;
+            if (offset.sqrMagnitude < 0.001f) return true;
             return Vector3.Dot(transform.forward, offset.normalized) >= 0.25f;
         }
 
@@ -579,7 +596,7 @@ namespace ShinobiLegacy.Combat
         {
             if (target == null || target.IsDead) return false;
             Vector3 origin = transform.position + Vector3.up * 1.05f;
-            Vector3 destination = target.transform.position + Vector3.up * 0.85f;
+            Vector3 destination = GetMeleeTargetPoint(target, origin);
             Vector3 direction = destination - origin;
             float distance = direction.magnitude;
             if (distance <= 0.05f) return true;
