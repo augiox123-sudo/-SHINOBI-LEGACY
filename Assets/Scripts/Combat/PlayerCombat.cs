@@ -153,9 +153,11 @@ namespace ShinobiLegacy.Combat
             float reach = attackRange + attackRadius;
             if (offset.sqrMagnitude > reach * reach) return false;
 
-            // Face the selected enemy before delivering the focused melee strike.
+            // Focused attacks may turn toward the selected target, then still require
+            // a clear strike path so walls and solid arena props can block the hit.
             if (offset.sqrMagnitude > 0.001f)
                 transform.rotation = Quaternion.LookRotation(offset.normalized, Vector3.up);
+            if (!HasClearMeleePath(target)) return false;
 
             // A locked target takes the focused basic strike instead of the wide fallback sweep.
             ApplyDamageOnce(target, damage, false);
@@ -563,6 +565,29 @@ namespace ShinobiLegacy.Combat
             return baseDamage * equipment.DamageMultiplier * equipment.LegendarySynergyDamageMultiplier;
         }
 
+        private bool IsInsideMeleeArc(CombatantHealth target)
+        {
+            if (target == null || target.IsDead) return false;
+            Vector3 offset = target.transform.position - transform.position;
+            offset.y = 0f;
+            float reach = attackRange + attackRadius;
+            if (offset.sqrMagnitude < 0.001f || offset.sqrMagnitude > reach * reach) return false;
+            return Vector3.Dot(transform.forward, offset.normalized) >= 0.25f;
+        }
+
+        private bool HasClearMeleePath(CombatantHealth target)
+        {
+            if (target == null || target.IsDead) return false;
+            Vector3 origin = transform.position + Vector3.up * 1.05f;
+            Vector3 destination = target.transform.position + Vector3.up * 0.85f;
+            Vector3 direction = destination - origin;
+            float distance = direction.magnitude;
+            if (distance <= 0.05f) return true;
+            if (!Physics.Raycast(origin, direction / distance, out RaycastHit hit, distance,
+                Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore)) return true;
+            return hit.collider != null && hit.collider.GetComponentInParent<CombatantHealth>() == target;
+        }
+
         private void HitTargets(float range, float radius, float damage)
         {
             Vector3 center = transform.position + Vector3.up * 1f + transform.forward * range * 0.55f;
@@ -573,7 +598,8 @@ namespace ShinobiLegacy.Combat
                 Collider hit = hitBuffer[i];
                 if (hit == null) continue;
                 CombatantHealth health = hit.GetComponentInParent<CombatantHealth>();
-                if (health != null && !health.IsDead && health.transform != transform)
+                if (health != null && !health.IsDead && health.transform != transform &&
+                    IsInsideMeleeArc(health) && HasClearMeleePath(health))
                     ApplyDamageOnce(health, damage, false);
                 hitBuffer[i] = null;
             }
