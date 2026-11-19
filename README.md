@@ -265,7 +265,7 @@ The repository now includes an automated first-test scene and APK workflow for U
 3. In the Unity Editor, run **Tools → Shinobi Legacy → Prepare Android First Test**. This generates the Safe Village and Prototype Arena scenes and places Safe Village first in Build Settings.
 4. Switch the active build platform to **Android** in File → Build Settings if Unity requests it, then wait for the platform switch/import to finish.
 5. Run **Tools → Shinobi Legacy → Build Android First Test APK**.
-6. The development APK is written to `Builds/Android/SHINOBI_LEGACY_FirstTest.apk`.
+6. The development APK is written to `Builds/Android/SHINOBI_LEGACY_FirstTest.apk`. In the running test build, the **COMBAT TEST** button switches from the village to the prototype arena, and **VILLAGE HUB** returns to the village.
 
 The first-test player is configured for landscape, ARM64, Android API 26+, Gamma color space, IL2CPP and a conservative mobile 30 FPS profile with shadows disabled. This is a development test build, not a store release.
 
