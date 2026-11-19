@@ -21,6 +21,16 @@ namespace ShinobiLegacy.Player
             Experience = 0;
         }
 
+        public void RestoreProgress(int savedLevel, int savedExperience)
+        {
+            Level = Mathf.Max(1, savedLevel);
+            Experience = Mathf.Max(0, savedExperience);
+            Combat.CombatantHealth health = GetComponent<Combat.CombatantHealth>();
+            if (health != null && Level > 1)
+                health.SetMaxHealth(health.MaxHealth + (Level - 1) * levelUpHealthBonus);
+            ProgressChanged?.Invoke(Level, Experience, ExperienceToNextLevel);
+        }
+
         public void AddExperience(int amount)
         {
             if (amount <= 0) return;
