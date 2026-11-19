@@ -70,8 +70,10 @@ namespace ShinobiLegacy.UI
                 case "fire_wave": return "Flame Wave";
                 case "fire_dragon": return "Twin Dragons";
                 case "fire_burst": return "Inferno Impact";
+                case "fire_meteor": return "Meteor Flame";
                 case "burst_storm": return "Chakra Tempest";
                 case "burst_guard": return "Guardian Pulse";
+                case "burst_chain": return "Chain Lightning";
                 default: return id;
             }
         }
