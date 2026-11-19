@@ -356,7 +356,7 @@ namespace ShinobiLegacy.Enemies
             flatTarget.y = transform.position.y;
             if (Vector3.Distance(transform.position, flatTarget) <= slamRange + 0.8f)
             {
-                if (animationBridge != null) animationBridge.PlayAttack();
+                if (animationBridge != null) animationBridge.PlayHeavyAttack();
                 CombatantHealth playerHealth = target.GetComponent<CombatantHealth>();
                 if (playerHealth != null && !playerHealth.IsDead) playerHealth.TakeDamage(slamDamage);
             }
@@ -372,7 +372,7 @@ namespace ShinobiLegacy.Enemies
 
             CombatantHealth targetHealth = target.GetComponent<CombatantHealth>();
             if (targetHealth == null || targetHealth.IsDead) return;
-            if (animationBridge != null) animationBridge.TriggerAbility();
+            if (animationBridge != null) animationBridge.PlayHeavyAttack();
 
             // The special is a dodgeable close-range area attack. The warning ring
             // uses the same profile radius that is checked when the attack resolves.
