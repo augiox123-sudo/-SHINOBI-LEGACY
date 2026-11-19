@@ -122,7 +122,11 @@ namespace ShinobiLegacy.Enemies
             if (target == null)
             {
                 attackPending = false;
-                if (animationBridge != null) animationBridge.SetMoveSpeed(0f);
+                if (animationBridge != null)
+                {
+                    animationBridge.CancelWindup();
+                    animationBridge.SetMoveSpeed(0f);
+                }
                 return;
             }
             CombatantHealth targetHealth = target.GetComponent<CombatantHealth>();
@@ -130,7 +134,11 @@ namespace ShinobiLegacy.Enemies
             {
                 target = null;
                 attackPending = false;
-                if (animationBridge != null) animationBridge.SetMoveSpeed(0f);
+                if (animationBridge != null)
+                {
+                    animationBridge.CancelWindup();
+                    animationBridge.SetMoveSpeed(0f);
+                }
                 return;
             }
             Vector3 offset = target.position - transform.position;
@@ -139,7 +147,11 @@ namespace ShinobiLegacy.Enemies
             if (distance > detectionRange)
             {
                 attackPending = false;
-                if (animationBridge != null) animationBridge.SetMoveSpeed(0f);
+                if (animationBridge != null)
+                {
+                    animationBridge.CancelWindup();
+                    animationBridge.SetMoveSpeed(0f);
+                }
                 return;
             }
 
