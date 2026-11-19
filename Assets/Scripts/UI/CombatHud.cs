@@ -58,7 +58,8 @@ namespace ShinobiLegacy.UI
                 statusText.text = "BURST R" + combat.BurstRank + ": " + burst +
                     (string.IsNullOrEmpty(burstMod) ? "" : " [" + ModifierLabel(burstMod) + "]") +
                     "    FIRE R" + combat.FireRank + ": " + fire +
-                    (string.IsNullOrEmpty(fireMod) ? "" : " [" + ModifierLabel(fireMod) + "]");
+                    (string.IsNullOrEmpty(fireMod) ? "" : " [" + ModifierLabel(fireMod) + "]") +
+                    (gear != null && gear.LegendarySynergyActive ? "    LEGENDARY SYNERGY +10%" : "");
             }
         }
 
