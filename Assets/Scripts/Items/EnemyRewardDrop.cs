@@ -23,7 +23,12 @@ namespace ShinobiLegacy.Items
             guaranteedRareChance = boss;
         }
 
-        public void SetLegendaryChance(float chance)\n        {\n            legendaryChanceOverride = Mathf.Clamp01(chance);\n        }\n\n        private void Awake()
+        public void SetLegendaryChance(float chance)
+        {
+            legendaryChanceOverride = Mathf.Clamp01(chance);
+        }
+
+        private void Awake()
         {
             health = GetComponent<CombatantHealth>();
             health.Died += OnDied;
