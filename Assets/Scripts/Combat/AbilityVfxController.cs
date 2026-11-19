@@ -12,6 +12,14 @@ namespace ShinobiLegacy.Combat
         private static Material particleMaterial;
         private static Material lineMaterial;
 
+        public void PlayBossImpact(Vector3 position, float radius, Color color)
+        {
+            float safeRadius = Mathf.Clamp(radius, 1.5f, 6f);
+            EmitBurst(position + Vector3.up * 0.45f, color, 58, safeRadius * 0.72f, 5.2f, 0.42f);
+            EmitRing(position + Vector3.up * 0.06f, safeRadius, color);
+            EmitRing(position + Vector3.up * 0.08f, safeRadius * 0.62f, new Color(1f, 0.88f, 0.62f, 0.9f));
+        }
+
         public void PlayMeleeSwing(Vector3 origin, Vector3 direction)
         {
             EmitCone(origin, direction, new Color(0.82f, 0.9f, 1f, 0.9f), 22, 2.6f, 32f, 0.18f, 5.5f);
