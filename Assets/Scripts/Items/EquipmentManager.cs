@@ -84,12 +84,46 @@ namespace ShinobiLegacy.Items
             return false;
         }
 
+        public float BonusDamagePercent
+        {
+            get
+            {
+                float value = 0f;
+                foreach (InventoryItem item in equipped.Values)
+                    if (item != null) value += item.bonusDamagePercent;
+                return value;
+            }
+        }
+
+        public float CriticalChance
+        {
+            get
+            {
+                float value = 0f;
+                foreach (InventoryItem item in equipped.Values)
+                    if (item != null) value += item.bonusCriticalChance;
+                return Mathf.Clamp(value, 0f, 0.35f);
+            }
+        }
+
+        public float CriticalDamageMultiplier
+        {
+            get
+            {
+                float value = 1.5f;
+                foreach (InventoryItem item in equipped.Values)
+                    if (item != null) value += item.bonusCriticalDamage;
+                return Mathf.Clamp(value, 1.5f, 3f);
+            }
+        }
+
         public float DamageMultiplier
         {
             get
             {
                 InventoryItem weapon = GetEquipped("Weapon");
-                return 1f + (weapon != null ? weapon.power * 0.0125f : 0f);
+                float weaponBonus = weapon != null ? weapon.power * 0.0125f : 0f;
+                return 1f + weaponBonus + BonusDamagePercent;
             }
         }
 
@@ -99,7 +133,8 @@ namespace ShinobiLegacy.Items
             {
                 float value = 0f;
                 foreach (InventoryItem item in equipped.Values)
-                    if (item != null && item.slot != "Weapon") value += item.power * 0.08f;
+                    if (item != null && item.slot != "Weapon")
+                        value += item.power * 0.08f + item.bonusDefense;
                 return value;
             }
         }
