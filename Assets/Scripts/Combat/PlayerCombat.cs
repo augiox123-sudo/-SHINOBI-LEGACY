@@ -97,6 +97,7 @@ namespace ShinobiLegacy.Combat
             ownHealth = GetComponent<CombatantHealth>();
             abilityVfx = GetComponent<AbilityVfxController>();
             animationBridge = GetComponent<CombatAnimationBridge>();
+            if (animationBridge == null) animationBridge = gameObject.AddComponent<CombatAnimationBridge>();
             targetLock = GetComponent<EnemyTargetLockSystem>();
             if (abilityVfx == null) abilityVfx = gameObject.AddComponent<AbilityVfxController>();
             ResourcesChanged?.Invoke();
