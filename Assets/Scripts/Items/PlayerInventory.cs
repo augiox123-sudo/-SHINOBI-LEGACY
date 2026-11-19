@@ -16,17 +16,25 @@ namespace ShinobiLegacy.Items
         public bool EquipBest(EquipmentManager equipment)
         {
             if (equipment == null || items.Count == 0) return false;
+
             int bestIndex = -1;
-            int bestPower = -1;
+            int bestUpgrade = 0;
             for (int i = 0; i < items.Count; i++)
             {
-                if (items[i] != null && items[i].power > bestPower)
+                InventoryItem candidate = items[i];
+                if (candidate == null || string.IsNullOrEmpty(candidate.slot)) continue;
+
+                InventoryItem current = equipment.GetEquipped(candidate.slot);
+                int upgrade = candidate.power - (current != null ? current.power : 0);
+                if (upgrade > bestUpgrade)
                 {
-                    bestPower = items[i].power;
+                    bestUpgrade = upgrade;
                     bestIndex = i;
                 }
             }
-            return EquipAt(bestIndex, equipment);
+
+            // Never replace a stronger item with a weaker one.
+            return bestIndex >= 0 && EquipAt(bestIndex, equipment);
         }
 
         public bool EquipAt(int index, EquipmentManager equipment)
