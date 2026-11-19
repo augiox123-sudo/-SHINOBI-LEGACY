@@ -579,3 +579,11 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Procedural character rigs now briefly hold their current visual pose when struck: 0.04 seconds for a normal hit and 0.075 seconds for a heavy hit.
 - The pause is local to the affected character's visual motion component. It does not change Unity's global time scale, so player input, enemy AI, cooldowns and other combatants continue running.
 - The short hold is followed by the existing light/heavy recoil pose. This is a lightweight hit-confirmation layer; exact feel, animation overlap and Android frame pacing still need Unity Play Mode and device testing.
+
+
+## Three-tier melee impact reactions
+
+- Basic combo impacts now have three distinct visual reaction tiers: the first strike uses a light recoil, the second uses a medium recoil, and the third-hit finisher uses the strongest recoil.
+- The tiers are selected from the existing knockback strengths: below 2.7 is light, 2.7–3.79 is medium, and 3.8 or higher is heavy. This maps the current combo values (2.5, 2.9 and 4.5) to visibly different reactions.
+- Local visual hit-stop also scales by tier: 0.04 seconds for light, 0.055 seconds for medium and 0.075 seconds for heavy. The enemy stagger threshold and duration calculation remain unchanged, so this visual distinction does not weaken existing interruption behavior.
+- This remains procedural placeholder motion. The three reactions need Unity Play Mode review for readability, overlap with combo poses and Android frame pacing.
