@@ -41,6 +41,8 @@ namespace ShinobiLegacy.Editor
             player.name = "Player_ShadowNinja_Blockout";
             player.transform.position = new Vector3(0f, 1f, 0f);
             player.GetComponent<Renderer>().sharedMaterial = MakeMaterial("Player", new Color(0.12f, 0.28f, 0.48f));
+            player.GetComponent<Renderer>().enabled = false;
+            ShinobiCharacterVisualBuilder.BuildPlayer(player.transform);
             Object.DestroyImmediate(player.GetComponent<CapsuleCollider>());
             CharacterController motorCollider = player.AddComponent<CharacterController>();
             motorCollider.height = 2f;
@@ -112,6 +114,8 @@ namespace ShinobiLegacy.Editor
                 enemy.name = "TrainingEnemy_" + (i + 1);
                 enemy.transform.position = new Vector3((i - 1) * 3.2f, 1f, 6f + (i % 2) * 1.5f);
                 enemy.GetComponent<Renderer>().sharedMaterial = MakeMaterial("Enemy Material", new Color(0.55f, 0.12f, 0.12f));
+                enemy.GetComponent<Renderer>().enabled = false;
+                ShinobiCharacterVisualBuilder.BuildEnemy(enemy.transform);
                 Object.DestroyImmediate(enemy.GetComponent<CapsuleCollider>());
                 CharacterController enemyController = enemy.AddComponent<CharacterController>();
                 enemyController.height = 2f;
@@ -130,6 +134,8 @@ namespace ShinobiLegacy.Editor
             boss.transform.position = new Vector3(0f, 1.6f, 14f);
             boss.transform.localScale = new Vector3(1.65f, 1.6f, 1.65f);
             boss.GetComponent<Renderer>().sharedMaterial = MakeMaterial("Boss Material", new Color(0.32f, 0.19f, 0.12f));
+            boss.GetComponent<Renderer>().enabled = false;
+            ShinobiCharacterVisualBuilder.BuildEnemy(boss.transform, true);
             Object.DestroyImmediate(boss.GetComponent<CapsuleCollider>());
             CharacterController bossController = boss.AddComponent<CharacterController>();
             bossController.height = 2f;
