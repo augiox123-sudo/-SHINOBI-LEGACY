@@ -124,7 +124,7 @@ namespace ShinobiLegacy.Combat
         {
             if (Time.time < nextAttackTime) return;
             nextAttackTime = Time.time + attackCooldown;
-            if (animationBridge != null) animationBridge.TriggerAttack();
+            if (animationBridge != null) animationBridge.PlayAttack();
             damagedThisCast.Clear();
             float damage = GetScaledDamage(attackDamage);
             if (!TryHitLockedTarget(damage))
