@@ -222,18 +222,30 @@ namespace ShinobiLegacy.Enemies
 
             CombatantHealth targetHealth = target.GetComponent<CombatantHealth>();
             if (targetHealth == null || targetHealth.IsDead) return;
-            if (bossProfile == 1)
-            {
-                // Verdant boss briefly regenerates instead of dealing burst damage.
-                health.Restore(health.MaxHealth * 0.08f);
-                return;
-            }
-
             if (animationBridge != null) animationBridge.TriggerAbility();
-            float damage = slamDamage * (bossProfile == 0 ? 1.55f : 1.2f);
-            targetHealth.TakeDamage(damage);
-            if (bossProfile == 2) targetHealth.ApplyStun(1.15f);
-            else if (bossProfile == 3) targetHealth.ApplyStun(0.55f);
+
+            // Each guardian profile has a different phase-two signature attack.
+            switch (bossProfile)
+            {
+                case 0: // Ashen: high burst followed by a short burn.
+                    targetHealth.TakeDamage(slamDamage * 1.55f);
+                    if (!targetHealth.IsDead) targetHealth.ApplyBurn(Mathf.Max(2f, slamDamage * 0.12f), 3f, 1f);
+                    break;
+
+                case 1: // Verdant: recover health instead of striking the player.
+                    health.Restore(health.MaxHealth * 0.10f);
+                    break;
+
+                case 2: // Thunder: moderate burst and a longer interrupting stun.
+                    targetHealth.TakeDamage(slamDamage * 1.2f);
+                    if (!targetHealth.IsDead) targetHealth.ApplyStun(1.25f);
+                    break;
+
+                default: // Drowned: heavier control pressure with a shorter stun.
+                    targetHealth.TakeDamage(slamDamage * 1.35f);
+                    if (!targetHealth.IsDead) targetHealth.ApplyStun(0.8f);
+                    break;
+            }
         }
 
         private void SetBodyColor(Color color)
