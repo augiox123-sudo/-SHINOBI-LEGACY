@@ -103,6 +103,9 @@ namespace ShinobiLegacy.Items
                 lightningRank = playerCombat != null ? playerCombat.LightningRank : 1,
                 waterRank = playerCombat != null ? playerCombat.WaterRank : 1,
                 windRank = playerCombat != null ? playerCombat.WindRank : 1,
+                lightningUses = playerCombat != null ? playerCombat.LightningUses : 0,
+                waterUses = playerCombat != null ? playerCombat.WaterUses : 0,
+                windUses = playerCombat != null ? playerCombat.WindUses : 0,
                 playerLevel = progression != null ? progression.Level : 1,
                 playerExperience = progression != null ? progression.Experience : 0
             };
