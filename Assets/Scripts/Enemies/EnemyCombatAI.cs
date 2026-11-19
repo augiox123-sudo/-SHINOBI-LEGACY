@@ -73,6 +73,12 @@ namespace ShinobiLegacy.Enemies
         private void Update()
         {
             if (health == null || health.IsDead || health.IsStunned || target == null) return;
+            CombatantHealth targetHealth = target.GetComponent<CombatantHealth>();
+            if (targetHealth == null || targetHealth.IsDead)
+            {
+                target = null;
+                return;
+            }
             Vector3 offset = target.position - transform.position;
             offset.y = 0f;
             float distance = offset.magnitude;
@@ -92,8 +98,7 @@ namespace ShinobiLegacy.Enemies
             else if (Time.time >= nextAttackTime)
             {
                 nextAttackTime = Time.time + attackCooldown;
-                CombatantHealth targetHealth = target.GetComponent<CombatantHealth>();
-                if (targetHealth != null) targetHealth.TakeDamage(attackDamage);
+                targetHealth.TakeDamage(attackDamage);
             }
         }
 
@@ -145,6 +150,12 @@ namespace ShinobiLegacy.Enemies
         private void OnDied()
         {
             enabled = false;
+            if (hitFlashRoutine != null)
+            {
+                StopCoroutine(hitFlashRoutine);
+                hitFlashRoutine = null;
+            }
+            RestoreVisualColors();
             if (controller != null) controller.enabled = false;
             Destroy(gameObject, 1.4f);
         }
