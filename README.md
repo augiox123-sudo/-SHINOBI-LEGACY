@@ -364,3 +364,7 @@ Boss windups are now cancelled if the player leaves the configured encounter det
 ## Mobile HUD update throttling
 
 Chakra regeneration notifications are throttled to a 0.15-second interval instead of firing every rendered frame. Ability casts still emit an immediate resource-change notification, so the HUD responds immediately when chakra is spent while avoiding unnecessary per-frame UI callbacks during passive regeneration.
+
+## Enemy hit-flash efficiency
+
+Enemy damage feedback now iterates renderer arrays by index and reuses the precomputed color-support flags directly. This removes a repeated linear `Array.IndexOf` lookup for each renderer during each hit-flash update while preserving MaterialPropertyBlock-based color changes (no per-hit material instance creation).
