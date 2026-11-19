@@ -23,6 +23,8 @@ namespace ShinobiLegacy.UI
             healthFill = healthBar;
             chakraFill = chakraBar;
             statusText = status;
+            if (health != null) health.HealthChanged += OnHealthChanged;
+            if (combat != null) combat.ResourcesChanged += Refresh;
             Refresh();
         }
 
@@ -40,6 +42,7 @@ namespace ShinobiLegacy.UI
 
         private void Update()
         {
+            Refresh();
             if (combat == null) return;
             if (statusText != null)
             {
