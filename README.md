@@ -544,3 +544,11 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Brutes use a stronger red warning and heavier line treatment; Hunter and Skirmisher attacks use an amber warning.
 - The telegraph is hidden when the strike resolves, the wind-up is cancelled, or the enemy dies. Its runtime material is released when the AI component is destroyed.
 - This is a lightweight LineRenderer indicator. Ground clipping, visual readability, shader availability, Unity compilation, Play Mode timing and Android performance still require validation.
+
+
+## Player directional dodge
+
+- Added a dedicated mobile dodge action. It uses the current virtual-joystick direction relative to the isometric camera; with no movement input, it dodges forward.
+- The evade applies a short CharacterController dash after the normal motor update, has a 1.25-second cooldown, and grants 0.18 seconds of temporary damage immunity through the existing health damage gate.
+- The mobile HUD creates a DODGE button with a cooldown overlay when the player has the dodge component. The button is placed beside the target-cycle control.
+- Dodge is intended to escape committed enemy melee arcs and guardian impact zones through movement and timing. Cooldown, dash distance, immunity window, collision behavior and touch layout still require Unity Play Mode and Android device testing.
