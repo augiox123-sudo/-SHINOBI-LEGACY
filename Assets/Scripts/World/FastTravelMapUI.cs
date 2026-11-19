@@ -62,6 +62,7 @@ namespace ShinobiLegacy.World
             }
 
             GUILayout.BeginArea(new Rect(panel.x + 18f, mapRect.yMax + 12f, panel.width - 36f, panel.yMax - mapRect.yMax - 24f));
+            scroll = GUILayout.BeginScrollView(scroll);
             GUILayout.Label("REGIONAL ACCESS");
             WorldRegionProgression regionProgression = GetComponent<WorldRegionProgression>();
             PlayerProgression playerProgression = GetComponent<PlayerProgression>();
@@ -77,8 +78,8 @@ namespace ShinobiLegacy.World
             }
 
             GUILayout.Space(8f);
+            GUILayout.Space(8f);
             GUILayout.Label("DISCOVERED DESTINATIONS  |  CHARACTER LEVEL " + playerLevel);
-            scroll = GUILayout.BeginScrollView(scroll);
             bool found = false;
             foreach (FastTravelPoint point in points)
             {
