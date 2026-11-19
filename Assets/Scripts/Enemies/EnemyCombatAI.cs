@@ -20,6 +20,7 @@ namespace ShinobiLegacy.Enemies
         private CombatantHealth health;
         private float nextAttackTime;
         private Renderer[] visuals;
+        private Color[] originalVisualColors;
         private MaterialPropertyBlock hitBlock;
         private Coroutine hitFlashRoutine;
         private static readonly int ColorProperty = Shader.PropertyToID("_Color");
@@ -39,6 +40,9 @@ namespace ShinobiLegacy.Enemies
             controller = GetComponent<CharacterController>();
             health = GetComponent<CombatantHealth>();
             visuals = GetComponentsInChildren<Renderer>();
+            originalVisualColors = new Color[visuals.Length];
+            for (int i = 0; i < visuals.Length; i++)
+                originalVisualColors[i] = visuals[i] != null && visuals[i].sharedMaterial != null ? visuals[i].sharedMaterial.color : Color.white;
             hitBlock = new MaterialPropertyBlock();
             health.Died += OnDied;
             health.HealthChanged += OnHealthChanged;
@@ -91,14 +95,25 @@ namespace ShinobiLegacy.Enemies
         {
             SetHitFlash(new Color(1f, 0.22f, 0.16f, 1f));
             yield return new WaitForSeconds(0.09f);
-            SetHitFlash(Color.white);
+            RestoreVisualColors();
             yield return new WaitForSeconds(0.045f);
             SetHitFlash(new Color(1f, 0.55f, 0.35f, 1f));
             yield return new WaitForSeconds(0.07f);
-            SetHitFlash(Color.white);
+            RestoreVisualColors();
             hitFlashRoutine = null;
         }
 
+        private void RestoreVisualColors()
+        {
+            if (visuals == null || originalVisualColors == null) return;
+            for (int i = 0; i < visuals.Length; i++)
+            {
+                if (visuals[i] == null) continue;
+                visuals[i].GetPropertyBlock(hitBlock);
+                hitBlock.SetColor(ColorProperty, originalVisualColors[i]);
+                visuals[i].SetPropertyBlock(hitBlock);
+            }
+        }
         private void SetHitFlash(Color color)
         {
             if (visuals == null) return;
