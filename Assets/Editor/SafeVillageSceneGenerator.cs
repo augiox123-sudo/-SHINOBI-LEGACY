@@ -23,7 +23,17 @@ namespace ShinobiLegacy.Editor
         [MenuItem("Tools/Shinobi Legacy/Create Safe Village Hub")]
         public static void CreateVillage()
         {
-            if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            CreateVillageInternal(true);
+        }
+
+        public static void CreateVillageForBuild()
+        {
+            CreateVillageInternal(false);
+        }
+
+        private static void CreateVillageInternal(bool askBeforeReplacingScene)
+        {
+            if (askBeforeReplacingScene && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             CreateMaterials();
 
@@ -200,8 +210,8 @@ namespace ShinobiLegacy.Editor
             EditorSceneManager.SaveScene(scene, scenePath);
             EditorBuildSettings.scenes = new[]
             {
-                new EditorBuildSettingsScene("Assets/Scenes/PrototypeArena.unity", true),
-                new EditorBuildSettingsScene(scenePath, true)
+                new EditorBuildSettingsScene(scenePath, true),
+                new EditorBuildSettingsScene("Assets/Scenes/PrototypeArena.unity", true)
             };
             AssetDatabase.SaveAssets();
             Debug.Log("SHINOBI LEGACY: Safe Village hub created with player spawn, isometric camera, wallet and vendor buy/sell interaction.");
