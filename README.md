@@ -187,6 +187,12 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 
 
 
+## Combat targeting and ability cooldown feedback
+
+- Lightning Style searches for the nearest valid enemy in its forward combat area rather than relying on the first physics collider hit. Terrain and scenery colliders no longer consume the cast before an enemy can be acquired.
+- The combat HUD displays remaining cooldowns for Chakra Burst, Fire, Lightning, Water and Wind abilities, alongside mastery ranks and equipped legendary modifiers.
+- These changes are static-code checked only; target acquisition, HUD layout and mobile performance still require an in-Unity playtest.
+
 ## Boss-specific legendary loot
 
 - Each of the four regional dungeon bosses and regional champions now has a dedicated legendary drop identity when the legendary rarity roll succeeds:
