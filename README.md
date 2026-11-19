@@ -243,3 +243,7 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 ## Boss attack telegraphs
 
 Boss wind-up attacks now display a pulsing ground ring before impact. The ring radius distinguishes the normal slam from the phase-two special attack, and its color reflects the boss profile. The indicator is hidden when the attack resolves, the boss is stunned, or the boss dies. This is a runtime-generated LineRenderer effect with no external asset dependency.
+
+## Enemy hit reactions
+
+Standard enemies now react visibly when damaged. Their renderers briefly flash using a shared `MaterialPropertyBlock` rather than creating new materials, then restore their original material colors. Repeated hits restart the short flash sequence. This is a lightweight first-pass combat feedback effect; final authored hit animations and impact VFX are still planned.
