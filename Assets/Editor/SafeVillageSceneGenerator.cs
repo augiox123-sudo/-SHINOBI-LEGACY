@@ -87,13 +87,13 @@ namespace ShinobiLegacy.Editor
             // Four explorable regional outposts connected to the world map.
             // These are scalable blockout zones; final terrain, foliage and authored art come later.
             CreateRegionOutpost("ASHEN RUINS", "ashen_ruins", new Vector3(-190f, 0f, 0f),
-                new Color(0.34f, 0.19f, 0.16f), "THE ASHEN WARDEN");
+                new Color(0.34f, 0.19f, 0.16f), "THE ASHEN WARDEN", 5);
             CreateRegionOutpost("VERDANT FOREST", "verdant_forest", new Vector3(190f, 0f, 0f),
-                new Color(0.12f, 0.29f, 0.14f), "THE ROOTBOUND COLOSSUS");
+                new Color(0.12f, 0.29f, 0.14f), "THE ROOTBOUND COLOSSUS", 10);
             CreateRegionOutpost("THUNDER SHRINE", "thunder_shrine", new Vector3(0f, 0f, 190f),
-                new Color(0.2f, 0.18f, 0.38f), "RAIJIN'S BROKEN AVATAR");
+                new Color(0.2f, 0.18f, 0.38f), "RAIJIN'S BROKEN AVATAR", 18);
             CreateRegionOutpost("DROWNED TEMPLE", "drowned_temple", new Vector3(0f, 0f, -190f),
-                new Color(0.08f, 0.25f, 0.34f), "THE ABYSSAL GUARDIAN");
+                new Color(0.08f, 0.25f, 0.34f), "THE ABYSSAL GUARDIAN", 28);
 
             // Playable village arrival point, wallet, inventory and isometric camera.
             GameObject player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
@@ -212,7 +212,7 @@ namespace ShinobiLegacy.Editor
         }
 
         private static void CreateRegionOutpost(string regionName, string regionId, Vector3 center,
-            Color terrainColor, string bossName)
+            Color terrainColor, string bossName, int requiredLevel)
         {
             Material terrain = MakeMaterial(regionName + " Terrain", terrainColor);
             GameObject island = GameObject.CreatePrimitive(PrimitiveType.Plane);
@@ -251,8 +251,13 @@ namespace ShinobiLegacy.Editor
             CreateLabel("DUNGEON: " + regionName, center + new Vector3(0f, 3f, 18f), 1.2f);
             CreateLabel("BOSS: " + bossName, center + new Vector3(0f, 12f, 34f), 1.1f);
 
-            FastTravelPoint travel = CreateFastTravelPoint(regionId, regionName,
+            CreateFastTravelPoint(regionId, regionName,
                 center + new Vector3(0f, 1f, -8f), regionId);
+
+            GameObject encounterObject = new GameObject("Region_" + regionId + "_PatrolSpawner");
+            encounterObject.transform.position = center;
+            RegionEncounterSpawner encounter = encounterObject.AddComponent<RegionEncounterSpawner>();
+            encounter.Configure(regionId, regionName + " Patrol", terrainColor, requiredLevel, 3);
         }
 
         private static void CreateMaterials()
