@@ -187,6 +187,12 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 
 
 
+## Mobile combat optimization pass
+
+- Lightning target acquisition now rejects enemies behind the player and chooses the nearest valid enemy in the forward combat area.
+- Combat HUD text/resource refresh is throttled to a configurable interval (default 0.15 seconds) instead of rebuilding cooldown and equipment strings every rendered frame. Health events still update the health bar immediately.
+- This reduces avoidable UI work on lower-memory Android devices; actual frame-time and allocation improvements must still be measured in Unity Profiler on target hardware.
+
 ## Combat targeting and ability cooldown feedback
 
 - Lightning Style searches for the nearest valid enemy in its forward combat area rather than relying on the first physics collider hit. Terrain and scenery colliders no longer consume the cast before an enemy can be acquired.
