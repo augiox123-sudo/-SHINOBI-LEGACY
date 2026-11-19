@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using ShinobiLegacy.Items;
 
 namespace ShinobiLegacy.Combat
 {
@@ -33,6 +34,7 @@ namespace ShinobiLegacy.Combat
         private float nextFireTime;
         private float chakra;
         private readonly Collider[] hitBuffer = new Collider[24];
+        private EquipmentManager equipment;
 
         public float Chakra => chakra;
         public float MaxChakra => chakraMaximum;
@@ -45,6 +47,7 @@ namespace ShinobiLegacy.Combat
         private void Awake()
         {
             chakra = chakraMaximum;
+            equipment = GetComponent<EquipmentManager>();
             ResourcesChanged?.Invoke();
         }
 
@@ -65,7 +68,7 @@ namespace ShinobiLegacy.Combat
         {
             if (Time.time < nextAttackTime) return;
             nextAttackTime = Time.time + attackCooldown;
-            HitTargets(attackRange, attackRadius, attackDamage);
+            HitTargets(attackRange, attackRadius, GetScaledDamage(attackDamage));
         }
 
         public void CastChakraBurst()
@@ -73,7 +76,7 @@ namespace ShinobiLegacy.Combat
             if (Time.time < nextBurstTime || chakra < burstCost) return;
             chakra -= burstCost;
             nextBurstTime = Time.time + burstCooldown;
-            HitTargets(burstRange, burstRadius, burstDamage);
+            HitTargets(burstRange, burstRadius, GetScaledDamage(burstDamage));
             ResourcesChanged?.Invoke();
         }
 
@@ -89,9 +92,15 @@ namespace ShinobiLegacy.Combat
             {
                 CombatantHealth health = hit.collider.GetComponentInParent<CombatantHealth>();
                 if (health != null && health.transform != transform)
-                    health.TakeDamage(fireDamage);
+                    health.TakeDamage(GetScaledDamage(fireDamage));
             }
             ResourcesChanged?.Invoke();
+        }
+
+        private float GetScaledDamage(float baseDamage)
+        {
+            if (equipment == null) return baseDamage;
+            return baseDamage * equipment.DamageMultiplier;
         }
 
         private void HitTargets(float range, float radius, float damage)
