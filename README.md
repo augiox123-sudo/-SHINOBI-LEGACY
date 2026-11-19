@@ -469,3 +469,11 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Stone Guardian slam and phase-two special attacks now use this heavy-attack cue instead of the lighter generic attack/ability motion.
 - The motion is deliberately lightweight and reuses the existing procedural rig transforms; it does not add meshes, particles or per-frame allocations.
 - This remains a blockout animation pass. The motion timing and silhouette need Unity Play Mode review, and a final boss requires authored rigging, animation clips, impact VFX/audio and Android profiling.
+
+
+## Guardian impact feedback
+
+- Stone Guardian slam and phase-two specials now produce a compact two-layer ground shockwave and a profile-colored particle burst on impact.
+- A short additive camera shake is applied only when the player remains inside a damaging impact zone; a successful dodge still shows the boss impact without shaking the camera.
+- The shake is capped at a low intensity and short duration, and runs after the isometric follow camera so it does not permanently alter the follow offset.
+- This is lightweight procedural feedback, not final authored VFX. Visual layering, camera comfort, Unity compilation and Redmi 13C performance still require Play Mode and device testing.
