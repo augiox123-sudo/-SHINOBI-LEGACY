@@ -22,7 +22,11 @@ namespace ShinobiLegacy.World
             if (progression == null) progression = other.GetComponentInParent<PlayerProgression>();
             if (progression == null) return;
             VillageQuestSystem quests = progression.GetComponent<VillageQuestSystem>();
-            if (quests != null) quests.SetBoardVisible(true);
+            if (quests != null)
+            {
+                quests.SetNearby(true);
+                quests.SetBoardVisible(true);
+            }
         }
 
         private void OnTriggerExit(Collider other)
@@ -31,7 +35,7 @@ namespace ShinobiLegacy.World
             if (progression == null) progression = other.GetComponentInParent<PlayerProgression>();
             if (progression == null) return;
             VillageQuestSystem quests = progression.GetComponent<VillageQuestSystem>();
-            if (quests != null) quests.SetBoardVisible(false);
+            if (quests != null) quests.SetNearby(false);
         }
     }
 }
