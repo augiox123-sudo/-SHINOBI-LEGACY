@@ -1,0 +1,70 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace ShinobiLegacy.UI
+{
+    public sealed class CombatHud : MonoBehaviour
+    {
+        [SerializeField] private ShinobiLegacy.Combat.CombatantHealth health;
+        [SerializeField] private ShinobiLegacy.Combat.PlayerCombat combat;
+        [SerializeField] private Image healthFill;
+        [SerializeField] private Image chakraFill;
+        [SerializeField] private Text statusText;
+
+        public void Configure(
+            ShinobiLegacy.Combat.CombatantHealth playerHealth,
+            ShinobiLegacy.Combat.PlayerCombat playerCombat,
+            Image healthBar,
+            Image chakraBar,
+            Text status)
+        {
+            health = playerHealth;
+            combat = playerCombat;
+            healthFill = healthBar;
+            chakraFill = chakraBar;
+            statusText = status;
+            Refresh();
+        }
+
+        private void OnEnable()
+        {
+            if (health != null) health.HealthChanged += OnHealthChanged;
+            if (combat != null) combat.ResourcesChanged += Refresh;
+        }
+
+        private void OnDisable()
+        {
+            if (health != null) health.HealthChanged -= OnHealthChanged;
+            if (combat != null) combat.ResourcesChanged -= Refresh;
+        }
+
+        private void Update()
+        {
+            if (combat == null) return;
+            if (statusText != null)
+            {
+                string burst = combat.BurstCooldownRemaining > 0f
+                    ? combat.BurstCooldownRemaining.ToString("0.0") + "s"
+                    : "READY";
+                string fire = combat.FireCooldownRemaining > 0f
+                    ? combat.FireCooldownRemaining.ToString("0.0") + "s"
+                    : "READY";
+                statusText.text = "CHAKRA BURST: " + burst + "    FIRE STYLE: " + fire;
+            }
+        }
+
+        private void OnHealthChanged(float current, float maximum)
+        {
+            if (healthFill != null)
+                healthFill.fillAmount = maximum > 0f ? current / maximum : 0f;
+        }
+
+        private void Refresh()
+        {
+            if (healthFill != null && health != null)
+                healthFill.fillAmount = health.MaxHealth > 0f ? health.CurrentHealth / health.MaxHealth : 0f;
+            if (chakraFill != null && combat != null)
+                chakraFill.fillAmount = combat.MaxChakra > 0f ? combat.Chakra / combat.MaxChakra : 0f;
+        }
+    }
+}
