@@ -145,6 +145,12 @@ namespace ShinobiLegacy.Editor
                 foreach (GameObject root in scene.GetRootGameObjects())
                     objects.AddRange(root.GetComponentsInChildren<Transform>(true).Select(transform => transform.gameObject));
 
+                foreach (GameObject sceneObject in objects)
+                {
+                    if (sceneObject.GetComponents<Component>().Any(component => component == null))
+                        errors.Add(scenePath + ": missing script component on GameObject '" + sceneObject.name + "'.");
+                }
+
                 GameObject player = objects.FirstOrDefault(go => go.GetComponent("PlayerMotor") != null);
                 if (player == null)
                 {
@@ -159,13 +165,13 @@ namespace ShinobiLegacy.Editor
                     RequireComponent(player, "MobilePerformanceBootstrap", scenePath, errors);
                 }
 
-                bool hasMainCamera = objects.Any(go =>
-                {
-                    Camera camera = go.GetComponent<Camera>();
-                    return camera != null && go.CompareTag("MainCamera");
-                });
-                if (!hasMainCamera)
+                Camera mainCamera = objects
+                    .Select(go => go.GetComponent<Camera>())
+                    .FirstOrDefault(camera => camera != null && camera.CompareTag("MainCamera"));
+                if (mainCamera == null)
                     errors.Add(scenePath + ": tagged MainCamera with Camera component is missing.");
+                else if (!mainCamera.orthographic)
+                    errors.Add(scenePath + ": MainCamera must use orthographic projection for the isometric test camera.");
 
                 if (!objects.Any(go => go.GetComponent("IsometricCameraFollow") != null))
                     errors.Add(scenePath + ": IsometricCameraFollow is missing.");
@@ -173,8 +179,14 @@ namespace ShinobiLegacy.Editor
                 if (!objects.Any(go => go.GetComponent("VirtualJoystick") != null))
                     errors.Add(scenePath + ": VirtualJoystick is missing.");
 
-                if (!objects.Any(go => go.GetComponent("EventSystem") != null))
+                GameObject eventSystem = objects.FirstOrDefault(go => go.GetComponent("EventSystem") != null);
+                if (eventSystem == null)
                     errors.Add(scenePath + ": EventSystem is missing.");
+                else if (eventSystem.GetComponent("StandaloneInputModule") == null)
+                    errors.Add(scenePath + ": EventSystem is missing StandaloneInputModule for touch UI events.");
+
+                if (!objects.Any(go => go.GetComponent("VirtualJoystick") != null))
+                    errors.Add(scenePath + ": VirtualJoystick is missing.");
 
                 if (!objects.Any(go => go.GetComponent<Canvas>() != null))
                     errors.Add(scenePath + ": UI Canvas is missing.");
