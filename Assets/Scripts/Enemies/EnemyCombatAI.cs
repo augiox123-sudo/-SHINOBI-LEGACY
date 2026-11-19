@@ -108,17 +108,36 @@ namespace ShinobiLegacy.Enemies
 
         private void Update()
         {
-            if (health == null || health.IsDead || health.IsStunned || target == null) return;
+            if (health == null || health.IsDead) return;
+            if (health.IsStunned)
+            {
+                attackPending = false;
+                if (animationBridge != null) animationBridge.SetMoveSpeed(0f);
+                return;
+            }
+            if (target == null)
+            {
+                attackPending = false;
+                if (animationBridge != null) animationBridge.SetMoveSpeed(0f);
+                return;
+            }
             CombatantHealth targetHealth = target.GetComponent<CombatantHealth>();
             if (targetHealth == null || targetHealth.IsDead)
             {
                 target = null;
+                attackPending = false;
+                if (animationBridge != null) animationBridge.SetMoveSpeed(0f);
                 return;
             }
             Vector3 offset = target.position - transform.position;
             offset.y = 0f;
             float distance = offset.magnitude;
-            if (distance > detectionRange) return;
+            if (distance > detectionRange)
+            {
+                attackPending = false;
+                if (animationBridge != null) animationBridge.SetMoveSpeed(0f);
+                return;
+            }
 
             if (distance > 0.05f)
             {
