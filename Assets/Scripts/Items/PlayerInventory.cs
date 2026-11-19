@@ -39,6 +39,14 @@ namespace ShinobiLegacy.Items
             return true;
         }
 
+        public bool RemoveAt(int index)
+        {
+            if (index < 0 || index >= items.Count) return false;
+            items.RemoveAt(index);
+            ItemAdded?.Invoke(null);
+            return true;
+        }
+
         public bool Add(InventoryItem item)
         {
             if (item == null || items.Count >= capacity) return false;
