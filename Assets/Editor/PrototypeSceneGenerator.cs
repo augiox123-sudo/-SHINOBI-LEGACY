@@ -43,6 +43,7 @@ namespace ShinobiLegacy.Editor
             player.AddComponent<ShinobiLegacy.UI.InventoryEquipmentUI>();
             PlayerProgression progression = player.AddComponent<PlayerProgression>();
             player.AddComponent<WorldRegionProgression>();
+            player.AddComponent<RegionalBountySystem>();
             PlayerInventory inventory = player.AddComponent<PlayerInventory>();
             EquipmentManager equipment = player.AddComponent<EquipmentManager>();
             player.AddComponent<PlayerWallet>();
