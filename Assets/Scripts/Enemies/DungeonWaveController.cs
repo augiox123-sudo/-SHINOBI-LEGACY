@@ -176,6 +176,8 @@ namespace ShinobiLegacy.Enemies
             waitingForNextWave = false;
             PlayerWallet wallet = player != null ? player.GetComponent<PlayerWallet>() : null;
             if (wallet != null) wallet.Add(completionCoinReward + currentWave * 75);
+            PlayerForgeSystem forge = player != null ? player.GetComponent<PlayerForgeSystem>() : null;
+            if (forge != null) forge.AddMaterials(4 + currentWave * 2);
             SetStatus("DUNGEON CLEARED!  REWARD +" + (completionCoinReward + currentWave * 75) + " COINS");
         }
 
