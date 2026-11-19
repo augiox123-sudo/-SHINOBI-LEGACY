@@ -88,6 +88,12 @@ namespace ShinobiLegacy.Combat
             if (motion != null) motion.PlayWindup(heavy);
         }
 
+        public void SetStaggered(bool value)
+        {
+            ShinobiProceduralMotion motion = ResolveProceduralMotion();
+            if (motion != null) motion.SetStaggered(value);
+        }
+
         public void CancelWindup()
         {
             ShinobiProceduralMotion motion = ResolveProceduralMotion();
