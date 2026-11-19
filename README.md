@@ -513,3 +513,11 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - The enemy AI now forwards its stagger state to the procedural motion layer. During the short impact pause, the enemy holds a distinct arm-and-torso recoil pose instead of only freezing its movement.
 - The pose is driven by the existing rig transforms and is cleared automatically when the stagger window ends. It adds no physics bodies, animation assets or per-frame allocations.
 - This remains a blockout motion cue; pose readability and transition timing need Unity Play Mode and Android validation.
+
+
+## Collider-aware melee hit validation
+
+- Basic melee attacks now measure reach against the closest point on the target's collider instead of relying only on the target transform pivot. This gives large enemies and the guardian a more representative strike distance.
+- The melee check also rejects targets with an excessive vertical separation and keeps the forward-arc and obstruction checks, so solid walls and arena props can still block a strike.
+- Focused target-lock attacks retain their turn-to-target behavior, but validate range and line of sight against the collider shape before applying damage.
+- This is a source-level collision improvement. Collider setup, actual hit feel, Unity compilation and Android device testing still need validation.
