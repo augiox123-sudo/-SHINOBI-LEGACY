@@ -39,6 +39,7 @@ namespace ShinobiLegacy.Combat
         private readonly Collider[] chainBuffer = new Collider[24];
         private EquipmentManager equipment;
         private CombatantHealth ownHealth;
+        private AbilityVfxController abilityVfx;
         [SerializeField, Range(1, 5)] private int burstRank = 1;
         [SerializeField, Range(1, 5)] private int fireRank = 1;
         [SerializeField] private int burstUses;
@@ -62,6 +63,8 @@ namespace ShinobiLegacy.Combat
             chakra = chakraMaximum;
             equipment = GetComponent<EquipmentManager>();
             ownHealth = GetComponent<CombatantHealth>();
+            abilityVfx = GetComponent<AbilityVfxController>();
+            if (abilityVfx == null) abilityVfx = gameObject.AddComponent<AbilityVfxController>();
             ResourcesChanged?.Invoke();
         }
 
@@ -111,6 +114,7 @@ namespace ShinobiLegacy.Combat
                 if (modifier == "burst_guard" && ownHealth != null)
                     ownHealth.Restore(ownHealth.MaxHealth * 0.18f);
             }
+            if (abilityVfx != null) abilityVfx.PlayChakra(transform.position, transform.forward, modifier, burstRadius);
             RecordAbilityUse(true);
             ResourcesChanged?.Invoke();
         }
@@ -143,6 +147,7 @@ namespace ShinobiLegacy.Combat
                         damage * (modifier == "fire_meteor" ? 1.4f : 1.15f), true);
             }
             else FireRay(origin, direction, damage, 0.55f, false);
+            if (abilityVfx != null) abilityVfx.PlayFire(origin, direction, fireRange, modifier);
             RecordAbilityUse(false);
             ResourcesChanged?.Invoke();
         }
@@ -197,6 +202,7 @@ namespace ShinobiLegacy.Combat
                     }
                 }
                 if (closest == null) break;
+                if (abilityVfx != null) abilityVfx.PlayLightning(previous != null ? previous.transform.position + Vector3.up : transform.position + Vector3.up, closest.transform.position + Vector3.up);
                 ApplyDamageOnce(closest, baseDamage * Mathf.Pow(0.72f, jump + 1), false);
                 closest.ApplyStun(0.35f);
                 previous = closest;
