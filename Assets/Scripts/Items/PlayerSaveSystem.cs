@@ -140,7 +140,14 @@ namespace ShinobiLegacy.Items
             {
                 InventoryItem item = source[i];
                 if (item != null)
-                    result[i] = new InventoryItem(item.itemName, item.rarity, item.power, item.slot) { abilityModifier = item.abilityModifier };
+                    result[i] = new InventoryItem(item.itemName, item.rarity, item.power, item.slot)
+                    {
+                        abilityModifier = item.abilityModifier,
+                        bonusDamagePercent = item.bonusDamagePercent,
+                        bonusDefense = item.bonusDefense,
+                        bonusCriticalChance = item.bonusCriticalChance,
+                        bonusCriticalDamage = item.bonusCriticalDamage
+                    };
             }
             return result;
         }
