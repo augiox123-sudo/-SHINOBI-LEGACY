@@ -48,7 +48,7 @@ namespace ShinobiLegacy.Items
             InventoryItem item = new InventoryItem(names[index], rarity, power, slots[index]);
             if (rarity == LootRarity.Legendary)
             {
-                string[] legendaryEffects = { "fire_wave", "fire_dragon", "fire_burst", "burst_storm", "burst_guard" };
+                string[] legendaryEffects = { "fire_wave", "fire_dragon", "fire_burst", "fire_meteor", "burst_storm", "burst_guard", "burst_chain" };
                 item.abilityModifier = legendaryEffects[Random.Range(0, legendaryEffects.Length)];
                 item.itemName += " [" + GetModifierName(item.abilityModifier) + "]";
             }
@@ -72,8 +72,10 @@ namespace ShinobiLegacy.Items
                 case "fire_wave": return "Flame Wave";
                 case "fire_dragon": return "Twin Dragons";
                 case "fire_burst": return "Inferno Impact";
+                case "fire_meteor": return "Meteor Flame";
                 case "burst_storm": return "Chakra Tempest";
                 case "burst_guard": return "Guardian Pulse";
+                case "burst_chain": return "Chain Lightning";
                 default: return "Awakened Technique";
             }
         }
