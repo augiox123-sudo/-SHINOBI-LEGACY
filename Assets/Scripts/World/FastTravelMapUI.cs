@@ -71,9 +71,15 @@ namespace ShinobiLegacy.World
             {
                 bool unlocked = regionProgression != null && regionProgression.IsUnlocked(region.id);
                 GUILayout.BeginHorizontal("box");
+                int levelsRemaining = regionProgression != null ? regionProgression.GetLevelsUntilUnlock(region.id) :
+                    Mathf.Max(0, region.requiredLevel - playerLevel);
+                string access = unlocked ? "ACCESS: UNLOCKED" :
+                    "LOCKED - " + levelsRemaining + " LEVEL(S) TO GO";
                 GUILayout.Label((unlocked ? "[UNLOCKED] " : "[LOCKED] ") + region.displayName +
-                    "\n" + region.description + "  |  Required level: " + region.requiredLevel,
-                    GUILayout.ExpandWidth(true), GUILayout.Height(54f));
+                    "\n" + region.description +
+                    "\n" + access + "  |  RECOMMENDED LEVEL " + region.requiredLevel +
+                    "\nDUNGEON: " + region.dungeonName + "  |  BOSS: " + region.bossName,
+                    GUILayout.ExpandWidth(true), GUILayout.Height(82f));
                 GUILayout.EndHorizontal();
             }
 
