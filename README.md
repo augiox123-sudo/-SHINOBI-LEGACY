@@ -97,3 +97,11 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - Choices are saved locally with PlayerPrefs and restored on the next launch.
 - The default is 30 FPS with shadows disabled for a more conservative mobile performance baseline. Selecting 60 FPS requests a 60 FPS target; actual performance depends on device capability, scene load and thermal limits.
 - The settings script is source-added but has not yet been compiled in Unity Editor or tested on a physical Android device.
+
+
+## Local player save
+
+- Added a local JSON save for the safe-village player: coins, carried inventory and equipped gear.
+- The save updates when currency, inventory or equipment changes and is also written when the app is paused or closed.
+- The generated Safe Village player now receives the save component automatically.
+- This is currently a device-local prototype save using PlayerPrefs. It is not cloud synchronization, account security or a server-authoritative multiplayer save.
