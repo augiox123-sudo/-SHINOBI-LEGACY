@@ -82,7 +82,7 @@ namespace ShinobiLegacy.Combat
             comboStrike = Mathf.Clamp(strike, 1, 3);
             comboDuration = comboStrike == 3 ? 0.52f : 0.42f;
             comboTimer = comboDuration;
-            attackTimer = comboDuration;
+            attackTimer = 0f;
         }
 
         public void PlayHit(bool heavy = false)
