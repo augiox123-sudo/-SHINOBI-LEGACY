@@ -19,17 +19,8 @@ namespace ShinobiLegacy.Performance
         private float averageFps;
         private float minimumFps;
         private bool visible = true;
+        private GUIStyle diagnosticStyle;
         private string diagnosticText = "Collecting performance data...";
-
-        private void Awake()
-        {
-            if (!Debug.isDebugBuild)
-            {
-                enabled = false;
-                return;
-            }
-
-        }
 
         private void Update()
         {
@@ -72,6 +63,16 @@ namespace ShinobiLegacy.Performance
         {
             if (!Debug.isDebugBuild) return;
 
+            if (diagnosticStyle == null)
+            {
+                diagnosticStyle = new GUIStyle(GUI.skin.label)
+                {
+                    fontSize = 14,
+                    wordWrap = true
+                };
+                diagnosticStyle.normal.textColor = Color.white;
+            }
+
             const float panelWidth = 390f;
             const float panelHeight = 118f;
             float scale = Mathf.Clamp(Screen.width / 1600f, 0.65f, 1f);
@@ -83,7 +84,7 @@ namespace ShinobiLegacy.Performance
             if (visible)
             {
                 GUI.Box(new Rect(x, y, panelWidth, panelHeight), "SHINOBI LEGACY - PERFORMANCE");
-                GUI.Label(new Rect(x + 10f, y + 25f, panelWidth - 20f, panelHeight - 32f), diagnosticText);
+                GUI.Label(new Rect(x + 10f, y + 25f, panelWidth - 20f, panelHeight - 32f), diagnosticText, diagnosticStyle);
                 if (GUI.Button(new Rect(x + panelWidth - 30f, y + 3f, 24f, 20f), "–"))
                     visible = false;
             }
