@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 using ShinobiLegacy.Items;
 
 namespace ShinobiLegacy.Combat
@@ -11,6 +12,7 @@ namespace ShinobiLegacy.Combat
         private float currentHealth;
         private EquipmentManager equipment;
         private float invulnerableUntil;
+        private Coroutine burnRoutine;
 
         public float CurrentHealth => currentHealth;
         public float MaxHealth => maxHealth;
@@ -49,6 +51,25 @@ namespace ShinobiLegacy.Combat
             HealthChanged?.Invoke(currentHealth, maxHealth);
         }
 
+        public void ApplyBurn(float damagePerTick, float duration, float tickInterval = 1f)
+        {
+            if (IsDead || damagePerTick <= 0f || duration <= 0f) return;
+            if (burnRoutine != null) StopCoroutine(burnRoutine);
+            burnRoutine = StartCoroutine(BurnOverTime(damagePerTick, duration, Mathf.Max(0.25f, tickInterval)));
+        }
+
+        private IEnumerator BurnOverTime(float damagePerTick, float duration, float tickInterval)
+        {
+            float elapsed = 0f;
+            while (elapsed < duration && !IsDead)
+            {
+                yield return new WaitForSeconds(tickInterval);
+                elapsed += tickInterval;
+                if (!IsDead) TakeDamage(damagePerTick);
+            }
+            burnRoutine = null;
+        }
+
         public void Restore(float amount)
         {
             if (IsDead || amount <= 0f) return;
@@ -60,6 +81,8 @@ namespace ShinobiLegacy.Combat
         {
             if (IsDead) return;
             IsDead = true;
+            if (burnRoutine != null) StopCoroutine(burnRoutine);
+            burnRoutine = null;
             Died?.Invoke();
             if (destroyOnDeath) Destroy(gameObject, 1.2f);
         }
