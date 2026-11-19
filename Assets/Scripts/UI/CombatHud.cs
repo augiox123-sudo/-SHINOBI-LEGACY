@@ -59,6 +59,9 @@ namespace ShinobiLegacy.UI
                     (string.IsNullOrEmpty(burstMod) ? "" : " [" + ModifierLabel(burstMod) + "]") +
                     "    FIRE R" + combat.FireRank + ": " + fire +
                     (string.IsNullOrEmpty(fireMod) ? "" : " [" + ModifierLabel(fireMod) + "]") +
+                    "    LIGHTNING R" + combat.LightningRank +
+                    "    WATER R" + combat.WaterRank +
+                    "    WIND R" + combat.WindRank +
                     (gear != null && gear.LegendarySynergyActive ? "    LEGENDARY SYNERGY +10%" : "");
             }
         }
