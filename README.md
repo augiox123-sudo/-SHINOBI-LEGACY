@@ -499,3 +499,10 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - The procedural character motion now distinguishes ordinary hits from heavier impacts. Light hits use a short, restrained torso recoil; knockbacks with strength 2.3 or higher trigger a stronger body lean and arm recoil.
 - The reaction is routed through the existing animation bridge and reuses the current knockback strength, with no additional rigidbody simulation or per-frame allocations.
 - These are placeholder transform motions. Final hit-stun timing, animation clips and impact feel still require Unity Play Mode and Android device testing.
+
+
+## Enemy impact stagger
+
+- Strong knockbacks now apply a short stagger window to the affected combatant. The duration scales modestly with knockback strength and is capped at 0.34 seconds.
+- Standard enemy AI pauses movement and cancels any pending melee wind-up while staggered, then resumes normal behavior automatically. Player and boss controllers do not consume this enemy-only AI pause.
+- This adds a brief hit-confirmation window without introducing physics ragdolls or long crowd-control locks. Timing and combat balance still require Unity Play Mode and Android device testing.
