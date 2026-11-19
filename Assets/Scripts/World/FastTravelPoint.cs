@@ -17,10 +17,14 @@ namespace ShinobiLegacy.World
         {
             get
             {
-                if (PlayerPrefs.GetInt(PreferenceKey, 0) != 1) return false;
-                if (string.IsNullOrEmpty(regionId)) return true;
+                if (string.IsNullOrEmpty(regionId))
+                    return PlayerPrefs.GetInt(PreferenceKey, 0) == 1;
+
                 WorldRegionProgression regions = FindObjectOfType<WorldRegionProgression>();
-                return regions != null && regions.IsUnlocked(regionId);
+                if (regions == null || !regions.IsUnlocked(regionId)) return false;
+
+                // Regional destinations become available as soon as their region unlocks.
+                return true;
             }
         }
 
