@@ -91,18 +91,42 @@ namespace ShinobiLegacy.Combat
             EmitBurst(to, new Color(0.45f, 0.85f, 1f), 18, 0.45f, 3f, 0.3f);
         }
 
-        public void PlayWater(Vector3 origin, Vector3 direction, float range)
+        public void PlayLightningStorm(Vector3 center)
         {
-            Color water = new Color(0.12f, 0.62f, 1f, 1f);
-            EmitCone(origin, direction, water, 90, range, 13f, 0.62f, 9f);
-            EmitRing(origin + direction.normalized * 3f + Vector3.up * 0.08f, 2.2f, water);
+            Color lightning = new Color(0.42f, 0.82f, 1f, 1f);
+            EmitBurst(center + Vector3.up * 1.8f, lightning, 95, 3.2f, 10f, 0.45f);
+            EmitRing(center + Vector3.up * 0.12f, 3.4f, lightning);
+            for (int i = 0; i < 4; i++)
+            {
+                float angle = i * Mathf.PI * 0.5f;
+                Vector3 offset = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * 2.5f;
+                PlayLightning(center + offset + Vector3.up * 4f, center + offset);
+            }
         }
 
-        public void PlayWind(Vector3 center, Vector3 direction)
+        public void PlayWater(Vector3 origin, Vector3 direction, float range, string modifier = "")
+        {
+            Color water = new Color(0.12f, 0.62f, 1f, 1f);
+            EmitCone(origin, direction, water, modifier == "water_torrent" ? 140 : 90, range,
+                modifier == "water_torrent" ? 18f : 13f, 0.62f, 9f);
+            EmitRing(origin + direction.normalized * 3f + Vector3.up * 0.08f,
+                modifier == "water_torrent" ? 3.1f : 2.2f, water);
+        }
+
+        public void PlayWaterPrison(Vector3 center)
+        {
+            Color water = new Color(0.2f, 0.78f, 1f, 1f);
+            EmitRing(center + Vector3.up * 0.1f, 2.5f, water);
+            EmitBurst(center + Vector3.up * 1.2f, water, 65, 1.8f, 3f, 0.8f);
+        }
+
+        public void PlayWind(Vector3 center, Vector3 direction, string modifier = "")
         {
             Color wind = new Color(0.72f, 0.92f, 1f, 1f);
-            EmitBurst(center, wind, 75, 2.4f, 8f, 0.55f);
-            EmitRing(center + Vector3.up * 0.08f, 3.1f, wind);
+            EmitBurst(center, wind, modifier == "wind_vortex" ? 115 : 75, 2.4f, 8f, 0.55f);
+            EmitRing(center + Vector3.up * 0.08f, modifier == "wind_vortex" ? 4.6f : 3.1f, wind);
+            if (modifier == "wind_blade")
+                EmitCone(center, direction, new Color(0.82f, 1f, 1f, 1f), 110, 8f, 9f, 0.42f, 12f);
         }
 
         private static void EmitCone(Vector3 origin, Vector3 direction, Color color, int count,
