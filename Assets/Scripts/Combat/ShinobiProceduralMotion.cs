@@ -25,6 +25,9 @@ namespace ShinobiLegacy.Combat
         private Quaternion torsoBase;
         private float moveSpeed;
         private float attackTimer;
+        private float comboTimer;
+        private float comboDuration;
+        private int comboStrike;
         private float hitTimer;
         private bool heavyHit;
         private bool staggered;
@@ -70,7 +73,16 @@ namespace ShinobiLegacy.Combat
 
         public void PlayAttack()
         {
-            if (!dead) attackTimer = 0.32f;
+            PlayComboAttack(1);
+        }
+
+        public void PlayComboAttack(int strike)
+        {
+            if (dead) return;
+            comboStrike = Mathf.Clamp(strike, 1, 3);
+            comboDuration = comboStrike == 3 ? 0.52f : 0.42f;
+            comboTimer = comboDuration;
+            attackTimer = comboDuration;
         }
 
         public void PlayHit(bool heavy = false)
@@ -111,6 +123,7 @@ namespace ShinobiLegacy.Combat
             float dt = Time.deltaTime;
             cycle += dt * runCycleSpeed * Mathf.Lerp(0.25f, 1f, moveSpeed);
             attackTimer = Mathf.Max(0f, attackTimer - dt);
+            comboTimer = Mathf.Max(0f, comboTimer - dt);
             hitTimer = Mathf.Max(0f, hitTimer - dt);
             abilityTimer = Mathf.Max(0f, abilityTimer - dt);
             heavyAttackTimer = Mathf.Max(0f, heavyAttackTimer - dt);
@@ -119,6 +132,13 @@ namespace ShinobiLegacy.Combat
             float stride = Mathf.Sin(cycle) * runSwingAngle * moveSpeed;
             float armCounter = -stride;
             float attackWeight = attackTimer > 0f ? Mathf.Sin((1f - attackTimer / 0.42f) * Mathf.PI) : 0f;
+            float comboProgress = comboDuration > 0f ? 1f - comboTimer / comboDuration : 1f;
+            float comboWeight = comboTimer > 0f ? Mathf.Sin(comboProgress * Mathf.PI) : 0f;
+            float comboArmX = comboStrike == 1 ? -108f : comboStrike == 2 ? -82f : -132f;
+            float comboLeftX = comboStrike == 2 ? -104f : comboStrike == 3 ? -118f : 0f;
+            float comboRightZ = comboStrike == 1 ? -24f : comboStrike == 2 ? 22f : -8f;
+            float comboLeftZ = comboStrike == 2 ? -18f : comboStrike == 3 ? 12f : 0f;
+            float comboTorsoYaw = comboStrike == 1 ? -13f : comboStrike == 2 ? 15f : -25f;
             float hitWeight = hitTimer > 0f ? Mathf.Sin((1f - hitTimer / (heavyHit ? 0.26f : 0.18f)) * Mathf.PI) : 0f;
             float hitArmAngle = heavyHit ? 28f : 12f;
             float abilityWeight = abilityTimer > 0f ? Mathf.Sin((1f - abilityTimer / 0.42f) * Mathf.PI) : 0f;
@@ -130,9 +150,9 @@ namespace ShinobiLegacy.Combat
 
             if (leftLeg != null) leftLeg.localRotation = leftLegBase * Quaternion.Euler(stride, 0f, 0f);
             if (rightLeg != null) rightLeg.localRotation = rightLegBase * Quaternion.Euler(-stride, 0f, 0f);
-            if (leftArm != null) leftArm.localRotation = leftArmBase * Quaternion.Euler(armCounter + heavyWeight * -72f + windupWeight * windupArmAngle + hitWeight * hitArmAngle + staggerWeight * 34f, 0f, 0f);
-            float rightArmAngle = stride + attackWeight * -105f + abilityWeight * -55f + heavyWeight * -48f + windupWeight * windupArmAngle * 0.75f + hitWeight * hitArmAngle * 0.8f + staggerWeight * 27f;
-            if (rightArm != null) rightArm.localRotation = rightArmBase * Quaternion.Euler(rightArmAngle, 0f, 0f);
+            if (leftArm != null) leftArm.localRotation = leftArmBase * Quaternion.Euler(armCounter + heavyWeight * -72f + windupWeight * windupArmAngle + hitWeight * hitArmAngle + staggerWeight * 34f + comboWeight * comboLeftX, 0f, comboWeight * comboLeftZ);
+            float rightArmAngle = stride + attackWeight * -105f + abilityWeight * -55f + heavyWeight * -48f + windupWeight * windupArmAngle * 0.75f + hitWeight * hitArmAngle * 0.8f + staggerWeight * 27f + comboWeight * comboArmX;
+            if (rightArm != null) rightArm.localRotation = rightArmBase * Quaternion.Euler(rightArmAngle, 0f, comboWeight * comboRightZ);
 
             float bob = dead ? -0.12f : Mathf.Abs(Mathf.Sin(cycle * 2f)) * idleBobAmount * (0.35f + moveSpeed);
             transform.localPosition = basePosition + Vector3.up * bob;
@@ -140,7 +160,7 @@ namespace ShinobiLegacy.Combat
             {
                 float recoil = hitWeight * (heavyHit ? 24f : 12f);
                 float windupLean = windupWeight * (heavyWindup ? 14f : 6f);
-                torso.localRotation = torsoBase * Quaternion.Euler(recoil + abilityWeight * -8f + heavyWeight * 18f + windupLean + staggerWeight * 18f, 0f, 0f);
+                torso.localRotation = torsoBase * Quaternion.Euler(recoil + abilityWeight * -8f + heavyWeight * 18f + windupLean + staggerWeight * 18f + comboWeight * (comboStrike == 3 ? 18f : 7f), comboWeight * comboTorsoYaw, 0f);
             }
         }
     }
