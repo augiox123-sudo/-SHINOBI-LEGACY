@@ -87,6 +87,8 @@ namespace ShinobiLegacy.Editor
             Part(rig, "Mask", PrimitiveType.Cube, new Vector3(0f, 0.7f * scale, 0.23f * scale), new Vector3(0.34f, 0.17f, 0.1f) * scale, darkCloth);
             Part(rig, "ShoulderLeft", PrimitiveType.Sphere, new Vector3(-0.43f * scale, 0.38f * scale, 0f), new Vector3(0.32f, 0.28f, 0.34f) * scale, trim);
             Part(rig, "ShoulderRight", PrimitiveType.Sphere, new Vector3(0.43f * scale, 0.38f * scale, 0f), new Vector3(0.32f, 0.28f, 0.34f) * scale, trim);
+            Part(rig, "ArmLeft", PrimitiveType.Capsule, new Vector3(-0.43f * scale, -0.02f * scale, 0f), new Vector3(0.19f, 0.46f, 0.19f) * scale, body);
+            Part(rig, "ArmRight", PrimitiveType.Capsule, new Vector3(0.43f * scale, -0.02f * scale, 0f), new Vector3(0.19f, 0.46f, 0.19f) * scale, body);
             Part(rig, "LegLeft", PrimitiveType.Capsule, new Vector3(-0.2f * scale, -0.68f * scale, 0f), new Vector3(0.23f, 0.5f, 0.24f) * scale, body);
             Part(rig, "LegRight", PrimitiveType.Capsule, new Vector3(0.2f * scale, -0.68f * scale, 0f), new Vector3(0.23f, 0.5f, 0.24f) * scale, body);
             Part(rig, "BeltSash", PrimitiveType.Cube, new Vector3(0f, -0.31f * scale, 0.2f * scale), new Vector3(0.52f, 0.09f, 0.045f) * scale, trim);
