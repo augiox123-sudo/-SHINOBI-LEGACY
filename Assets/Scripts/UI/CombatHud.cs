@@ -10,6 +10,8 @@ namespace ShinobiLegacy.UI
         [SerializeField] private Image healthFill;
         [SerializeField] private Image chakraFill;
         [SerializeField] private Text statusText;
+        [SerializeField, Min(0.05f)] private float refreshInterval = 0.15f;
+        private float nextRefreshTime;
 
         public void Configure(
             ShinobiLegacy.Combat.CombatantHealth playerHealth,
@@ -42,6 +44,8 @@ namespace ShinobiLegacy.UI
 
         private void Update()
         {
+            if (Time.unscaledTime < nextRefreshTime) return;
+            nextRefreshTime = Time.unscaledTime + Mathf.Max(0.05f, refreshInterval);
             Refresh();
             if (combat == null) return;
             if (statusText != null)
