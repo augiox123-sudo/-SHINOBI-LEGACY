@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using ShinobiLegacy.Items;
 
 namespace ShinobiLegacy.UI
 {
@@ -12,7 +11,11 @@ namespace ShinobiLegacy.UI
         [SerializeField] private Image chakraFill;
         [SerializeField] private Text statusText;
         [SerializeField, Min(0.05f)] private float refreshInterval = 0.15f;
+        [SerializeField, Min(0.1f)] private float statusRefreshInterval = 0.5f;
         private float nextRefreshTime;
+        private float nextStatusRefreshTime;
+        private EquipmentManager cachedEquipment;
+        private bool subscribed;
 
         public void Configure(
             ShinobiLegacy.Combat.CombatantHealth playerHealth,
@@ -21,69 +24,91 @@ namespace ShinobiLegacy.UI
             Image chakraBar,
             Text status)
         {
+            Unsubscribe();
             health = playerHealth;
             combat = playerCombat;
             healthFill = healthBar;
             chakraFill = chakraBar;
             statusText = status;
-            if (health != null) health.HealthChanged += OnHealthChanged;
-            if (combat != null) combat.ResourcesChanged += Refresh;
+            cachedEquipment = combat != null ? combat.GetComponent<EquipmentManager>() : null;
+            Subscribe();
             Refresh();
+            RefreshStatus();
         }
 
         private void OnEnable()
         {
-            if (health != null) health.HealthChanged += OnHealthChanged;
-            if (combat != null) combat.ResourcesChanged += Refresh;
+            Subscribe();
         }
 
         private void OnDisable()
         {
+            Unsubscribe();
+        }
+
+        private void Subscribe()
+        {
+            if (subscribed) return;
+            if (health != null) health.HealthChanged += OnHealthChanged;
+            if (combat != null) combat.ResourcesChanged += Refresh;
+            subscribed = true;
+        }
+
+        private void Unsubscribe()
+        {
+            if (!subscribed) return;
             if (health != null) health.HealthChanged -= OnHealthChanged;
             if (combat != null) combat.ResourcesChanged -= Refresh;
+            subscribed = false;
         }
 
         private void Update()
         {
-            if (Time.unscaledTime < nextRefreshTime) return;
-            nextRefreshTime = Time.unscaledTime + Mathf.Max(0.05f, refreshInterval);
-            Refresh();
-            if (combat == null) return;
-            if (statusText != null)
+            if (Time.unscaledTime >= nextRefreshTime)
             {
-                string burst = combat.BurstCooldownRemaining > 0f
-                    ? combat.BurstCooldownRemaining.ToString("0.0") + "s"
-                    : "READY";
-                string fire = combat.FireCooldownRemaining > 0f
-                    ? combat.FireCooldownRemaining.ToString("0.0") + "s"
-                    : "READY";
-                string lightning = combat.LightningCooldownRemaining > 0f
-                    ? combat.LightningCooldownRemaining.ToString("0.0") + "s"
-                    : "READY";
-                string water = combat.WaterCooldownRemaining > 0f
-                    ? combat.WaterCooldownRemaining.ToString("0.0") + "s"
-                    : "READY";
-                string wind = combat.WindCooldownRemaining > 0f
-                    ? combat.WindCooldownRemaining.ToString("0.0") + "s"
-                    : "READY";
-                EquipmentManager gear = combat.GetComponent<EquipmentManager>();
-                string burstMod = gear != null ? gear.GetAbilityModifier("burst") : string.Empty;
-                string fireMod = gear != null ? gear.GetAbilityModifier("fire") : string.Empty;
-                string lightningMod = gear != null ? gear.GetAbilityModifier("lightning") : string.Empty;
-                string waterMod = gear != null ? gear.GetAbilityModifier("water") : string.Empty;
-                string windMod = gear != null ? gear.GetAbilityModifier("wind") : string.Empty;
-                statusText.text = "BURST R" + combat.BurstRank + ": " + burst +
-                    (string.IsNullOrEmpty(burstMod) ? "" : " [" + ModifierLabel(burstMod) + "]") +
-                    "    FIRE R" + combat.FireRank + ": " + fire +
-                    (string.IsNullOrEmpty(fireMod) ? "" : " [" + ModifierLabel(fireMod) + "]") +
-                    "    LIGHTNING R" + combat.LightningRank + ": " + lightning +
-                    (string.IsNullOrEmpty(lightningMod) ? "" : " [" + ModifierLabel(lightningMod) + "]") +
-                    "    WATER R" + combat.WaterRank + ": " + water +
-                    (string.IsNullOrEmpty(waterMod) ? "" : " [" + ModifierLabel(waterMod) + "]") +
-                    "    WIND R" + combat.WindRank + ": " + wind +
-                    (string.IsNullOrEmpty(windMod) ? "" : " [" + ModifierLabel(windMod) + "]") +
-                    (gear != null && gear.LegendarySynergyActive ? "    LEGENDARY SYNERGY +10%" : "");
+                nextRefreshTime = Time.unscaledTime + Mathf.Max(0.05f, refreshInterval);
+                Refresh();
             }
+
+            if (Time.unscaledTime >= nextStatusRefreshTime)
+            {
+                nextStatusRefreshTime = Time.unscaledTime + Mathf.Max(0.1f, statusRefreshInterval);
+                RefreshStatus();
+            }
+        }
+
+        private void RefreshStatus()
+        {
+            if (combat == null || statusText == null) return;
+            if (cachedEquipment == null) cachedEquipment = combat.GetComponent<EquipmentManager>();
+
+            string burst = CooldownLabel(combat.BurstCooldownRemaining);
+            string fire = CooldownLabel(combat.FireCooldownRemaining);
+            string lightning = CooldownLabel(combat.LightningCooldownRemaining);
+            string water = CooldownLabel(combat.WaterCooldownRemaining);
+            string wind = CooldownLabel(combat.WindCooldownRemaining);
+            string burstMod = cachedEquipment != null ? cachedEquipment.GetAbilityModifier("burst") : string.Empty;
+            string fireMod = cachedEquipment != null ? cachedEquipment.GetAbilityModifier("fire") : string.Empty;
+            string lightningMod = cachedEquipment != null ? cachedEquipment.GetAbilityModifier("lightning") : string.Empty;
+            string waterMod = cachedEquipment != null ? cachedEquipment.GetAbilityModifier("water") : string.Empty;
+            string windMod = cachedEquipment != null ? cachedEquipment.GetAbilityModifier("wind") : string.Empty;
+
+            statusText.text = "BURST R" + combat.BurstRank + ": " + burst +
+                (string.IsNullOrEmpty(burstMod) ? "" : " [" + ModifierLabel(burstMod) + "]") +
+                "    FIRE R" + combat.FireRank + ": " + fire +
+                (string.IsNullOrEmpty(fireMod) ? "" : " [" + ModifierLabel(fireMod) + "]") +
+                "    LIGHTNING R" + combat.LightningRank + ": " + lightning +
+                (string.IsNullOrEmpty(lightningMod) ? "" : " [" + ModifierLabel(lightningMod) + "]") +
+                "    WATER R" + combat.WaterRank + ": " + water +
+                (string.IsNullOrEmpty(waterMod) ? "" : " [" + ModifierLabel(waterMod) + "]") +
+                "    WIND R" + combat.WindRank + ": " + wind +
+                (string.IsNullOrEmpty(windMod) ? "" : " [" + ModifierLabel(windMod) + "]") +
+                (cachedEquipment != null && cachedEquipment.LegendarySynergyActive ? "    LEGENDARY SYNERGY +10%" : "");
+        }
+
+        private static string CooldownLabel(float remaining)
+        {
+            return remaining > 0f ? remaining.ToString("0.0") + "s" : "READY";
         }
 
         private static string ModifierLabel(string id)
