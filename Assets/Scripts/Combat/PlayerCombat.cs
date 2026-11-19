@@ -45,6 +45,7 @@ namespace ShinobiLegacy.Combat
         private EquipmentManager equipment;
         private CombatantHealth ownHealth;
         private AbilityVfxController abilityVfx;
+        private CombatAnimationBridge animationBridge;
         private EnemyTargetLockSystem targetLock;
         [SerializeField, Range(1, 5)] private int burstRank = 1;
         [SerializeField, Range(1, 5)] private int fireRank = 1;
@@ -95,6 +96,7 @@ namespace ShinobiLegacy.Combat
             equipment = GetComponent<EquipmentManager>();
             ownHealth = GetComponent<CombatantHealth>();
             abilityVfx = GetComponent<AbilityVfxController>();
+            animationBridge = GetComponent<CombatAnimationBridge>();
             targetLock = GetComponent<EnemyTargetLockSystem>();
             if (abilityVfx == null) abilityVfx = gameObject.AddComponent<AbilityVfxController>();
             ResourcesChanged?.Invoke();
@@ -121,6 +123,7 @@ namespace ShinobiLegacy.Combat
         {
             if (Time.time < nextAttackTime) return;
             nextAttackTime = Time.time + attackCooldown;
+            if (animationBridge != null) animationBridge.TriggerAttack();
             damagedThisCast.Clear();
             float damage = GetScaledDamage(attackDamage);
             if (!TryHitLockedTarget(damage))
@@ -152,6 +155,7 @@ namespace ShinobiLegacy.Combat
             if (Time.time < nextBurstTime || chakra < burstCost) return;
             chakra -= burstCost;
             nextBurstTime = Time.time + burstCooldown;
+            if (animationBridge != null) animationBridge.TriggerAbility();
             damagedThisCast.Clear();
             float damage = GetScaledDamage(burstDamage) * (1f + (burstRank - 1) * 0.05f);
             string modifier = equipment != null ? equipment.GetAbilityModifier("burst") : string.Empty;
@@ -182,6 +186,7 @@ namespace ShinobiLegacy.Combat
             if (Time.time < nextFireTime || chakra < fireCost) return;
             chakra -= fireCost;
             nextFireTime = Time.time + fireCooldown;
+            if (animationBridge != null) animationBridge.TriggerAbility();
             damagedThisCast.Clear();
             Vector3 origin = transform.position + Vector3.up * 1.1f + transform.forward * 0.6f;
             Vector3 direction = transform.forward;
@@ -216,6 +221,7 @@ namespace ShinobiLegacy.Combat
             if (Time.time < nextLightningTime || chakra < 30f) return;
             chakra -= 30f;
             nextLightningTime = Time.time + 7f;
+            if (animationBridge != null) animationBridge.TriggerAbility();
             damagedThisCast.Clear();
             Vector3 origin = transform.position + Vector3.up * 1.1f + transform.forward * 0.5f;
             float damage = GetScaledDamage(76f) * (1f + (lightningRank - 1) * 0.05f);
@@ -287,6 +293,7 @@ namespace ShinobiLegacy.Combat
             if (Time.time < nextWaterTime || chakra < 25f) return;
             chakra -= 25f;
             nextWaterTime = Time.time + 5.5f;
+            if (animationBridge != null) animationBridge.TriggerAbility();
             damagedThisCast.Clear();
             Vector3 origin = transform.position + Vector3.up * 0.7f + transform.forward * 2f;
             float damage = GetScaledDamage(43f) * (1f + (waterRank - 1) * 0.05f);
@@ -329,6 +336,7 @@ namespace ShinobiLegacy.Combat
             if (Time.time < nextWindTime || chakra < 22f) return;
             chakra -= 22f;
             nextWindTime = Time.time + 4.5f;
+            if (animationBridge != null) animationBridge.TriggerAbility();
             damagedThisCast.Clear();
             Vector3 center = transform.position + Vector3.up + transform.forward * 3.1f;
             float damage = GetScaledDamage(58f) * (1f + (windRank - 1) * 0.05f);
