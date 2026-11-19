@@ -268,7 +268,9 @@ The repository now includes an automated first-test scene and APK workflow for U
 6. Run **Tools → Shinobi Legacy → Build Android First Test APK**.
 7. The development APK is written to `Builds/Android/SHINOBI_LEGACY_FirstTest.apk`. In the running test build, the **COMBAT TEST** button switches from the village to the prototype arena, and **VILLAGE HUB** returns to the village.
 
-The first-test player is configured for landscape, ARM64, Android API 26+, Gamma color space, IL2CPP and a conservative mobile 30 FPS profile with shadows disabled. This is a development test build, not a store release.
+The first-test player is configured for landscape, ARM64, Android API 26+, automatic installed target SDK selection, Gamma color space, IL2CPP, incremental garbage collection and Android optimized frame pacing. Incremental GC spreads collection work over smaller slices, while optimized frame pacing aims to distribute frames more evenly; neither guarantees a fixed FPS on a device. The runtime target remains 30 FPS with shadows disabled. This is a development test build, not a store release.
+
+The validation step also checks that Android Build Support is installed in the Editor, both scenes have no missing-script components, the main camera is orthographic, and the EventSystem has its legacy Standalone Input Module for the current touch UI.
 
 **Build limitation:** the repository changes can be prepared here, but an actual APK cannot be claimed until Unity's Android toolchain compiles the project successfully. Check the Unity Console and Editor.log for any compile or build errors. The APK must then be installed and tested on a physical Android device; stable 30 FPS is a target, not yet a measured result.
 
