@@ -559,3 +559,10 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - The second strike deals 1.12x basic attack damage; the third strike is a heavier finisher dealing 1.35x damage and uses a slightly longer 0.72-second recovery.
 - Waiting longer than the combo window resets the sequence to the first strike. The same combo damage is used for both focused target-lock hits and the forward melee sweep.
 - This is a gameplay timing/damage pass using the current procedural attack motion. Distinct authored combo animations, hit-stop, sound, balance and Unity/Android testing remain outstanding.
+
+
+## Melee combo finisher impact
+
+- The second basic strike now applies a slightly stronger push, while the third-hit finisher applies a stronger 4.5-strength knockback with a longer 0.19-second impulse window. The existing enemy stagger system therefore gives the finisher a more noticeable interruption.
+- The finisher has its own heavier forward-swing and impact feedback: a denser particle burst and two compact impact rings. Normal attacks retain their lighter effects.
+- Damage multipliers and combo timing are unchanged. These are lightweight procedural effects and controller impulses; impact feel, stagger balance, collision behavior and mobile performance still require Unity Play Mode and Android testing.
