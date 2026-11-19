@@ -346,3 +346,7 @@ Record device model, Android version, build date, test duration, observed FPS (i
 - The equipment component is cached instead of repeatedly looked up while composing status text.
 - Health/chakra bars retain a responsive 0.15-second refresh interval, while the longer skill/status line refreshes at 0.5 seconds by default to reduce repeated string/UI work on mobile.
 - These are source-level safeguards; Unity compilation, profiler measurements and device testing are still required.
+
+## Focused basic attacks
+
+When the player has an enemy selected with the mobile target-lock control, a basic attack now prioritizes that selected enemy if it is within melee reach. If the selected enemy is out of reach or no target is selected, the existing forward-area attack remains as a fallback. This keeps target lock useful without changing the area behavior of Chakra and elemental abilities.
