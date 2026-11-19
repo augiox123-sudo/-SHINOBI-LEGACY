@@ -137,14 +137,21 @@ namespace ShinobiLegacy.Combat
         public void TriggerHit()
         {
             ShinobiProceduralMotion motion = ResolveProceduralMotion();
-            if (motion != null) motion.PlayHit();
+            if (motion != null) motion.PlayHit(1);
+            Trigger(HitHash);
+        }
+
+        public void TriggerMediumHit()
+        {
+            ShinobiProceduralMotion motion = ResolveProceduralMotion();
+            if (motion != null) motion.PlayHit(2);
             Trigger(HitHash);
         }
 
         public void TriggerHeavyHit()
         {
             ShinobiProceduralMotion motion = ResolveProceduralMotion();
-            if (motion != null) motion.PlayHit(true);
+            if (motion != null) motion.PlayHit(3);
             Trigger(HitHash);
         }
 
