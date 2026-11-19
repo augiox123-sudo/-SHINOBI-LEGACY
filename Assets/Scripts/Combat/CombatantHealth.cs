@@ -76,11 +76,24 @@ namespace ShinobiLegacy.Combat
             direction.y = 0f;
             if (direction.sqrMagnitude < 0.0001f) direction = -transform.forward;
             hitReaction.ApplyImpulse(direction, strength, duration);
+            if (strength >= 3.8f)
+            {
+                if (animationBridge != null) animationBridge.TriggerHeavyHit();
+            }
+            else if (strength >= 2.7f)
+            {
+                if (animationBridge != null) animationBridge.TriggerMediumHit();
+            }
+            else
+            {
+                if (animationBridge != null) animationBridge.TriggerHit();
+            }
+
+            // Keep the existing interruption threshold independent from visual reaction tier.
             if (strength >= 2.3f)
             {
                 float staggerDuration = Mathf.Clamp(0.12f + strength * 0.055f, 0.16f, 0.34f);
                 staggeredUntil = Mathf.Max(staggeredUntil, Time.time + staggerDuration);
-                if (animationBridge != null) animationBridge.TriggerHeavyHit();
             }
         }
 
