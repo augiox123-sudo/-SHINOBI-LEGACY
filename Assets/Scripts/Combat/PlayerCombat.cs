@@ -102,7 +102,11 @@ namespace ShinobiLegacy.Combat
         {
             float previous = chakra;
             chakra = Mathf.Min(chakraMaximum, chakra + chakraRegeneration * Time.deltaTime);
-            if (!Mathf.Approximately(previous, chakra)) ResourcesChanged?.Invoke();
+            if (!Mathf.Approximately(previous, chakra) && Time.time >= nextResourceRegenEventTime)
+            {
+                nextResourceRegenEventTime = Time.time + ResourceRegenEventInterval;
+                ResourcesChanged?.Invoke();
+            }
 
 #if UNITY_EDITOR || UNITY_STANDALONE
             if (Input.GetKeyDown(KeyCode.Space)) BasicAttack();
