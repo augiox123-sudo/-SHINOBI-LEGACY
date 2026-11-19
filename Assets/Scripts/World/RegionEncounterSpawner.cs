@@ -108,6 +108,9 @@ namespace ShinobiLegacy.World
 
         private void OnPatrolEnemyDied()
         {
+            RegionalBountySystem bounty = player != null ? player.GetComponent<RegionalBountySystem>() : null;
+            if (bounty != null) bounty.RegisterKill(regionId);
+
             activeEnemies.RemoveAll(enemy => enemy == null ||
                 enemy.GetComponent<CombatantHealth>() == null ||
                 enemy.GetComponent<CombatantHealth>().IsDead);
