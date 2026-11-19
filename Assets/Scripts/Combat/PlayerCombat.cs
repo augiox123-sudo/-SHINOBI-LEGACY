@@ -43,6 +43,7 @@ namespace ShinobiLegacy.Combat
         private EquipmentManager equipment;
         private CombatantHealth ownHealth;
         private AbilityVfxController abilityVfx;
+        private EnemyTargetLockSystem targetLock;
         [SerializeField, Range(1, 5)] private int burstRank = 1;
         [SerializeField, Range(1, 5)] private int fireRank = 1;
         [SerializeField] private int burstUses;
@@ -82,6 +83,7 @@ namespace ShinobiLegacy.Combat
             equipment = GetComponent<EquipmentManager>();
             ownHealth = GetComponent<CombatantHealth>();
             abilityVfx = GetComponent<AbilityVfxController>();
+            targetLock = GetComponent<EnemyTargetLockSystem>();
             if (abilityVfx == null) abilityVfx = gameObject.AddComponent<AbilityVfxController>();
             ResourcesChanged?.Invoke();
         }
@@ -202,11 +204,20 @@ namespace ShinobiLegacy.Combat
                         // Keep acquisition in front of the shinobi; do not select enemies behind
                         // the player just because they happen to be closer to the search sphere.
                         if (distance > 0.01f &&
-                            Vector3.Dot(transform.forward, toCandidate.normalized) >= 0.2f &&
-                            distance < nearestDistance)
+                            Vector3.Dot(transform.forward, toCandidate.normalized) >= 0.2f)
                         {
-                            nearestDistance = distance;
-                            primaryTarget = candidate;
+                            // A manually selected lock takes priority, provided it is inside
+                            // this skill's actual acquisition area and facing arc.
+                            if (targetLock != null && candidate == targetLock.CurrentTarget)
+                            {
+                                primaryTarget = candidate;
+                                nearestDistance = -1f;
+                            }
+                            else if (nearestDistance >= 0f && distance < nearestDistance)
+                            {
+                                nearestDistance = distance;
+                                primaryTarget = candidate;
+                            }
                         }
                     }
                 }
