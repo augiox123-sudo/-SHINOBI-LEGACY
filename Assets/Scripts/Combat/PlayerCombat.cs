@@ -33,6 +33,9 @@ namespace ShinobiLegacy.Combat
         private float nextAttackTime;
         private float nextBurstTime;
         private float nextFireTime;
+        private float nextLightningTime;
+        private float nextWaterTime;
+        private float nextWindTime;
         private float chakra;
         private readonly Collider[] hitBuffer = new Collider[24];
         private readonly HashSet<CombatantHealth> damagedThisCast = new HashSet<CombatantHealth>();
@@ -44,6 +47,15 @@ namespace ShinobiLegacy.Combat
         [SerializeField, Range(1, 5)] private int fireRank = 1;
         [SerializeField] private int burstUses;
         [SerializeField] private int fireUses;
+        [SerializeField, Range(1, 5)] private int lightningRank = 1;
+        [SerializeField, Range(1, 5)] private int waterRank = 1;
+        [SerializeField, Range(1, 5)] private int windRank = 1;
+        [SerializeField] private int lightningUses;
+        [SerializeField] private int waterUses;
+        [SerializeField] private int windUses;
+        public int LightningRank => lightningRank;
+        public int WaterRank => waterRank;
+        public int WindRank => windRank;
         public int BurstRank => burstRank;
         public int FireRank => fireRank;
         public int BurstUses => burstUses;
@@ -53,6 +65,9 @@ namespace ShinobiLegacy.Combat
         public float MaxChakra => chakraMaximum;
         public float BurstCooldownRemaining => Mathf.Max(0f, nextBurstTime - Time.time);
         public float FireCooldownRemaining => Mathf.Max(0f, nextFireTime - Time.time);
+        public float LightningCooldownRemaining => Mathf.Max(0f, nextLightningTime - Time.time);
+        public float WaterCooldownRemaining => Mathf.Max(0f, nextWaterTime - Time.time);
+        public float WindCooldownRemaining => Mathf.Max(0f, nextWindTime - Time.time);
         public float BurstCooldownDuration => burstCooldown;
         public float FireCooldownDuration => fireCooldown;
         public event Action ResourcesChanged;
@@ -153,6 +168,96 @@ namespace ShinobiLegacy.Combat
         }
 
 
+        public void CastLightningStyle()
+        {
+            if (Time.time < nextLightningTime || chakra < 30f) return;
+            chakra -= 30f;
+            nextLightningTime = Time.time + 7f;
+            damagedThisCast.Clear();
+            Vector3 origin = transform.position + Vector3.up * 1.1f + transform.forward * 0.5f;
+            float damage = GetScaledDamage(76f) * (1f + (lightningRank - 1) * 0.05f);
+            if (Physics.SphereCast(origin, 0.85f, transform.forward, out RaycastHit hit, 10f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
+                CombatantHealth target = hit.collider.GetComponentInParent<CombatantHealth>();
+                if (target != null && target.transform != transform)
+                {
+                    ApplyDamageOnce(target, damage, false);
+                    target.ApplyStun(1.1f);
+                    if (abilityVfx != null) abilityVfx.PlayLightning(origin, target.transform.position + Vector3.up);
+                }
+            }
+            RecordElementUse(0);
+            ResourcesChanged?.Invoke();
+        }
+
+        public void CastWaterStyle()
+        {
+            if (Time.time < nextWaterTime || chakra < 25f) return;
+            chakra -= 25f;
+            nextWaterTime = Time.time + 5.5f;
+            damagedThisCast.Clear();
+            Vector3 origin = transform.position + Vector3.up * 0.7f + transform.forward * 2f;
+            float damage = GetScaledDamage(43f) * (1f + (waterRank - 1) * 0.05f);
+            for (int step = 0; step < 3; step++)
+            {
+                Vector3 center = origin + transform.forward * (step * 2.3f);
+                int count = Physics.OverlapSphereNonAlloc(center, 1.65f + step * 0.15f, hitBuffer, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+                for (int i = 0; i < count; i++)
+                {
+                    Collider hit = hitBuffer[i];
+                    if (hit != null)
+                    {
+                        CombatantHealth target = hit.GetComponentInParent<CombatantHealth>();
+                        if (target != null && target.transform != transform && !target.IsDead)
+                        {
+                            ApplyDamageOnce(target, damage, false);
+                            target.ApplyStun(0.22f);
+                        }
+                    }
+                    hitBuffer[i] = null;
+                }
+            }
+            if (abilityVfx != null) abilityVfx.PlayWater(origin, transform.forward, 7f);
+            RecordElementUse(1);
+            ResourcesChanged?.Invoke();
+        }
+
+        public void CastWindStyle()
+        {
+            if (Time.time < nextWindTime || chakra < 22f) return;
+            chakra -= 22f;
+            nextWindTime = Time.time + 4.5f;
+            damagedThisCast.Clear();
+            Vector3 center = transform.position + Vector3.up + transform.forward * 3.1f;
+            float damage = GetScaledDamage(58f) * (1f + (windRank - 1) * 0.05f);
+            int count = Physics.OverlapSphereNonAlloc(center, 3.1f, hitBuffer, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < count; i++)
+            {
+                Collider hit = hitBuffer[i];
+                if (hit != null)
+                {
+                    CombatantHealth target = hit.GetComponentInParent<CombatantHealth>();
+                    if (target != null && target.transform != transform && !target.IsDead)
+                    {
+                        ApplyDamageOnce(target, damage, false);
+                        target.ApplyStun(0.18f);
+                    }
+                }
+                hitBuffer[i] = null;
+            }
+            if (abilityVfx != null) abilityVfx.PlayWind(center, transform.forward);
+            RecordElementUse(2);
+            ResourcesChanged?.Invoke();
+        }
+
+        private void RecordElementUse(int element)
+        {
+            if (element == 0) { lightningUses++; if (lightningRank < 5 && lightningUses >= lightningRank * 20) lightningRank++; }
+            else if (element == 1) { waterUses++; if (waterRank < 5 && waterUses >= waterRank * 20) waterRank++; }
+            else { windUses++; if (windRank < 5 && windUses >= windRank * 20) windRank++; }
+            AbilityProgressChanged?.Invoke();
+        }
+
         private void FireRay(Vector3 origin, Vector3 direction, float damage, float radius, bool applyBurn)
         {
             if (Physics.SphereCast(origin, radius, direction, out RaycastHit hit, fireRange,
@@ -249,12 +354,20 @@ namespace ShinobiLegacy.Combat
             AbilityProgressChanged?.Invoke();
         }
 
-        public void RestoreAbilityProgress(int savedBurstRank, int savedFireRank, int savedBurstUses, int savedFireUses)
+        public void RestoreAbilityProgress(int savedBurstRank, int savedFireRank, int savedBurstUses, int savedFireUses,
+            int savedLightningRank = 1, int savedWaterRank = 1, int savedWindRank = 1,
+            int savedLightningUses = 0, int savedWaterUses = 0, int savedWindUses = 0)
         {
             burstRank = Mathf.Clamp(savedBurstRank, 1, 5);
             fireRank = Mathf.Clamp(savedFireRank, 1, 5);
             burstUses = Mathf.Max(0, savedBurstUses);
             fireUses = Mathf.Max(0, savedFireUses);
+            lightningRank = Mathf.Clamp(savedLightningRank, 1, 5);
+            waterRank = Mathf.Clamp(savedWaterRank, 1, 5);
+            windRank = Mathf.Clamp(savedWindRank, 1, 5);
+            lightningUses = Mathf.Max(0, savedLightningUses);
+            waterUses = Mathf.Max(0, savedWaterUses);
+            windUses = Mathf.Max(0, savedWindUses);
         }
 
         private float GetScaledDamage(float baseDamage)
