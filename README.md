@@ -247,3 +247,7 @@ Boss wind-up attacks now display a pulsing ground ring before impact. The ring r
 ## Enemy hit reactions
 
 Standard enemies now react visibly when damaged. Their renderers briefly flash using a shared `MaterialPropertyBlock` rather than creating new materials, then restore their original material colors. Repeated hits restart the short flash sequence. This is a lightweight first-pass combat feedback effect; final authored hit animations and impact VFX are still planned.
+
+## Target-lock combat integration
+
+The mobile target-lock system can cycle nearby enemies and display the selected target with its health bar. Lightning Style now prioritizes that manually selected enemy when it is inside the skill's valid search area and forward-facing arc; otherwise it falls back to the nearest eligible enemy. This keeps the lock useful without allowing attacks through the full map or behind the player.
