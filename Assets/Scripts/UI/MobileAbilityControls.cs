@@ -19,6 +19,7 @@ namespace ShinobiLegacy.UI
         [SerializeField] private float spacing = 14f;
         private Canvas controlsCanvas;
         private EnemyTargetLockSystem targetLock;
+        private PlayerDodge playerDodge;
         private readonly List<CooldownWidget> cooldownWidgets = new List<CooldownWidget>(6);
         private float nextCooldownRefresh;
 
@@ -37,6 +38,7 @@ namespace ShinobiLegacy.UI
             if (combat == null) combat = GetComponent<PlayerCombat>();
             if (combat == null) return;
             targetLock = GetComponent<EnemyTargetLockSystem>();
+            playerDodge = GetComponent<PlayerDodge>();
             EnsureEventSystem();
             BuildControls();
         }
@@ -67,6 +69,9 @@ namespace ShinobiLegacy.UI
                 () => combat.WindCooldownRemaining, () => combat.WindCooldownDuration, () => combat.HasChakraForWind);
             if (targetLock != null)
                 CreateButton("TARGET", 6, () => targetLock.CycleTarget(), new Color(0.72f, 0.42f, 0.12f, 0.94f));
+            if (playerDodge != null)
+                CreateButton("DODGE", 7, () => playerDodge.TryDodge(), new Color(0.18f, 0.58f, 0.38f, 0.94f),
+                    () => playerDodge.CooldownRemaining, () => playerDodge.CooldownDuration, null);
         }
 
         private void CreateButton(string label, int index, UnityEngine.Events.UnityAction action, Color color,
