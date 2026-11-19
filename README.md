@@ -368,3 +368,7 @@ Chakra regeneration notifications are throttled to a 0.15-second interval instea
 ## Enemy hit-flash efficiency
 
 Enemy damage feedback now iterates renderer arrays by index and reuses the precomputed color-support flags directly. This removes a repeated linear `Array.IndexOf` lookup for each renderer during each hit-flash update while preserving MaterialPropertyBlock-based color changes (no per-hit material instance creation).
+
+## Boss visual material efficiency
+
+Boss color changes now use a cached `MaterialPropertyBlock` and the shader's supported `_BaseColor` or `_Color` property. The boss AI no longer accesses `Renderer.material` during combat, avoiding an unnecessary per-boss material instance while keeping phase, attack-warning, and stun color feedback.
