@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ShinobiLegacy.World
 {
-    [RequireComponent(typeof(SphereCollider))]
+    [RequireComponent(typeof(SphereCollider), typeof(Rigidbody))]
     public sealed class FastTravelPoint : MonoBehaviour
     {
         public string pointId = "village_gate";
@@ -18,6 +18,9 @@ namespace ShinobiLegacy.World
             SphereCollider trigger = GetComponent<SphereCollider>();
             trigger.isTrigger = true;
             trigger.radius = unlockRadius;
+            Rigidbody body = GetComponent<Rigidbody>();
+            body.isKinematic = true;
+            body.useGravity = false;
         }
 
         private void OnTriggerEnter(Collider other)
