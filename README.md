@@ -160,3 +160,13 @@ This is still a Unity source prototype. It has not yet been compiled or tested i
 - Loading restores the saved level/XP and reapplies the character's level-based maximum-health bonuses.
 - XP/level changes trigger an immediate local save; the existing periodic and app-pause saves remain in place.
 - `Equip Best` now compares each candidate against the currently equipped item in the same slot and equips only a genuine power upgrade. It no longer picks a high-power item from an unrelated slot or replaces stronger gear with weaker gear.
+
+
+## Regional world progression and expedition zones
+
+- The Safe Village generator now lays out four distant expedition outposts: **Ashen Ruins**, **Verdant Forest**, **Thunder Shrine** and **Drowned Temple**. Each has a themed blockout terrain area, boundary stones, dungeon altar, boss monument and a named destination marker.
+- Region access is level-gated: Ashen Ruins (5), Verdant Forest (10), Thunder Shrine (18) and Drowned Temple (28). Unlocks are stored locally and appear on the world map.
+- The world map now spans the village and all four regional outposts. Regional fast-travel points become available when their region unlocks.
+- Entering an unlocked region activates a three-enemy patrol. Clearing the patrol summons a stronger regional champion with a guaranteed item drop and a 12% legendary chance. The patrol cycle can respawn after the player leaves the area and the respawn delay passes.
+- Regional bounty contracts can be accepted from the world map. One contract can be active at a time; defeat 10 enemies in the selected region to receive level-scaled coins and XP. Contract progress is stored locally.
+- These regions and encounters are functional source-level blockouts. They still need authored 3D environments, unique enemy/boss models, animations, audio, and full Unity runtime validation.
