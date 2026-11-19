@@ -52,7 +52,13 @@ namespace ShinobiLegacy.UI
                 string fire = combat.FireCooldownRemaining > 0f
                     ? combat.FireCooldownRemaining.ToString("0.0") + "s"
                     : "READY";
-                statusText.text = "CHAKRA BURST: " + burst + "    FIRE STYLE: " + fire;
+                EquipmentManager gear = combat.GetComponent<EquipmentManager>();
+                string burstMod = gear != null ? gear.GetAbilityModifier("burst") : string.Empty;
+                string fireMod = gear != null ? gear.GetAbilityModifier("fire") : string.Empty;
+                statusText.text = "BURST R" + combat.BurstRank + ": " + burst +
+                    (string.IsNullOrEmpty(burstMod) ? "" : " [" + burstMod + "]") +
+                    "    FIRE R" + combat.FireRank + ": " + fire +
+                    (string.IsNullOrEmpty(fireMod) ? "" : " [" + fireMod + "]");
             }
         }
 
