@@ -9,6 +9,7 @@ namespace ShinobiLegacy.Player
         [SerializeField] private float rotationSpeed = 720f;
         [SerializeField] private Transform cameraTransform;
         private CharacterController controller;
+        private ShinobiLegacy.Combat.CombatAnimationBridge animationBridge;
         private Vector2 externalMoveInput;
         private bool movementEnabled = true;
 
@@ -21,6 +22,8 @@ namespace ShinobiLegacy.Player
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
+            animationBridge = GetComponent<ShinobiLegacy.Combat.CombatAnimationBridge>();
+            if (animationBridge == null) animationBridge = gameObject.AddComponent<ShinobiLegacy.Combat.CombatAnimationBridge>();
             if (cameraTransform == null && Camera.main != null)
                 cameraTransform = Camera.main.transform;
         }
@@ -58,6 +61,7 @@ namespace ShinobiLegacy.Player
             Vector3 direction = right * input.x + forward * input.y;
             if (direction.sqrMagnitude > 1f) direction.Normalize();
 
+            if (animationBridge != null) animationBridge.SetMoveSpeed(direction.magnitude * moveSpeed);
             Vector3 velocity = direction * moveSpeed;
             velocity.y = -2f;
             controller.Move(velocity * Time.deltaTime);
