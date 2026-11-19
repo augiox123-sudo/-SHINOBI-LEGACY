@@ -39,6 +39,7 @@ namespace ShinobiLegacy.Enemies
         private bool[] supportsLegacyColor;
         private MaterialPropertyBlock hitBlock;
         private Coroutine hitFlashRoutine;
+        private readonly RaycastHit[] meleeHitBuffer = new RaycastHit[16];
         private static readonly int BaseColorProperty = Shader.PropertyToID("_BaseColor");
         private static readonly int ColorProperty = Shader.PropertyToID("_Color");
 
@@ -156,7 +157,9 @@ namespace ShinobiLegacy.Enemies
                 return;
             }
 
-            if (distance > 0.05f)
+            // Lock the attack direction once the windup starts. The player can evade
+            // by moving outside the committed strike arc before the hit resolves.
+            if (!attackPending && distance > 0.05f)
             {
                 Quaternion desired = Quaternion.LookRotation(offset.normalized, Vector3.up);
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, desired, turnSpeed * Time.deltaTime);
@@ -172,9 +175,7 @@ namespace ShinobiLegacy.Enemies
                     if (target != null)
                     {
                         CombatantHealth liveTarget = target.GetComponent<CombatantHealth>();
-                        Vector3 check = target.position - transform.position;
-                        check.y = 0f;
-                        if (liveTarget != null && !liveTarget.IsDead && check.magnitude <= attackRange + 0.25f)
+                        if (liveTarget != null && !liveTarget.IsDead && IsMeleeStrikeValid(liveTarget))
                         {
                             if (animationBridge != null) animationBridge.PlayAttack();
                             liveTarget.TakeDamage(attackDamage);
@@ -226,6 +227,62 @@ namespace ShinobiLegacy.Enemies
                 attackWindupRemaining = attackWindup;
                 if (animationBridge != null) animationBridge.PlayWindup(behavior == 2);
             }
+        }
+
+        private bool IsMeleeStrikeValid(CombatantHealth liveTarget)
+        {
+            Collider targetCollider = liveTarget.GetComponent<Collider>();
+            if (targetCollider == null) targetCollider = liveTarget.GetComponentInChildren<Collider>();
+            Vector3 strikeOrigin = transform.position + Vector3.up * 1.0f + transform.forward * 0.35f;
+            Vector3 targetPoint = targetCollider != null
+                ? targetCollider.ClosestPoint(strikeOrigin)
+                : liveTarget.transform.position + Vector3.up * 0.85f;
+
+            Vector3 toTarget = targetPoint - strikeOrigin;
+            float verticalGap = Mathf.Abs(toTarget.y);
+            Vector3 horizontal = new Vector3(toTarget.x, 0f, toTarget.z);
+            float reach = attackRange + 0.18f;
+            if (verticalGap > 1.5f || horizontal.magnitude > reach) return false;
+
+            Vector3 direction = horizontal.sqrMagnitude > 0.0001f
+                ? horizontal.normalized
+                : transform.forward;
+            if (Vector3.Dot(transform.forward, direction) < 0.35f) return false;
+
+            // Ignore this enemy's own colliders, but let walls and other solid
+            // objects block the strike. The closest valid hit must belong to target.
+            float rayDistance = toTarget.magnitude;
+            if (rayDistance > 0.05f)
+            {
+                int hitCount = Physics.RaycastNonAlloc(
+                    strikeOrigin,
+                    toTarget.normalized,
+                    meleeHitBuffer,
+                    rayDistance + 0.08f,
+                    Physics.DefaultRaycastLayers,
+                    QueryTriggerInteraction.Ignore);
+
+                float nearestDistance = float.MaxValue;
+                Transform nearestTransform = null;
+                for (int i = 0; i < hitCount; i++)
+                {
+                    Collider hitCollider = meleeHitBuffer[i].collider;
+                    if (hitCollider == null || hitCollider.transform == transform ||
+                        hitCollider.transform.IsChildOf(transform)) continue;
+
+                    if (meleeHitBuffer[i].distance < nearestDistance)
+                    {
+                        nearestDistance = meleeHitBuffer[i].distance;
+                        nearestTransform = hitCollider.transform;
+                    }
+                }
+
+                if (nearestTransform != null &&
+                    nearestTransform != liveTarget.transform &&
+                    !nearestTransform.IsChildOf(liveTarget.transform)) return false;
+            }
+
+            return true;
         }
 
         private void OnHealthChanged(float current, float maximum)
