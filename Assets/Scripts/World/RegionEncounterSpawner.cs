@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using ShinobiLegacy.Combat;
 using ShinobiLegacy.Enemies;
+using ShinobiLegacy.Items;
 using ShinobiLegacy.Player;
 
 namespace ShinobiLegacy.World
