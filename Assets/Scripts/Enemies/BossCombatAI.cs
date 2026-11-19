@@ -60,7 +60,7 @@ namespace ShinobiLegacy.Enemies
             {
                 windingUp = false;
                 windupRemaining = 0f;
-                if (bodyRenderer != null) bodyRenderer.material.color = baseColor;
+                if (bodyRenderer != null) bodyRenderer.material.color = phaseTwo ? ProfileColor() : baseColor;
                 return;
             }
 
@@ -180,7 +180,7 @@ namespace ShinobiLegacy.Enemies
         private void OnDied()
         {
             windingUp = false;
-            if (bodyRenderer != null) bodyRenderer.material.color = baseColor;
+            if (bodyRenderer != null) bodyRenderer.material.color = phaseTwo ? ProfileColor() : baseColor;
             enabled = false;
             controller.enabled = false;
             Destroy(gameObject, 2f);
