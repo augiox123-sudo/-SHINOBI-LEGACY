@@ -120,6 +120,8 @@ namespace ShinobiLegacy.Editor
             player.name = "Player_Village_Hub";
             player.transform.position = new Vector3(0f, 1f, -58f);
             player.GetComponent<Renderer>().sharedMaterial = accentMat;
+            player.GetComponent<Renderer>().enabled = false;
+            ShinobiCharacterVisualBuilder.BuildPlayer(player.transform);
             Object.DestroyImmediate(player.GetComponent<CapsuleCollider>());
             CharacterController playerController = player.AddComponent<CharacterController>();
             playerController.height = 2f;
