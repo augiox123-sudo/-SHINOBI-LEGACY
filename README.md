@@ -403,3 +403,5 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - Added an optional `CombatAnimationBridge` that connects gameplay events to an authored Unity Animator Controller through `MoveSpeed`, `IsAttacking`, `IsDead`, `Attack`, `Hit`, and `Ability` parameters.
 - The bridge checks which parameter names and types actually exist before setting them, and safely does nothing when a character has no Animator or controller.
 - Player movement and combat, combatant hit/death events, and enemy/boss movement and attacks now feed the bridge. This is an integration layer only: animation clips, rigged 3D character models, and Animator Controller assets still need to be authored and assigned.
+
+- Animator attack state is now driven through a timed `IsAttacking` boolean (when that parameter exists) alongside the `Attack` trigger. The state automatically resets after the attack window and is cleared if the bridge is disabled or the character dies.
