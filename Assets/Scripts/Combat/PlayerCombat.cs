@@ -419,6 +419,9 @@ namespace ShinobiLegacy.Combat
         private void ApplyDamageOnce(CombatantHealth target, float damage, bool applyBurn)
         {
             if (target == null || target.IsDead || !damagedThisCast.Add(target)) return;
+            if (equipment == null) equipment = GetComponent<EquipmentManager>();
+            bool critical = equipment != null && UnityEngine.Random.value < equipment.CriticalChance;
+            if (critical) damage *= equipment.CriticalDamageMultiplier;
             target.TakeDamage(damage);
             if (applyBurn && !target.IsDead) target.ApplyBurn(Mathf.Max(2f, damage * 0.08f), 3f, 1f);
         }
