@@ -65,6 +65,8 @@ namespace ShinobiLegacy.Combat
         public int BurstUses => burstUses;
         public int FireUses => fireUses;
 
+        public float BasicAttackCooldownRemaining => Mathf.Max(0f, nextAttackTime - Time.time);
+        public float BasicAttackCooldownDuration => attackCooldown;
         public float Chakra => chakra;
         public float MaxChakra => chakraMaximum;
         public float BurstCooldownRemaining => Mathf.Max(0f, nextBurstTime - Time.time);
@@ -72,6 +74,14 @@ namespace ShinobiLegacy.Combat
         public float LightningCooldownRemaining => Mathf.Max(0f, nextLightningTime - Time.time);
         public float WaterCooldownRemaining => Mathf.Max(0f, nextWaterTime - Time.time);
         public float WindCooldownRemaining => Mathf.Max(0f, nextWindTime - Time.time);
+        public float LightningCooldownDuration => 7f;
+        public float WaterCooldownDuration => 5.5f;
+        public float WindCooldownDuration => 4.5f;
+        public bool HasChakraForBurst => chakra >= burstCost;
+        public bool HasChakraForFire => chakra >= fireCost;
+        public bool HasChakraForLightning => chakra >= 30f;
+        public bool HasChakraForWater => chakra >= 25f;
+        public bool HasChakraForWind => chakra >= 22f;
         public float BurstCooldownDuration => burstCooldown;
         public float FireCooldownDuration => fireCooldown;
         public event Action ResourcesChanged;
