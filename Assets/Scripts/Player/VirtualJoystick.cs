@@ -37,8 +37,12 @@ namespace ShinobiLegacy.Player
                 return;
 
             float radius = Mathf.Min(background.rect.width, background.rect.height) * 0.5f;
-            input = Vector2.ClampMagnitude(localPoint / Mathf.Max(1f, radius), 1f);
-            if (input.magnitude < deadZone) input = Vector2.zero;
+            Vector2 rawInput = Vector2.ClampMagnitude(localPoint / Mathf.Max(1f, radius), 1f);
+            float inputMagnitude = rawInput.magnitude;
+            if (inputMagnitude <= deadZone)
+                input = Vector2.zero;
+            else
+                input = rawInput.normalized * Mathf.InverseLerp(deadZone, 1f, inputMagnitude);
 
             handle.anchoredPosition = input * radius * 0.62f;
             player.MoveInput = input;
