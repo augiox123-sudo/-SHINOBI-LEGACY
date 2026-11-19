@@ -477,3 +477,11 @@ The shared `MobileAbilityControls.CreateButton` method now makes cooldown and re
 - A short additive camera shake is applied only when the player remains inside a damaging impact zone; a successful dodge still shows the boss impact without shaking the camera.
 - The shake is capped at a low intensity and short duration, and runs after the isometric follow camera so it does not permanently alter the follow offset.
 - This is lightweight procedural feedback, not final authored VFX. Visual layering, camera comfort, Unity compilation and Redmi 13C performance still require Play Mode and device testing.
+
+
+## Directional hit knockback
+
+- Successful player skill hits now apply a short, low-force push away from the player to surviving enemies.
+- Enemy melee attacks and Stone Guardian slam/phase-two damaging specials apply a stronger, brief push away from the attacker to the player.
+- Knockback is handled by a small `CharacterController` component in `LateUpdate`, after normal movement/AI updates, with capped strength and duration. It does not apply to defeated targets or the Verdant boss heal.
+- Existing procedural hit animation and enemy hit flash remain in place. The knockback is a first-pass gameplay reaction; collision feel, attack interruption and device behavior still need Unity Play Mode and Android testing.
