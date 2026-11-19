@@ -66,7 +66,11 @@ namespace ShinobiLegacy.World
             GUILayout.Label("REGIONAL ACCESS");
             WorldRegionProgression regionProgression = GetComponent<WorldRegionProgression>();
             PlayerProgression playerProgression = GetComponent<PlayerProgression>();
+            RegionalBountySystem bountySystem = GetComponent<RegionalBountySystem>();
             int playerLevel = playerProgression != null ? playerProgression.Level : 1;
+            if (bountySystem != null && bountySystem.HasContract)
+                GUILayout.Label("ACTIVE BOUNTY: " + bountySystem.ActiveRegion.ToUpper() +
+                    "  |  " + bountySystem.Kills + "/" + bountySystem.KillsRequired + " HUNTS");
             foreach (WorldRegionProgression.Region region in WorldRegionProgression.Regions)
             {
                 bool unlocked = regionProgression != null && regionProgression.IsUnlocked(region.id);
@@ -80,6 +84,20 @@ namespace ShinobiLegacy.World
                     "\n" + access + "  |  RECOMMENDED LEVEL " + region.requiredLevel +
                     "\nDUNGEON: " + region.dungeonName + "  |  BOSS: " + region.bossName,
                     GUILayout.ExpandWidth(true), GUILayout.Height(82f));
+
+                if (unlocked && bountySystem != null)
+                {
+                    if (bountySystem.HasContract && bountySystem.ActiveRegion == region.id)
+                        GUILayout.Label(bountySystem.Kills + "/" + bountySystem.KillsRequired,
+                            GUILayout.Width(68f));
+                    else if (!bountySystem.HasContract)
+                    {
+                        if (GUILayout.Button("HUNT", GUILayout.Width(82f), GUILayout.Height(54f)))
+                            bountySystem.AcceptContract(region.id);
+                    }
+                    else
+                        GUILayout.Label("BUSY", GUILayout.Width(68f));
+                }
                 GUILayout.EndHorizontal();
             }
 
