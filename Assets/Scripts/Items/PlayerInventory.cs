@@ -11,6 +11,17 @@ namespace ShinobiLegacy.Items
         public IReadOnlyList<InventoryItem> Items => items;
         public int Count => items.Count;
         public event Action<InventoryItem> ItemAdded;
+        public event Action<InventoryItem> ItemEquipped;
+
+        public bool EquipAt(int index, EquipmentManager equipment)
+        {
+            if (equipment == null || index < 0 || index >= items.Count) return false;
+            InventoryItem item = items[index];
+            if (!equipment.Equip(item)) return false;
+            items.RemoveAt(index);
+            ItemEquipped?.Invoke(item);
+            return true;
+        }
 
         public bool Add(InventoryItem item)
         {
